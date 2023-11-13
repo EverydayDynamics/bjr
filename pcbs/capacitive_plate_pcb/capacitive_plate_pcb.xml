@@ -1,0 +1,1426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>C:\Users\tamas\Documents\bjr\pcbs\capacitive_plate_pcb\capacitive_plate_pcb.kicad_sch</source>
+    <date>11/11/2023 01:08:53</date>
+    <tool>Eeschema 7.0.8</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>capacitive_plate_pcb.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>10nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H103KT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H103KT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H103KT?qs=Jm2GQyTW%2Fbg6jbH8a6Ap5w%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H103KT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H103KT?qs=Jm2GQyTW%2Fbg6jbH8a6Ap5w%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H103KT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>8769cdea-e7f1-4ccd-a53e-2be09af73068</tstamps>
+    </comp>
+    <comp ref="C2">
+      <value>1uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">06035C105KAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-06035C105KAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06035C105KAT2A?qs=%252BdQmOuGyFcGCdIIWh6fU7Q%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-06035C105KAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06035C105KAT2A?qs=%252BdQmOuGyFcGCdIIWh6fU7Q%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="06035C105KAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>08917bb7-54b7-4a51-9045-9e99b65a5030</tstamps>
+    </comp>
+    <comp ref="C3">
+      <value>22nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H223JT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H223JT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H223JT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H223JT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>defb1438-2f35-42cb-8820-10695d3ca08d</tstamps>
+    </comp>
+    <comp ref="C4">
+      <value>2.2nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H222KT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H222KT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H222KT?qs=Jm2GQyTW%2FbihXQsBriFUBg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H222KT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H222KT?qs=Jm2GQyTW%2FbihXQsBriFUBg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H222KT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>acadce9d-80a9-42d3-aa4f-e737a44071fc</tstamps>
+    </comp>
+    <comp ref="C5">
+      <value>22nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H223JT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H223JT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H223JT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H223JT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c8865b1a-19de-4b41-a4b4-75c6bf675c88</tstamps>
+    </comp>
+    <comp ref="C6">
+      <value>2.2uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">08053C225JAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-08053C225JAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-08053C225JAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="08053C225JAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>703a94c0-7f47-493e-9e3b-edd7c87af5ae</tstamps>
+    </comp>
+    <comp ref="C7">
+      <value>22nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H223JT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H223JT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H223JT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H223JT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>45c7215e-9996-47d3-8650-ef9c178a2ceb</tstamps>
+    </comp>
+    <comp ref="C8">
+      <value>2.2uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">08053C225JAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-08053C225JAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-08053C225JAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="08053C225JAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>a771b6af-2ee1-439f-a628-ccbff7236008</tstamps>
+    </comp>
+    <comp ref="C9">
+      <value>22nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H223JT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H223JT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H223JT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H223JT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>aed6123b-3690-43f4-973d-e1f753c18645</tstamps>
+    </comp>
+    <comp ref="C10">
+      <value>1uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">06035C105KAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-06035C105KAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06035C105KAT2A?qs=%252BdQmOuGyFcGCdIIWh6fU7Q%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-06035C105KAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06035C105KAT2A?qs=%252BdQmOuGyFcGCdIIWh6fU7Q%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="06035C105KAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>592372e5-5661-4b26-9a35-67171f94f096</tstamps>
+    </comp>
+    <comp ref="C11">
+      <value>22nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H223JT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H223JT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H223JT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H223JT?qs=Jm2GQyTW%2Fbig4dazQ2H7jw%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H223JT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0cbe5073-2ac4-4dde-81b7-fe8ce6dbfd4c</tstamps>
+    </comp>
+    <comp ref="C12">
+      <value>10n</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KGM15AR71H103KT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KGM15AR71H103KT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H103KT?qs=Jm2GQyTW%2Fbg6jbH8a6Ap5w%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KGM15AR71H103KT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KGM15AR71H103KT?qs=Jm2GQyTW%2Fbg6jbH8a6Ap5w%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KGM15AR71H103KT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>18f1ac2e-4110-48b8-8347-bb0c8382b605</tstamps>
+    </comp>
+    <comp ref="C13">
+      <value>4.7uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">06033D475KAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-06033D475KAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06033D475KAT2A?qs=%252BdQmOuGyFcGbOJhHeHDf%2Fg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-06033D475KAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06033D475KAT2A?qs=%252BdQmOuGyFcGbOJhHeHDf%2Fg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="06033D475KAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>35593567-6679-40d9-951a-a65067ffdee0</tstamps>
+    </comp>
+    <comp ref="C14">
+      <value>100n</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">KAM15AR71H104KT</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-KAM15AR71H104KT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KAM15AR71H104KT?qs=Jm2GQyTW%2Fbh2%2FGRPGE98wA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-KAM15AR71H104KT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/KAM15AR71H104KT?qs=Jm2GQyTW%2Fbh2%2FGRPGE98wA%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="KAM15AR71H104KT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>5d33c795-9d77-470e-8d80-285d141578d3</tstamps>
+    </comp>
+    <comp ref="C15">
+      <value>2.2uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">08053C225JAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-08053C225JAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-08053C225JAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/08053C225JAT2A?qs=%252BdQmOuGyFcHDZrTyjgfUWg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="08053C225JAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6be6839e-b29a-469a-a319-ead1d596840d</tstamps>
+    </comp>
+    <comp ref="C16">
+      <value>4.7uF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">KYOCERA AVX</field>
+        <field name="Manufacturer number">06033D475KAT2A</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">581-06033D475KAT2A</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06033D475KAT2A?qs=%252BdQmOuGyFcGbOJhHeHDf%2Fg%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="581-06033D475KAT2A"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/KYOCERA-AVX/06033D475KAT2A?qs=%252BdQmOuGyFcGbOJhHeHDf%2Fg%3D%3D"/>
+      <property name="Manufacturer" value="KYOCERA AVX"/>
+      <property name="Manufacturer number" value="06033D475KAT2A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ed351908-1e91-4877-8678-5ac92058b3f9</tstamps>
+    </comp>
+    <comp ref="J1">
+      <value>BM09B-SRSS-TB_LF__SN_</value>
+      <footprint>bjr_footprint_lib:JST_BM09B-SRSS-TB_LF__SN_</footprint>
+      <fields>
+        <field name="Manufacturer">JST</field>
+        <field name="Manufacturer number">BM09B-SRSS-TB(LF)(SN)</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">1679135</field>
+        <field name="Supplier website">https://uk.farnell.com/jst-japan-solderless-terminals/bm09b-srss-tb-lf-sn/header-top-entry-9way/dp/1679135?ost=bm09b-srss-tb_lf__sn_</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="BM09B-SRSS-TB_LF__SN_" description=""/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="1679135"/>
+      <property name="Supplier website" value="https://uk.farnell.com/jst-japan-solderless-terminals/bm09b-srss-tb-lf-sn/header-top-entry-9way/dp/1679135?ost=bm09b-srss-tb_lf__sn_"/>
+      <property name="Manufacturer" value="JST"/>
+      <property name="Manufacturer number" value="BM09B-SRSS-TB(LF)(SN)"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e699ecdd-8802-4f1d-a92c-bce9449469d6</tstamps>
+    </comp>
+    <comp ref="J2">
+      <value>SM08B-SRSS-TB_LF__SN_</value>
+      <footprint>bjr_footprint_lib:JST_SM08B-SRSS-TB_LF__SN_</footprint>
+      <fields>
+        <field name="Manufacturer">JST</field>
+        <field name="Manufacturer number">SM08B-SRSS-TB(LF)(SN)</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">1679124</field>
+        <field name="Supplier website">https://uk.farnell.com/jst-japan-solderless-terminals/sm08b-srss-tb-lf-sn/header-r-a-8way/dp/1679124?ost=sm08b-srss-tb_lf__sn_</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SM08B-SRSS-TB_LF__SN_" description=""/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="1679124"/>
+      <property name="Supplier website" value="https://uk.farnell.com/jst-japan-solderless-terminals/sm08b-srss-tb-lf-sn/header-r-a-8way/dp/1679124?ost=sm08b-srss-tb_lf__sn_"/>
+      <property name="Manufacturer" value="JST"/>
+      <property name="Manufacturer number" value="SM08B-SRSS-TB(LF)(SN)"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2fa0ca87-d0d1-4af6-80cd-deb823cf54cc</tstamps>
+    </comp>
+    <comp ref="JP1">
+      <value>SolderJumper_2_Open</value>
+      <footprint>Jumper:SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm</footprint>
+      <libsource lib="Jumper" part="SolderJumper_2_Open" description="Solder Jumper, 2-pole, open"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Solder Jumper, 2-pole, open"/>
+      <property name="ki_keywords" value="solder jumper SPST"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f8bdeb44-0498-4157-86a9-ea790c55c593</tstamps>
+    </comp>
+    <comp ref="JP2">
+      <value>Jumper_2_Bridged</value>
+      <footprint>Jumper:SolderJumper-2_P1.3mm_Bridged2Bar_RoundedPad1.0x1.5mm</footprint>
+      <libsource lib="Jumper" part="Jumper_2_Bridged" description="Jumper, 2-pole, closed/bridged"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Jumper, 2-pole, closed/bridged"/>
+      <property name="ki_keywords" value="Jumper SPST"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>1a413608-fe28-41c7-8584-7207d34e4e69</tstamps>
+    </comp>
+    <comp ref="M1">
+      <value>~</value>
+      <footprint>bjr_footprint_lib:WURTH ELEKTRONIK 9774010151R</footprint>
+      <fields>
+        <field name="Manufacturer">Wurth electronik</field>
+        <field name="Manufacturer number">9774010151R</field>
+        <field name="Name">SMT_Standoff_WURTH_9774010151R</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">2766287</field>
+        <field name="Supplier website">https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SMT_Standoff_WURTH_9774010151R" description=""/>
+      <property name="Name" value="SMT_Standoff_WURTH_9774010151R"/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="2766287"/>
+      <property name="Supplier website" value="https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r"/>
+      <property name="Manufacturer" value="Wurth electronik"/>
+      <property name="Manufacturer number" value="9774010151R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3cb4bf75-c534-4934-9386-31ab307b30de</tstamps>
+    </comp>
+    <comp ref="M2">
+      <value>~</value>
+      <footprint>bjr_footprint_lib:WURTH ELEKTRONIK 9774010151R</footprint>
+      <fields>
+        <field name="Manufacturer">Wurth electronik</field>
+        <field name="Manufacturer number">9774010151R</field>
+        <field name="Name">SMT_Standoff_WURTH_9774010151R</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">2766287</field>
+        <field name="Supplier website">https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SMT_Standoff_WURTH_9774010151R" description=""/>
+      <property name="Name" value="SMT_Standoff_WURTH_9774010151R"/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="2766287"/>
+      <property name="Supplier website" value="https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r"/>
+      <property name="Manufacturer" value="Wurth electronik"/>
+      <property name="Manufacturer number" value="9774010151R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e0ab0d81-3c6f-4230-b917-c900377899cd</tstamps>
+    </comp>
+    <comp ref="M3">
+      <value>~</value>
+      <footprint>bjr_footprint_lib:WURTH ELEKTRONIK 9774010151R</footprint>
+      <fields>
+        <field name="Manufacturer">Wurth electronik</field>
+        <field name="Manufacturer number">9774010151R</field>
+        <field name="Name">SMT_Standoff_WURTH_9774010151R</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">2766287</field>
+        <field name="Supplier website">https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SMT_Standoff_WURTH_9774010151R" description=""/>
+      <property name="Name" value="SMT_Standoff_WURTH_9774010151R"/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="2766287"/>
+      <property name="Supplier website" value="https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r"/>
+      <property name="Manufacturer" value="Wurth electronik"/>
+      <property name="Manufacturer number" value="9774010151R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bc1a3e20-5f4c-4cd3-85ec-88318616d345</tstamps>
+    </comp>
+    <comp ref="M4">
+      <value>~</value>
+      <footprint>bjr_footprint_lib:WURTH ELEKTRONIK 9774010151R</footprint>
+      <fields>
+        <field name="Manufacturer">Wurth electronik</field>
+        <field name="Manufacturer number">9774010151R</field>
+        <field name="Name">SMT_Standoff_WURTH_9774010151R</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier code">2766287</field>
+        <field name="Supplier website">https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SMT_Standoff_WURTH_9774010151R" description=""/>
+      <property name="Name" value="SMT_Standoff_WURTH_9774010151R"/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier code" value="2766287"/>
+      <property name="Supplier website" value="https://uk.farnell.com/wurth-elektronik/9774010151r/standoff-female-round-steel-m2/dp/2766287?st=smt_standoff_wurth_9774010151r"/>
+      <property name="Manufacturer" value="Wurth electronik"/>
+      <property name="Manufacturer number" value="9774010151R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bd16d25f-cfe5-4d6d-b8e7-2b499ee71350</tstamps>
+    </comp>
+    <comp ref="R1">
+      <value>10k</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Manufacturer number">ERJ-3EKF1002V</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">667-ERJ-3EKF1002V</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="667-ERJ-3EKF1002V"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Manufacturer number" value="ERJ-3EKF1002V"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d9c8f2ab-f3fa-4c09-871b-2672c00d9fd6</tstamps>
+    </comp>
+    <comp ref="R2">
+      <value>47R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">ROHM Semiconductor</field>
+        <field name="Manufacturer number">SDR03EZPF47R0</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">755-SDR03EZPF47R0</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="755-SDR03EZPF47R0"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D"/>
+      <property name="Manufacturer" value="ROHM Semiconductor"/>
+      <property name="Manufacturer number" value="SDR03EZPF47R0"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>01fcb123-da08-47d3-b586-2ea0f0e36584</tstamps>
+    </comp>
+    <comp ref="R3">
+      <value>47R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">ROHM Semiconductor</field>
+        <field name="Manufacturer number">SDR03EZPF47R0</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">755-SDR03EZPF47R0</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="755-SDR03EZPF47R0"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D"/>
+      <property name="Manufacturer" value="ROHM Semiconductor"/>
+      <property name="Manufacturer number" value="SDR03EZPF47R0"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bf8c6b4b-fba8-441f-9b21-d3859c38ae9e</tstamps>
+    </comp>
+    <comp ref="R4">
+      <value>47R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">ROHM Semiconductor</field>
+        <field name="Manufacturer number">SDR03EZPF47R0</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">755-SDR03EZPF47R0</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="755-SDR03EZPF47R0"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/ROHM-Semiconductor/SDR03EZPF47R0?qs=MyNHzdoqoQK1m5Qsu4TFDA%3D%3D"/>
+      <property name="Manufacturer" value="ROHM Semiconductor"/>
+      <property name="Manufacturer number" value="SDR03EZPF47R0"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4415d796-f445-4604-af16-856949dd169a</tstamps>
+    </comp>
+    <comp ref="R5">
+      <value>10k</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Manufacturer number">ERJ-3EKF1002V</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">667-ERJ-3EKF1002V</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="667-ERJ-3EKF1002V"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Manufacturer number" value="ERJ-3EKF1002V"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>91e070ec-f2d0-4175-9d78-090838ea945d</tstamps>
+    </comp>
+    <comp ref="R6">
+      <value>10k</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Manufacturer number">ERJ-3EKF1002V</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">667-ERJ-3EKF1002V</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="667-ERJ-3EKF1002V"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Manufacturer number" value="ERJ-3EKF1002V"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>49ba6a6c-f716-45de-a839-babf460c8de2</tstamps>
+    </comp>
+    <comp ref="R7">
+      <value>10k</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Manufacturer number">ERJ-3EKF1002V</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">667-ERJ-3EKF1002V</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="667-ERJ-3EKF1002V"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1002V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KusLiC2u%2FTVc%3D"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Manufacturer number" value="ERJ-3EKF1002V"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7af56cb3-3770-475a-8a7d-ef4a0b1dcb98</tstamps>
+    </comp>
+    <comp ref="R8">
+      <value>100k</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Manufacturer number">ERJ-3EKF1003V</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">667-ERJ-3EKF1003V</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1003V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KWGFKEyTNwFY%3D</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="667-ERJ-3EKF1003V"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Panasonic/ERJ-3EKF1003V?qs=sGAEpiMZZMtlubZbdhIBIHcx2Q2RnT7KWGFKEyTNwFY%3D"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Manufacturer number" value="ERJ-3EKF1003V"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>14025e42-4082-4b66-a0b5-7de148fe5121</tstamps>
+    </comp>
+    <comp ref="TP1">
+      <value>TestPoint</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="test point"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9b08c0fe-331a-4276-981d-28cf1f11fcbe</tstamps>
+    </comp>
+    <comp ref="TP2">
+      <value>TestPoint</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="test point"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>af75c46f-7ec1-4eba-b4bc-5a7c135a1f19</tstamps>
+    </comp>
+    <comp ref="TP3">
+      <value>TestPoint</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <property name="ki_description" value="test point"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ecdbd503-a1b9-4316-ab68-4b82ae7e3e80</tstamps>
+    </comp>
+    <comp ref="U1">
+      <value>ATMXT336UD-MAUHA1</value>
+      <footprint>bjr_footprint_lib:XQFN-56-1EP_6x6mm_P0.4mm_EP4.6x4.6mm_ThermalVias</footprint>
+      <fields>
+        <field name="Manufacturer">Microchip Technology</field>
+        <field name="Manufacturer number">ATMXT336UD-MAUHA1</field>
+        <field name="Supplier">DigiKey</field>
+        <field name="Supplier code">150-ATMXT336UD-MAUHA1-ND</field>
+        <field name="Supplier website">https://www.digikey.co.uk/en/products/detail/microchip-technology/ATMXT336UD-MAUHA1/13557887?s=N4IgTCBcDaIIIBUCyANBBmdA2AqgEQFok4cAJOARhAF0BfIA</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="ATMXT336UD-MAUHA1" description=""/>
+      <property name="Supplier" value="DigiKey"/>
+      <property name="Supplier code" value="150-ATMXT336UD-MAUHA1-ND"/>
+      <property name="Supplier website" value="https://www.digikey.co.uk/en/products/detail/microchip-technology/ATMXT336UD-MAUHA1/13557887?s=N4IgTCBcDaIIIBUCyANBBmdA2AqgEQFok4cAJOARhAF0BfIA"/>
+      <property name="Manufacturer" value="Microchip Technology"/>
+      <property name="Manufacturer number" value="ATMXT336UD-MAUHA1"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f2163e1f-8ed4-42ab-a071-8b39b2e2127c</tstamps>
+    </comp>
+    <comp ref="U2">
+      <value>ICM-42670-P</value>
+      <footprint>bjr_footprint_lib:IC_ICM-42670-P</footprint>
+      <fields>
+        <field name="Manufacturer">TDK InvenSense</field>
+        <field name="Manufacturer number">ICM-42670-P</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">410-ICM-42670-P</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/TDK-InvenSense/ICM-42670-P?qs=iLbezkQI%252BsgK8sMF5V7fQQ%3D%3D</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="ICM-42670-P" description=""/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="410-ICM-42670-P"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/TDK-InvenSense/ICM-42670-P?qs=iLbezkQI%252BsgK8sMF5V7fQQ%3D%3D"/>
+      <property name="Manufacturer" value="TDK InvenSense"/>
+      <property name="Manufacturer number" value="ICM-42670-P"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4572476f-dcc9-414a-bd3b-00c2d52d6d8d</tstamps>
+    </comp>
+    <comp ref="U3">
+      <value>MCP1824T-3302E_OT</value>
+      <footprint>bjr_footprint_lib:SOT95P280X145-5N</footprint>
+      <fields>
+        <field name="Description">
+IC,LINEAR REGULATOR;MAX. INPUT,6V;OUTPUT,3.3V;300MA;ACCURACY,0.4%;SOT23-5 | Microchip Technology Inc. MCP1824T-3302E/OT
+</field>
+        <field name="Manufacturer">Microchip</field>
+        <field name="Manufacturer number">MCP1824T-3302E/OT</field>
+        <field name="Package">SOT-23 Microchip</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier code">579-MCP1824T-3302EOT</field>
+        <field name="Supplier website">https://www.mouser.co.uk/ProductDetail/Microchip-Technology/MCP1824T-3302E-OT?qs=gsqZ4L1luKpf30CVQFzEaA%3D%3D</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="MCP1824T-3302E_OT" description=""/>
+      <property name="Description" value="&#xA;IC,LINEAR REGULATOR;MAX. INPUT,6V;OUTPUT,3.3V;300MA;ACCURACY,0.4%;SOT23-5 | Microchip Technology Inc. MCP1824T-3302E/OT&#xA;"/>
+      <property name="Package" value="SOT-23 Microchip"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier code" value="579-MCP1824T-3302EOT"/>
+      <property name="Supplier website" value="https://www.mouser.co.uk/ProductDetail/Microchip-Technology/MCP1824T-3302E-OT?qs=gsqZ4L1luKpf30CVQFzEaA%3D%3D"/>
+      <property name="Manufacturer" value="Microchip"/>
+      <property name="Manufacturer number" value="MCP1824T-3302E/OT"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="capacitive_plate_pcb.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>fac07809-7cb9-4622-b509-b8b0ebfebcdd</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="TestPoint">
+      <description>test point</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Pin*</fp>
+        <fp>Test*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">TP</field>
+        <field name="Value">TestPoint</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Jumper" part="Jumper_2_Bridged">
+      <description>Jumper, 2-pole, closed/bridged</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Jumper*</fp>
+        <fp>TestPoint*2Pads*</fp>
+        <fp>TestPoint*Bridge*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">JP</field>
+        <field name="Value">Jumper_2_Bridged</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A" type="passive"/>
+        <pin num="2" name="B" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Jumper" part="SolderJumper_2_Open">
+      <description>Solder Jumper, 2-pole, open</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>SolderJumper*Open*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">JP</field>
+        <field name="Value">SolderJumper_2_Open</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A" type="passive"/>
+        <pin num="2" name="B" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="ATMXT336UD-MAUHA1">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ATMXT336UD-MAUHA1</field>
+        <field name="Footprint">bjr_footprint_lib:XQFN-56-1EP_6x6mm_P0.4mm_EP4.6x4.6mm_ThermalVias</field>
+      </fields>
+      <pins>
+        <pin num="1" name="X0" type="output"/>
+        <pin num="2" name="X1" type="output"/>
+        <pin num="3" name="X2" type="output"/>
+        <pin num="4" name="X3" type="output"/>
+        <pin num="5" name="X4" type="output"/>
+        <pin num="6" name="X5" type="output"/>
+        <pin num="7" name="X6" type="output"/>
+        <pin num="8" name="X7" type="output"/>
+        <pin num="9" name="X8" type="output"/>
+        <pin num="10" name="X9" type="output"/>
+        <pin num="11" name="X10" type="output"/>
+        <pin num="12" name="X11" type="output"/>
+        <pin num="13" name="X12" type="output"/>
+        <pin num="14" name="X13" type="output"/>
+        <pin num="15" name="XVDD" type="power_in"/>
+        <pin num="16" name="EXTCAP1" type="bidirectional"/>
+        <pin num="17" name="Y12" type="output"/>
+        <pin num="18" name="Y13" type="output"/>
+        <pin num="19" name="Y14" type="output"/>
+        <pin num="20" name="Y15" type="output"/>
+        <pin num="21" name="Y16" type="output"/>
+        <pin num="22" name="Y17" type="output"/>
+        <pin num="23" name="Y18" type="output"/>
+        <pin num="24" name="Y19" type="output"/>
+        <pin num="25" name="Y20" type="output"/>
+        <pin num="26" name="Y21" type="output"/>
+        <pin num="27" name="Y22" type="output"/>
+        <pin num="28" name="Y23" type="output"/>
+        <pin num="29" name="EXTCAP0" type="bidirectional"/>
+        <pin num="30" name="VDD" type="power_in"/>
+        <pin num="31" name="VDDCORE" type="power_in"/>
+        <pin num="32" name="VDDIO" type="power_in"/>
+        <pin num="33" name="TEST_BAR" type="output"/>
+        <pin num="34" name="SDA" type="output"/>
+        <pin num="35" name="SCL" type="output"/>
+        <pin num="36" name="RESET_BAR" type="input"/>
+        <pin num="37" name="CHG_BAR" type="output"/>
+        <pin num="38" name="SYNC/DBG_DATA" type="input"/>
+        <pin num="39" name="DBG_CLK" type="output"/>
+        <pin num="40" name="DS0" type="output"/>
+        <pin num="41" name="GKEYY0/DBG_SS" type="output"/>
+        <pin num="42" name="GKEYY1" type="output"/>
+        <pin num="43" name="GKEYY2" type="output"/>
+        <pin num="44" name="Y11" type="output"/>
+        <pin num="45" name="Y10" type="output"/>
+        <pin num="46" name="Y9" type="output"/>
+        <pin num="47" name="Y8" type="output"/>
+        <pin num="48" name="Y7" type="output"/>
+        <pin num="49" name="Y6" type="output"/>
+        <pin num="50" name="Y5" type="output"/>
+        <pin num="51" name="Y4" type="output"/>
+        <pin num="52" name="Y3" type="output"/>
+        <pin num="53" name="Y2" type="output"/>
+        <pin num="54" name="Y1" type="output"/>
+        <pin num="55" name="Y0" type="output"/>
+        <pin num="56" name="AVDD" type="power_in"/>
+        <pin num="57" name="GND" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="BM09B-SRSS-TB_LF__SN_">
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">BM09B-SRSS-TB_LF__SN_</field>
+        <field name="Footprint">bjr_footprint_lib:JST_BM09B-SRSS-TB_LF__SN_</field>
+        <field name="MF">JST Sales</field>
+        <field name="MAXIMUM_PACKAGE_HEIGHT">6.3 mm</field>
+        <field name="Package">None</field>
+        <field name="Price">None</field>
+        <field name="Check_prices">https://www.snapeda.com/parts/BM09B-SRSS-TB(LF)(SN)/JST+Sales+America+Inc./view-part/?ref=eda</field>
+        <field name="STANDARD">Manufacturer Recommendations</field>
+        <field name="PARTREV">N/A</field>
+        <field name="SnapEDA_Link">https://www.snapeda.com/parts/BM09B-SRSS-TB(LF)(SN)/JST+Sales+America+Inc./view-part/?ref=snap</field>
+        <field name="MP">BM09B-SRSS-TB(LF)(SN)</field>
+        <field name="Description">
+Connector Header Surface Mount 9 position 0.039 (1.00mm)
+</field>
+        <field name="MANUFACTURER">JST Sales America Inc.</field>
+        <field name="Availability">In Stock</field>
+        <field name="SNAPEDA_PN">BM09B-SRSS-TB(LF)(SN)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+        <pin num="4" name="4" type="passive"/>
+        <pin num="5" name="5" type="passive"/>
+        <pin num="6" name="6" type="passive"/>
+        <pin num="7" name="7" type="passive"/>
+        <pin num="8" name="8" type="passive"/>
+        <pin num="9" name="9" type="passive"/>
+        <pin num="S1" name="SHIELD" type="passive"/>
+        <pin num="S2" name="SHIELD" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="ICM-42670-P">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ICM-42670-P</field>
+        <field name="Footprint">bjr_footprint_lib:IC_ICM-42670-P</field>
+        <field name="MF">TDK InvenSense</field>
+        <field name="Description">
+Low-Power, Premium Performance 6-Axis MotionTrackingTM IMU with I3C, I2C and SPI interface in 2.5mm x 3mm Package
+</field>
+        <field name="Package">None</field>
+        <field name="Price">None</field>
+        <field name="Check_prices">https://www.snapeda.com/parts/ICM-42670-P/TDK+InvenSense/view-part/?ref=eda</field>
+        <field name="SnapEDA_Link">https://www.snapeda.com/parts/ICM-42670-P/TDK+InvenSense/view-part/?ref=snap</field>
+        <field name="MP">ICM-42670-P</field>
+        <field name="Availability">In Stock</field>
+        <field name="Purchase-URL">https://www.snapeda.com/api/url_track_click_mouser/?unipart_id=6277738&amp;manufacturer=TDK InvenSense&amp;part_name=ICM-42670-P&amp;search_term=icm-42670-p</field>
+      </fields>
+      <pins>
+        <pin num="1" name="AP_SDO/AP_AD0" type="bidirectional"/>
+        <pin num="2" name="RESV_2" type="passive"/>
+        <pin num="3" name="RESV_3" type="passive"/>
+        <pin num="4" name="INT1/INT" type="output"/>
+        <pin num="5" name="VDDIO" type="power_in"/>
+        <pin num="6" name="GND" type="power_in"/>
+        <pin num="7" name="FSYNC" type="input"/>
+        <pin num="8" name="VDD" type="power_in"/>
+        <pin num="9" name="INT2" type="output"/>
+        <pin num="10" name="RESV_10" type="passive"/>
+        <pin num="11" name="RESV_11" type="passive"/>
+        <pin num="12" name="AP_CS" type="input"/>
+        <pin num="13" name="AP_SCL/AP_SCLK" type="input"/>
+        <pin num="14" name="AP_SDA/AP_SDIO/AP_SDI" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="MCP1824T-3302E_OT">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MCP1824T-3302E_OT</field>
+        <field name="Footprint">bjr_footprint_lib:SOT95P280X145-5N</field>
+        <field name="MF">Microchip</field>
+        <field name="Description">
+IC,LINEAR REGULATOR;MAX. INPUT,6V;OUTPUT,3.3V;300MA;ACCURACY,0.4%;SOT23-5 | Microchip Technology Inc. MCP1824T-3302E/OT
+</field>
+        <field name="Package">SOT-23 Microchip</field>
+        <field name="Price">None</field>
+        <field name="MP">MCP1824T-3302E/OT</field>
+        <field name="Availability">In Stock</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VIN" type="input"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="~{SHDN}" type="input"/>
+        <pin num="4" name="PWRGD" type="output"/>
+        <pin num="5" name="VOUT" type="output"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="SM08B-SRSS-TB_LF__SN_">
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">SM08B-SRSS-TB_LF__SN_</field>
+        <field name="Footprint">bjr_footprint_lib:JST_SM08B-SRSS-TB_LF__SN_</field>
+        <field name="MF">JST Sales</field>
+        <field name="Description">
+Connector Header Surface Mount, Right Angle 8 position 0.039 (1.00mm)
+</field>
+        <field name="Package">None</field>
+        <field name="Price">None</field>
+        <field name="Check_prices">https://www.snapeda.com/parts/SM08B-SRSS-TB(LF)(SN)/JST+Sales+America+Inc./view-part/?ref=eda</field>
+        <field name="SnapEDA_Link">https://www.snapeda.com/parts/SM08B-SRSS-TB(LF)(SN)/JST+Sales+America+Inc./view-part/?ref=snap</field>
+        <field name="MP">SM08B-SRSS-TB(LF)(SN)</field>
+        <field name="Availability">In Stock</field>
+        <field name="MANUFACTURER">JST</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+        <pin num="3" name="" type="passive"/>
+        <pin num="4" name="" type="passive"/>
+        <pin num="5" name="" type="passive"/>
+        <pin num="6" name="" type="passive"/>
+        <pin num="7" name="" type="passive"/>
+        <pin num="8" name="" type="passive"/>
+        <pin num="P1" name="" type="no_connect"/>
+        <pin num="P2" name="" type="no_connect"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="SMT_Standoff_WURTH_9774010151R">
+      <fields>
+        <field name="Reference">M</field>
+        <field name="Footprint">bjr_footprint_lib:WURTH ELEKTRONIK 9774010151R</field>
+        <field name="Name">SMT_Standoff_WURTH_9774010151R</field>
+      </fields>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>C:\Program Files\KiCad\7.0\share\kicad\symbols\/Connector.kicad_sym</uri>
+    </library>
+    <library logical="Device">
+      <uri>C:\Program Files\KiCad\7.0\share\kicad\symbols\/Device.kicad_sym</uri>
+    </library>
+    <library logical="Jumper">
+      <uri>C:\Program Files\KiCad\7.0\share\kicad\symbols\/Jumper.kicad_sym</uri>
+    </library>
+    <library logical="bjr_symbol_lib">
+      <uri>C:/Users/tamas/Documents/bjr/pcbs/bjr_symbol_lib.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/+3.3V">
+      <node ref="C12" pin="1" pintype="passive"/>
+      <node ref="C14" pin="2" pintype="passive"/>
+      <node ref="C15" pin="1" pintype="passive"/>
+      <node ref="C16" pin="1" pintype="passive"/>
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="C8" pin="1" pintype="passive"/>
+      <node ref="C9" pin="2" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
+      <node ref="R6" pin="1" pintype="passive"/>
+      <node ref="R7" pin="1" pintype="passive"/>
+      <node ref="R8" pin="2" pintype="passive"/>
+      <node ref="TP3" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="U1" pin="30" pinfunction="VDD" pintype="power_in"/>
+      <node ref="U1" pin="32" pinfunction="VDDIO" pintype="power_in"/>
+      <node ref="U1" pin="56" pinfunction="AVDD" pintype="power_in"/>
+      <node ref="U2" pin="12" pinfunction="AP_CS" pintype="input"/>
+      <node ref="U2" pin="5" pinfunction="VDDIO" pintype="power_in"/>
+      <node ref="U2" pin="8" pinfunction="VDD" pintype="power_in"/>
+      <node ref="U3" pin="5" pinfunction="VOUT" pintype="output"/>
+    </net>
+    <net code="2" name="/+5V">
+      <node ref="C13" pin="1" pintype="passive"/>
+      <node ref="J1" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="J2" pin="1" pintype="passive"/>
+      <node ref="TP1" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="U3" pin="1" pinfunction="VIN" pintype="input"/>
+      <node ref="U3" pin="3" pinfunction="~{SHDN}" pintype="input"/>
+    </net>
+    <net code="3" name="/DS0">
+      <node ref="U1" pin="40" pinfunction="DS0" pintype="output"/>
+    </net>
+    <net code="4" name="/IMU_INT1">
+      <node ref="J1" pin="8" pinfunction="8" pintype="passive"/>
+      <node ref="U2" pin="4" pinfunction="INT1/INT" pintype="output"/>
+    </net>
+    <net code="5" name="/IMU_INT2">
+      <node ref="J1" pin="7" pinfunction="7" pintype="passive"/>
+      <node ref="U2" pin="9" pinfunction="INT2" pintype="output"/>
+    </net>
+    <net code="6" name="/PAS_SHIELD">
+      <node ref="JP2" pin="2" pinfunction="B" pintype="passive"/>
+    </net>
+    <net code="7" name="/PWRGD">
+      <node ref="J1" pin="9" pinfunction="9" pintype="passive"/>
+      <node ref="R8" pin="1" pintype="passive"/>
+      <node ref="TP2" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="U3" pin="4" pinfunction="PWRGD" pintype="output"/>
+    </net>
+    <net code="8" name="/SCL">
+      <node ref="J1" pin="4" pinfunction="4" pintype="passive"/>
+      <node ref="J2" pin="4" pintype="passive"/>
+      <node ref="U1" pin="35" pinfunction="SCL" pintype="output"/>
+      <node ref="U2" pin="13" pinfunction="AP_SCL/AP_SCLK" pintype="input"/>
+    </net>
+    <net code="9" name="/SDA">
+      <node ref="J1" pin="3" pinfunction="3" pintype="passive"/>
+      <node ref="J2" pin="3" pintype="passive"/>
+      <node ref="U1" pin="34" pinfunction="SDA" pintype="output"/>
+      <node ref="U2" pin="14" pinfunction="AP_SDA/AP_SDIO/AP_SDI" pintype="bidirectional"/>
+    </net>
+    <net code="10" name="/TOUCH_CHG_BAR">
+      <node ref="J1" pin="5" pinfunction="5" pintype="passive"/>
+      <node ref="J2" pin="6" pintype="passive"/>
+      <node ref="R7" pin="2" pintype="passive"/>
+      <node ref="U1" pin="37" pinfunction="CHG_BAR" pintype="output"/>
+    </net>
+    <net code="11" name="/TOUCH_DBG_CLK">
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="U1" pin="39" pinfunction="DBG_CLK" pintype="output"/>
+    </net>
+    <net code="12" name="/TOUCH_DBG_DATA">
+      <node ref="R4" pin="2" pintype="passive"/>
+      <node ref="U1" pin="38" pinfunction="SYNC/DBG_DATA" pintype="input"/>
+    </net>
+    <net code="13" name="/TOUCH_RST_BAR">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="J1" pin="6" pinfunction="6" pintype="passive"/>
+      <node ref="J2" pin="5" pintype="passive"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="U1" pin="36" pinfunction="RESET_BAR" pintype="input"/>
+    </net>
+    <net code="14" name="/X0">
+      <node ref="U1" pin="1" pinfunction="X0" pintype="output"/>
+    </net>
+    <net code="15" name="/X1">
+      <node ref="U1" pin="2" pinfunction="X1" pintype="output"/>
+    </net>
+    <net code="16" name="/X2">
+      <node ref="U1" pin="3" pinfunction="X2" pintype="output"/>
+    </net>
+    <net code="17" name="/X3">
+      <node ref="U1" pin="4" pinfunction="X3" pintype="output"/>
+    </net>
+    <net code="18" name="/X4">
+      <node ref="U1" pin="5" pinfunction="X4" pintype="output"/>
+    </net>
+    <net code="19" name="/X5">
+      <node ref="U1" pin="6" pinfunction="X5" pintype="output"/>
+    </net>
+    <net code="20" name="/X6">
+      <node ref="U1" pin="7" pinfunction="X6" pintype="output"/>
+    </net>
+    <net code="21" name="/X7">
+      <node ref="U1" pin="8" pinfunction="X7" pintype="output"/>
+    </net>
+    <net code="22" name="/X8">
+      <node ref="U1" pin="9" pinfunction="X8" pintype="output"/>
+    </net>
+    <net code="23" name="/X9">
+      <node ref="U1" pin="10" pinfunction="X9" pintype="output"/>
+    </net>
+    <net code="24" name="/X10">
+      <node ref="U1" pin="11" pinfunction="X10" pintype="output"/>
+    </net>
+    <net code="25" name="/X11">
+      <node ref="U1" pin="12" pinfunction="X11" pintype="output"/>
+    </net>
+    <net code="26" name="/X12">
+      <node ref="U1" pin="13" pinfunction="X12" pintype="output"/>
+    </net>
+    <net code="27" name="/X13">
+      <node ref="U1" pin="14" pinfunction="X13" pintype="output"/>
+    </net>
+    <net code="28" name="/Y0">
+      <node ref="U1" pin="55" pinfunction="Y0" pintype="output"/>
+    </net>
+    <net code="29" name="/Y1">
+      <node ref="U1" pin="54" pinfunction="Y1" pintype="output"/>
+    </net>
+    <net code="30" name="/Y2">
+      <node ref="U1" pin="53" pinfunction="Y2" pintype="output"/>
+    </net>
+    <net code="31" name="/Y3">
+      <node ref="U1" pin="52" pinfunction="Y3" pintype="output"/>
+    </net>
+    <net code="32" name="/Y4">
+      <node ref="U1" pin="51" pinfunction="Y4" pintype="output"/>
+    </net>
+    <net code="33" name="/Y5">
+      <node ref="U1" pin="50" pinfunction="Y5" pintype="output"/>
+    </net>
+    <net code="34" name="/Y6">
+      <node ref="U1" pin="49" pinfunction="Y6" pintype="output"/>
+    </net>
+    <net code="35" name="/Y7">
+      <node ref="U1" pin="48" pinfunction="Y7" pintype="output"/>
+    </net>
+    <net code="36" name="/Y8">
+      <node ref="U1" pin="47" pinfunction="Y8" pintype="output"/>
+    </net>
+    <net code="37" name="/Y9">
+      <node ref="U1" pin="46" pinfunction="Y9" pintype="output"/>
+    </net>
+    <net code="38" name="/Y10">
+      <node ref="U1" pin="45" pinfunction="Y10" pintype="output"/>
+    </net>
+    <net code="39" name="/Y11">
+      <node ref="U1" pin="44" pinfunction="Y11" pintype="output"/>
+    </net>
+    <net code="40" name="/Y12">
+      <node ref="U1" pin="17" pinfunction="Y12" pintype="output"/>
+    </net>
+    <net code="41" name="/Y13">
+      <node ref="U1" pin="18" pinfunction="Y13" pintype="output"/>
+    </net>
+    <net code="42" name="/Y14">
+      <node ref="U1" pin="19" pinfunction="Y14" pintype="output"/>
+    </net>
+    <net code="43" name="/Y15">
+      <node ref="U1" pin="20" pinfunction="Y15" pintype="output"/>
+    </net>
+    <net code="44" name="/Y16">
+      <node ref="U1" pin="21" pinfunction="Y16" pintype="output"/>
+    </net>
+    <net code="45" name="/Y17">
+      <node ref="U1" pin="22" pinfunction="Y17" pintype="output"/>
+    </net>
+    <net code="46" name="/Y18">
+      <node ref="U1" pin="23" pinfunction="Y18" pintype="output"/>
+    </net>
+    <net code="47" name="/Y19">
+      <node ref="U1" pin="24" pinfunction="Y19" pintype="output"/>
+    </net>
+    <net code="48" name="/Y20">
+      <node ref="U1" pin="25" pinfunction="Y20" pintype="output"/>
+    </net>
+    <net code="49" name="/Y21">
+      <node ref="U1" pin="26" pinfunction="Y21" pintype="output"/>
+    </net>
+    <net code="50" name="/Y22">
+      <node ref="U1" pin="27" pinfunction="Y22" pintype="output"/>
+    </net>
+    <net code="51" name="/Y23">
+      <node ref="U1" pin="28" pinfunction="Y23" pintype="output"/>
+    </net>
+    <net code="52" name="GND">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C10" pin="2" pintype="passive"/>
+      <node ref="C11" pin="1" pintype="passive"/>
+      <node ref="C12" pin="2" pintype="passive"/>
+      <node ref="C13" pin="2" pintype="passive"/>
+      <node ref="C14" pin="1" pintype="passive"/>
+      <node ref="C15" pin="2" pintype="passive"/>
+      <node ref="C16" pin="2" pintype="passive"/>
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="C8" pin="2" pintype="passive"/>
+      <node ref="C9" pin="1" pintype="passive"/>
+      <node ref="J1" pin="2" pinfunction="2" pintype="passive"/>
+      <node ref="J2" pin="2" pintype="passive"/>
+      <node ref="JP1" pin="1" pinfunction="A" pintype="passive"/>
+      <node ref="JP2" pin="1" pinfunction="A" pintype="passive"/>
+      <node ref="U1" pin="57" pinfunction="GND" pintype="power_in"/>
+      <node ref="U2" pin="1" pinfunction="AP_SDO/AP_AD0" pintype="bidirectional"/>
+      <node ref="U2" pin="6" pinfunction="GND" pintype="power_in"/>
+      <node ref="U3" pin="2" pinfunction="GND" pintype="power_in"/>
+    </net>
+    <net code="53" name="Net-(J2-Pad7)">
+      <node ref="J2" pin="7" pintype="passive"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+    </net>
+    <net code="54" name="Net-(J2-Pad8)">
+      <node ref="J2" pin="8" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
+    </net>
+    <net code="55" name="Net-(JP1-B)">
+      <node ref="JP1" pin="2" pinfunction="B" pintype="passive"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+    </net>
+    <net code="56" name="Net-(U1-EXTCAP0)">
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="U1" pin="29" pinfunction="EXTCAP0" pintype="bidirectional"/>
+    </net>
+    <net code="57" name="Net-(U1-EXTCAP1)">
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="U1" pin="16" pinfunction="EXTCAP1" pintype="bidirectional"/>
+    </net>
+    <net code="58" name="Net-(U1-GKEYY0{slash}DBG_SS)">
+      <node ref="R3" pin="2" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+      <node ref="U1" pin="41" pinfunction="GKEYY0/DBG_SS" pintype="output"/>
+    </net>
+    <net code="59" name="Net-(U1-TEST_BAR)">
+      <node ref="R6" pin="2" pintype="passive"/>
+      <node ref="U1" pin="33" pinfunction="TEST_BAR" pintype="output"/>
+    </net>
+    <net code="60" name="Net-(U1-VDDCORE)">
+      <node ref="C10" pin="1" pintype="passive"/>
+      <node ref="C11" pin="2" pintype="passive"/>
+      <node ref="U1" pin="31" pinfunction="VDDCORE" pintype="power_in"/>
+    </net>
+    <net code="61" name="Net-(U1-XVDD)">
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="U1" pin="15" pinfunction="XVDD" pintype="power_in"/>
+    </net>
+    <net code="62" name="unconnected-(J1-SHIELD-PadS1)">
+      <node ref="J1" pin="S1" pinfunction="SHIELD" pintype="passive+no_connect"/>
+      <node ref="J1" pin="S2" pinfunction="SHIELD" pintype="passive+no_connect"/>
+    </net>
+    <net code="63" name="unconnected-(J2-PadP1)">
+      <node ref="J2" pin="P1" pintype="no_connect"/>
+    </net>
+    <net code="64" name="unconnected-(J2-PadP2)">
+      <node ref="J2" pin="P2" pintype="no_connect"/>
+    </net>
+    <net code="65" name="unconnected-(U1-GKEYY1-Pad42)">
+      <node ref="U1" pin="42" pinfunction="GKEYY1" pintype="output+no_connect"/>
+    </net>
+    <net code="66" name="unconnected-(U1-GKEYY2-Pad43)">
+      <node ref="U1" pin="43" pinfunction="GKEYY2" pintype="output+no_connect"/>
+    </net>
+    <net code="67" name="unconnected-(U2-FSYNC-Pad7)">
+      <node ref="U2" pin="7" pinfunction="FSYNC" pintype="input+no_connect"/>
+    </net>
+    <net code="68" name="unconnected-(U2-RESV_2-Pad2)">
+      <node ref="U2" pin="2" pinfunction="RESV_2" pintype="passive+no_connect"/>
+    </net>
+    <net code="69" name="unconnected-(U2-RESV_3-Pad3)">
+      <node ref="U2" pin="3" pinfunction="RESV_3" pintype="passive+no_connect"/>
+    </net>
+    <net code="70" name="unconnected-(U2-RESV_10-Pad10)">
+      <node ref="U2" pin="10" pinfunction="RESV_10" pintype="passive+no_connect"/>
+    </net>
+    <net code="71" name="unconnected-(U2-RESV_11-Pad11)">
+      <node ref="U2" pin="11" pinfunction="RESV_11" pintype="passive+no_connect"/>
+    </net>
+  </nets>
+</export>
