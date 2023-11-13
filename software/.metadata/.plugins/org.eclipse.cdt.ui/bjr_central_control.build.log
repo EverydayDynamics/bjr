@@ -1,0 +1,10 @@
+21:41:22 **** Incremental Build of configuration Debug for project bjr_central_control ****
+make -j12 all 
+arm-none-eabi-size   bjr_central_control.elf 
+   text	   data	    bss	    dec	    hex	filename
+  22676	    104	  21024	  43804	   ab1c	bjr_central_control.elf
+Finished building: default.size.stdout
+ 
+
+21:41:23 Build Finished. 0 errors, 0 warnings. (took 309ms)
+
