@@ -1,4 +1,27 @@
-[workspace]
-members =[
-    "src/app",
-    ]
+[package]
+name = "bjr-central-controller"
+version = "1.1.0"
+authors = ["Tamas Feher tamas@edbuilds.net"]
+edition = "2021"
+
+[dependencies]
+embedded-hal = "0.2.7"
+
+[dependencies.panic-halt]
+version = "0.2.0"
+
+
+[dev-dependencies]
+mockall = "0.11.4"
+
+[target.thumbv7em-none-eabihf.dependencies]
+cortex-m-rtic = "1.1.4"
+
+[target.thumbv7em-none-eabihf.dependencies.rtt-target]
+version = "0.3.1"
+features = ["cortex-m"]
+
+[target.thumbv7em-none-eabihf.dependencies.stm32f4xx-hal]
+version = "0.18.0"
+features = ["stm32f446", "rtic"]
+
