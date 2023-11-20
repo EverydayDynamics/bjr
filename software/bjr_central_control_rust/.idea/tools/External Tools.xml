@@ -1,0 +1,16 @@
+<toolSet name="External Tools">
+  <tool name="bjr cargo build" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="cargo" />
+      <option name="PARAMETERS" value="build" />
+      <option name="WORKING_DIRECTORY" value="C:/Users/tamas/Documents/bjr/software/bjr_central_control_rust" />
+    </exec>
+  </tool>
+  <tool name="bjr cargo clean" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="cargo" />
+      <option name="PARAMETERS" value="clean" />
+      <option name="WORKING_DIRECTORY" value="C:/Users/tamas/Documents/bjr/software/bjr_central_control_rust" />
+    </exec>
+  </tool>
+</toolSet>
