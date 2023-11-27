@@ -6,6 +6,17 @@ edition = "2021"
 
 [dependencies]
 embedded-hal = "0.2.7"
+log = { version = "0.4.20", features = [] }
+heapless = "0.8.0"
+
+[dependencies.uom]
+version = "0.35.0"
+default-features = false
+features = [
+    "autoconvert", # automatic base unit conversion.
+    "f32", "f64", # Floating point storage types.
+    "si",  # Built-in SI system and std library support.
+]
 
 [dependencies.panic-halt]
 version = "0.2.0"
@@ -16,9 +27,15 @@ mockall = "0.11.4"
 
 [target.thumbv7em-none-eabihf.dependencies]
 cortex-m-rtic = "1.1.4"
+rtt-log = "0.2.0"
+systick-monotonic = "1.0.0"
 
 [target.thumbv7em-none-eabihf.dependencies.rtt-target]
 version = "0.3.1"
+features = ["cortex-m"]
+
+[target.thumbv7em-none-eabihf.dependencies.panic-rtt-target]
+version = "0.1.2"
 features = ["cortex-m"]
 
 [target.thumbv7em-none-eabihf.dependencies.stm32f4xx-hal]

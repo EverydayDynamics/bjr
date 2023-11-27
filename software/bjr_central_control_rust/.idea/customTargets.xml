@@ -11,5 +11,15 @@
         </clean>
       </configuration>
     </target>
+    <target id="78585291-e78e-4790-bfae-7377fc8d6304" name="rust build release" defaultType="TOOL">
+      <configuration id="a6496b6a-1cd1-4c9c-a25e-78ce32488b59" name="rust build release">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_bjr cargo build release" />
+        </build>
+        <clean type="TOOL">
+          <tool actionId="Tool_External Tools_bjr cargo clean" />
+        </clean>
+      </configuration>
+    </target>
   </component>
 </project>
