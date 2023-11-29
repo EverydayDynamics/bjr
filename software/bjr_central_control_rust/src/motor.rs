@@ -7,6 +7,7 @@ use uom::si::ratio::ratio;
 use crate::captive_linear_stepper::{ LinearStepper};
 use crate::stepper_state::{STEP_BASE_FREQ, STEP_THRESHOLD, STEP_VELOCITY_SCALER, StepperState};
 use heapless::spsc::Producer;
+use crate::stepper_driver::StepperDriver;
 #[derive(Clone,Copy)]
 pub struct MotorState {
     pub vel: Velocity,
@@ -21,43 +22,43 @@ pub trait Motor {
 pub trait StepperMotor {
     fn update_state(&mut self, step_state: &StepperState);
 }
-pub struct LinearStepperMotor<'a, LSTP>
-where LSTP: LinearStepper 
+pub struct LinearStepperMotor<'a, LSTP, STPD>
+where LSTP: LinearStepper,
+      STPD: StepperDriver
 {
     linear_stepper: LSTP,
     motor_state: Option<MotorState>,
-    accel_sender: Producer<'a,i32,2>,
-    set_accel_holder: Option<i32>,
+    accel_sender: Producer<'a,FrequencyDrift,2>,
+    stepper_driver: STPD,
 }
-impl<LSTP> LinearStepperMotor<'_,LSTP>
-    where LSTP: LinearStepper
+impl<LSTP, STPD> LinearStepperMotor<'_,LSTP, STPD>
+    where LSTP: LinearStepper,
+          STPD: StepperDriver
 {
-    pub fn new(linear_stepper: LSTP, accel_sender: Producer<i32,2>) -> LinearStepperMotor<LSTP> {
-        LinearStepperMotor{ linear_stepper, motor_state: None, set_accel_holder: None, accel_sender}
+    pub fn new(linear_stepper: LSTP, accel_sender: Producer<FrequencyDrift,2>, stepper_driver: STPD) -> LinearStepperMotor<LSTP, STPD> {
+        LinearStepperMotor{ linear_stepper, motor_state: None,  accel_sender, stepper_driver}
     }
 }
-impl<LSTP> Motor for LinearStepperMotor<'_,LSTP>
-where LSTP: LinearStepper
+impl<LSTP, STPD> Motor for LinearStepperMotor<'_,LSTP, STPD>
+    where LSTP: LinearStepper,
+          STPD: StepperDriver
 {
     fn get_state(&self) -> MotorState {
        self.motor_state.unwrap()
     }
 
     fn update(&mut self, accel: Acceleration) {
-        let steps_per_ssq = accel/self.linear_stepper.distance_per_step();
-        let dimless_accel = (steps_per_ssq*
-            uom::si::f32::Time::new::<second>(STEP_VELOCITY_SCALER as f32) /
-            uom::si::f32::Frequency::new::<hertz>(STEP_BASE_FREQ as f32));
-        let _ =self.accel_sender.enqueue((dimless_accel.get::<ratio>())as i32);
+        let _ =self.accel_sender.enqueue(accel / self.linear_stepper.distance_per_step() * *self.stepper_driver.get_microstepping());
     }
 }
-impl<LSTP> StepperMotor for LinearStepperMotor<'_,LSTP>
-where LSTP: LinearStepper
+impl<LSTP, STPD> StepperMotor for LinearStepperMotor<'_,LSTP, STPD>
+    where LSTP: LinearStepper,
+          STPD: StepperDriver
 {
     fn update_state(&mut self, step_state: &StepperState) {
         self.motor_state = Some(MotorState {
-            vel: uom::si::f32::Frequency::new::<hertz>((step_state.vel as f32) / (STEP_VELOCITY_SCALER as f32)) * self.linear_stepper.distance_per_step(),
-            pos: step_state.pos as f32 * self.linear_stepper.distance_per_step()});
+            vel: Frequency::new::<hertz>(step_state.vel) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping(),
+            pos: Ratio::new::<ratio>(step_state.pos as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping()});
     }
 
 }
