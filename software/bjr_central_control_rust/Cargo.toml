@@ -44,3 +44,5 @@ features = ["cortex-m"]
 version = "0.18.0"
 features = ["stm32f446", "rtic"]
 
+[profile.dev]
+opt-level = 3
