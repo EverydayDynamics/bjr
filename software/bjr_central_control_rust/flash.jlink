@@ -1,0 +1,5 @@
+device STM32F446RE
+S
+loadbin target/thumbv7em-none-eabihf/release/bjr-central-controller, 0x08000000
+r
+q

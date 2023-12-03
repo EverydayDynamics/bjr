@@ -1,16 +1,14 @@
 use crate::stepper_state::StepperState;
-use log;
 use crate::actuator_num::NUM_ACTUATOR;
-use crate::motor;
 use crate::motor::{Motor, MotorState, StepperMotor};
 use crate::motor_controller::{MotorController, PDPosCtrl};
 use uom::si::velocity::millimeter_per_second;
 use uom::si::length::millimeter;
 use uom::si::f32::*;
 use uom::si::acceleration::millimeter_per_second_squared;
-use uom::fmt::DisplayStyle::Abbreviation;
 use uom::si::frequency::hertz;
 use uom::si::frequency_drift::hertz_per_second;
+use uom::fmt::DisplayStyle::Abbreviation;
 #[allow(unused_imports)]
 use num_traits::real::Real;
 pub struct ControllerTask<MOT>
@@ -47,10 +45,10 @@ impl<MOT> ControllerTask<MOT>
         let ctrl_output = self.motor_controllers[0].run(&setpoint,
                                       &self.motor[0].get_state(),
                                       &Acceleration::new::<millimeter_per_second_squared>(0.0));
-        //log::debug!("p:{},v:{}, a:{}",
-        //    self.motor[0].get_state().pos.into_format_args(millimeter, Abbreviation),
-        //    self.motor[0].get_state().vel.into_format_args(millimeter_per_second, Abbreviation),
-        //    ctrl_output.into_format_args(millimeter_per_second_squared, Abbreviation));
+        log::debug!("p:{},v:{}, a:{}",
+            self.motor[0].get_state().pos.into_format_args(millimeter, Abbreviation),
+            self.motor[0].get_state().vel.into_format_args(millimeter_per_second, Abbreviation),
+            ctrl_output.into_format_args(millimeter_per_second_squared, Abbreviation));
         self.motor[0].update(ctrl_output);
     }
     pub fn next_run(&mut self) -> u64{

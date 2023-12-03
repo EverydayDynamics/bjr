@@ -3,8 +3,6 @@ extern crate uom;
 use core::sync::atomic::Ordering;
 use uom::si::f32::*;
 use uom::si::frequency::hertz;
-use uom::si::time::second;
-use uom::num::One;
 use uom::si::ratio::ratio;
 use crate::captive_linear_stepper::{ LinearStepper};
 use crate::stepper_state::{StepperState};
@@ -51,7 +49,8 @@ impl<LSTP, STPD> Motor for LinearStepperMotor<'_,LSTP, STPD>
     }
 
     fn update(&mut self, accel: Acceleration) {
-        let _ =self.accel_sender.enqueue((accel / self.linear_stepper.distance_per_step() * *self.stepper_driver.get_microstepping()).get::<hertz_per_second>());
+        let accel =  (accel / self.linear_stepper.distance_per_step() * *self.stepper_driver.get_microstepping()).get::<hertz_per_second>();
+        let _ =self.accel_sender.enqueue(accel);
     }
 }
 impl<LSTP, STPD> StepperMotor for LinearStepperMotor<'_,LSTP, STPD>
@@ -59,9 +58,11 @@ impl<LSTP, STPD> StepperMotor for LinearStepperMotor<'_,LSTP, STPD>
           STPD: StepperDriver
 {
     fn update_state(&mut self, step_state: &StepperState) {
+        let pos = step_state.pos.load(Ordering::Relaxed);
+        let vel = step_state.vel.load(Ordering::Relaxed);
         self.motor_state = Some(MotorState {
-            vel: Frequency::new::<hertz>(step_state.vel) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping(),
-            pos: Ratio::new::<ratio>(step_state.pos.load(Ordering::Relaxed) as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping()});
+            vel: Frequency::new::<hertz>(vel as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping(),
+            pos: Ratio::new::<ratio>( pos as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping()});
     }
 
 }
