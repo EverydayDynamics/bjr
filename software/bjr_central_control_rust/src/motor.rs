@@ -9,14 +9,10 @@ use crate::stepper_state::{StepperState};
 use heapless::spsc::Producer;
 use uom::si::frequency_drift::hertz_per_second;
 use crate::stepper_driver::StepperDriver;
-#[derive(Clone,Copy)]
-pub struct MotorState {
-    pub vel: Velocity,
-    pub pos: Length,
-}
+use crate::motor_state::MotorState;
 pub trait Motor {
     fn get_state(&self) -> MotorState;
-    fn update(&mut self, accel: Acceleration);
+    fn update(&mut self, accel: f32);
 
 }
 
@@ -48,8 +44,8 @@ impl<LSTP, STPD> Motor for LinearStepperMotor<'_,LSTP, STPD>
        self.motor_state.unwrap()
     }
 
-    fn update(&mut self, accel: Acceleration) {
-        let accel =  (accel / self.linear_stepper.distance_per_step() * *self.stepper_driver.get_microstepping()).get::<hertz_per_second>();
+    fn update(&mut self, accel: f32) {
+        let accel =  accel / self.linear_stepper.distance_per_step() * self.stepper_driver.get_microstepping();
         let _ =self.accel_sender.enqueue(accel);
     }
 }
@@ -61,8 +57,10 @@ impl<LSTP, STPD> StepperMotor for LinearStepperMotor<'_,LSTP, STPD>
         let pos = step_state.pos.load(Ordering::Relaxed);
         let vel = step_state.vel.load(Ordering::Relaxed);
         self.motor_state = Some(MotorState {
-            vel: Frequency::new::<hertz>(vel as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping(),
-            pos: Ratio::new::<ratio>( pos as f32) * self.linear_stepper.distance_per_step() / *self.stepper_driver.get_microstepping()});
+            vel: vel as f32 * self.linear_stepper.distance_per_step() / self.stepper_driver.get_microstepping(),
+            pos:  pos as f32 * self.linear_stepper.distance_per_step() / self.stepper_driver.get_microstepping()+self.linear_stepper.actuator_length(),
+            accel: 0.0,
+        });
     }
 
 }

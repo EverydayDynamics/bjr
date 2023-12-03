@@ -22,4 +22,7 @@ mod actuator_num;
 mod motor_controller;
 mod stepper_driver;
 mod stepper_controller2;
-mod dynamics;
+mod kinematics;
+mod plate_state;
+mod motor_state;
+mod value_state;

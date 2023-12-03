@@ -2,20 +2,20 @@ use uom::si::f32::*;
 use uom::si::ratio::ratio;
 
 pub trait StepperDriver {
-    fn get_microstepping(&self) -> &Ratio;
+    fn get_microstepping(&self) -> f32;
 }
 pub struct SilentStepStick {
-    microstepping: Ratio,
+    microstepping: f32,
 }
 impl SilentStepStick {
    pub fn new() -> SilentStepStick{
        SilentStepStick {
-           microstepping:Ratio::new::<ratio>(16.0),
+           microstepping:8.0,
        }
    }
 }
 impl StepperDriver for SilentStepStick {
-    fn get_microstepping(&self) -> &Ratio {
-        &self.microstepping
+    fn get_microstepping(&self) -> f32 {
+        self.microstepping
     }
 }

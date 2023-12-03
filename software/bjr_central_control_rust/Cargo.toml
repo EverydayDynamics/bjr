@@ -9,7 +9,8 @@ embedded-hal = "0.2.7"
 log = { version = "0.4.20", features = [] }
 heapless = "0.8.0"
 num-traits = { version = "0.2", default-features = false, features = ["libm"] }
-
+fast-math = "0.1.1"
+libm = "0.2.8"
 
 [dependencies.uom]
 version = "0.35.0"
@@ -45,4 +46,4 @@ version = "0.18.0"
 features = ["stm32f446", "rtic"]
 
 [profile.dev]
-opt-level = 3
+#opt-level = 3

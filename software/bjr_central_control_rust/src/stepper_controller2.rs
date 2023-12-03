@@ -57,6 +57,7 @@ impl<OP1, OP2> StepperCtrlrTask<'_, OP1, OP2>
         } else if delta_micros < 0 {
             delta_micros =0;
         }
+        //self.vel = 40000.0;
         self.vel += (delta_micros as f32 / 1000000.0) * self.accel;
         if self.vel > self.vel_limit {
             self.vel = self.vel_limit;
@@ -81,10 +82,10 @@ impl<OP1, OP2> StepperCtrlrTask<'_, OP1, OP2>
             } else {
                 // STEP NOW!!
                 if self.vel > 0.0 {
-                    self.dir_pin.set_high().ok().unwrap();
+                    self.dir_pin.set_low().ok().unwrap();
                     state.pos.fetch_add(1, Ordering::Relaxed);
                 } else {
-                    self.dir_pin.set_low().ok().unwrap();
+                    self.dir_pin.set_high().ok().unwrap();
                     state.pos.fetch_add(-1, Ordering::Relaxed);
                 }
                 self.step_pin.set_high().ok().unwrap();
@@ -97,15 +98,17 @@ impl<OP1, OP2> StepperCtrlrTask<'_, OP1, OP2>
         if micros_until_next_run > 100 {
             micros_until_next_run = 100;
         }
-        if micros_until_next_run < 2 {
+        if micros_until_next_run < 9 {
             //TODO: schedule missed do some error reporting here
-            micros_until_next_run = 2;
+            micros_until_next_run = 9;
         }
         self.last_micros = current_micros;
-        //log::debug!("{}",micros_until_next_run);
-        self.step_pin.set_low().ok().unwrap();
 
-        return micros_until_next_run as u64;
+        return self.last_micros+micros_until_next_run as u64;
+    }
+
+    pub fn reset_step_pin(&mut self)  {
+        self.step_pin.set_low().ok().unwrap();
     }
     pub fn set_internals(&mut self, vel: f32, last_micros: u64, last_step_micros: u64)  {
         self.vel = vel;
@@ -128,7 +131,7 @@ mod tests {
         let mut mock_stp = MockOutput::new();
         let _ = mock_stp.expect_set_high().times(1).returning(||Ok(()));
         let _ = mock_stp.expect_set_low().times(1).returning(||Ok(()));
-        let mut test_stepper_state = StepperState { pos: Default::default(), vel: 0.0 };
+        let mut test_stepper_state = StepperState { pos: Default::default(), vel: Default::default() };
         let mut tested_stepper = StepperCtrlrTask::new(mock_stp,mock_dir, test_accel_receiver);
         let mut micros = 0u64;
         tested_stepper.set_internals(1000.0,910, 0);
