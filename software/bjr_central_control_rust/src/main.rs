@@ -26,3 +26,4 @@ mod kinematics;
 mod plate_state;
 mod motor_state;
 mod value_state;
+mod initializer;

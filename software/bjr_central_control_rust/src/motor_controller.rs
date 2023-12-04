@@ -2,6 +2,7 @@ use crate::motor_state::MotorState;
 pub trait MotorController {
     fn run(&self, setpoint: &MotorState, state: &MotorState) -> f32;
 }
+#[derive(Clone,Copy)]
 pub struct PDPosCtrl {
     p_gain: f32, //1/s^2
     d_gain: f32, //1/s

@@ -2,13 +2,6 @@ use crate::stepper_state::StepperState;
 use crate::actuator_num::NUM_ACTUATOR;
 use crate::motor::{Motor, StepperMotor};
 use crate::motor_controller::{MotorController, PDPosCtrl};
-use uom::si::velocity::millimeter_per_second;
-use uom::si::length::millimeter;
-use uom::si::f32::*;
-use uom::si::acceleration::millimeter_per_second_squared;
-use uom::si::frequency::hertz;
-use uom::si::frequency_drift::hertz_per_second;
-use uom::fmt::DisplayStyle::Abbreviation;
 #[allow(unused_imports)]
 use num_traits::real::Real;
 
@@ -18,20 +11,16 @@ use crate::plate_state::PlateState;
 use crate::motor_state::MotorState;
 
 const phase:f32 =PI/3.0*2.0;
-const AMPLITUDE:f32 =PI/180.0*5.0;
-pub struct ControllerTask<MOT>
-    where MOT:Motor+StepperMotor
+const AMPLITUDE:f32 =PI/180.0*7.0;
+pub struct ControllerTask
 {
-    motor: [MOT;NUM_ACTUATOR],
     motor_controllers: [PDPosCtrl;NUM_ACTUATOR],
     next_runtime: u64,
 }
-impl<MOT> ControllerTask<MOT>
-    where MOT:Motor+StepperMotor
+impl ControllerTask
 {
-    pub fn new(motors: [MOT;NUM_ACTUATOR], ) -> ControllerTask<MOT> {
+    pub fn new() -> ControllerTask {
         ControllerTask{
-            motor: motors,
             motor_controllers: [
                 PDPosCtrl::new( ( 10.0), (10.0)),
                 PDPosCtrl::new( ( 10.0), ( 10.0)),
@@ -40,15 +29,10 @@ impl<MOT> ControllerTask<MOT>
             next_runtime: 10000,
         }
     }
-    pub fn update_stepper_state(&mut self, stepper_states: &[StepperState; NUM_ACTUATOR]){
-        for it in self.motor.iter_mut().zip(stepper_states.iter()) {
-            let (motor, step_state) = it;
-            motor.update_state(step_state);
-        }
-
-    }
-    pub fn run(&mut self) {
-        let speed = 4.000f32;
+    pub fn run<MOT>(&mut self, motors: &mut [MOT; NUM_ACTUATOR])
+        where MOT:Motor+StepperMotor
+    {
+        let speed = 8.000f32;
         let time:f32 = (self.next_runtime/10000) as f32 /100.0;
         let amplitude:f32 = 5.0;
         let pstate = PlateState{
@@ -64,12 +48,12 @@ impl<MOT> ControllerTask<MOT>
         };
         let motor_setpoints = kinematics::inverse(pstate);
         for i in 0..3 {
-            let ctrl_output = self.motor_controllers[i].run(&motor_setpoints[i], &self.motor[i].get_state());
-            self.motor[i].update(ctrl_output);
+            let ctrl_output = self.motor_controllers[i].run(&motor_setpoints[i], &motors[i].get_state());
+            motors[i].update(ctrl_output);
         }
     }
     pub fn next_run(&mut self) -> u64{
-        self.next_runtime += 10000;
-        self.next_runtime
+        self.next_runtime+=10000;
+        10000
     }
 }

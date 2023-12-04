@@ -12,14 +12,18 @@ mod app {
                                gpioa::PA7,
                                gpioa::PA8,
                                gpioa::PA9,
-                               Output}, prelude::*};
+                               gpiob::PB4,
+                               gpiob::PB5,
+                               gpiob::PB6,
+                               Output, Input}, prelude::*};
     use crate::stepper_state::StepperState;
     use crate::controller_task::ControllerTask;
     use crate::actuator_num::NUM_ACTUATOR;
     use crate::captive_linear_stepper::Lga201s06AUecb019;
-    use crate::motor::LinearStepperMotor;
+    use crate::motor::{LinearStepperMotor,MotorEnum};
     use crate::stepper_driver::SilentStepStick;
     use crate::stepper_controller2::StepperCtrlrTask;
+    use crate::initializer::Initializer;
     use systick_monotonic::{fugit::ExtU64, fugit::ExtU32};
     use heapless::spsc::Queue;
     use stm32f4xx_hal::pac;
@@ -31,16 +35,25 @@ mod app {
     use log;
     const SYSFREQ: u32 = 150_000_000;
     static STEPPERS_STATE: [StepperState;NUM_ACTUATOR] = [StepperState::new(),StepperState::new(),StepperState::new()];
+    type MotorLiteral= MotorEnum<
+        LinearStepperMotor<'static, Lga201s06AUecb019, SilentStepStick<PB4<Input>>>,
+        LinearStepperMotor<'static, Lga201s06AUecb019, SilentStepStick<PB5<Input>>>,
+        LinearStepperMotor<'static, Lga201s06AUecb019, SilentStepStick<PB6<Input>>>
+    >;
     // Shared resources go here
     #[shared]
     struct Shared {
-
+        #[lock_free]
+        motors: [MotorLiteral;3],
+        #[lock_free]
+        time_tracker: u64,
     }
 
     // Local resources go here
     #[local]
     struct Local {
-        controller_task: ControllerTask<LinearStepperMotor<'static, Lga201s06AUecb019, SilentStepStick>>,
+        controller_task: ControllerTask,
+        initializer_task: Initializer,
         stepper_task_a: StepperCtrlrTask<'static, PA5<Output>,PA0<Output>>,
         stepper_task_b: StepperCtrlrTask<'static, PA6<Output>,PA7<Output>>,
         stepper_task_c: StepperCtrlrTask<'static, PA8<Output>,PA9<Output>>,
@@ -70,16 +83,20 @@ mod app {
         let clocks = rcc.cfgr.sysclk(SYSFREQ.Hz()).freeze();
         // gpio ports A and C
         let gpioa = ctx.device.GPIOA.split();
+        let gpiob = ctx.device.GPIOB.split();
         // button
         // led
         let stepper_a_stp_pin = gpioa.pa5.into_push_pull_output();
         let stepper_a_dir_pin = gpioa.pa0.into_push_pull_output();
+        let stepper_a_diag_pin = gpiob.pb4.into_pull_down_input();
 
         let stepper_b_stp_pin = gpioa.pa6.into_push_pull_output();
         let stepper_b_dir_pin = gpioa.pa7.into_push_pull_output();
+        let stepper_b_diag_pin = gpiob.pb5.into_pull_down_input();
 
         let stepper_c_stp_pin = gpioa.pa8.into_push_pull_output();
         let stepper_c_dir_pin = gpioa.pa9.into_push_pull_output();
+        let stepper_c_diag_pin = gpiob.pb6.into_pull_down_input();
 
         let mut debug_pin = gpioa.pa1.into_push_pull_output();
         let mut debug_pin2 = gpioa.pa4.into_push_pull_output();
@@ -92,10 +109,11 @@ mod app {
         let stepper_task_b = StepperCtrlrTask::new(stepper_b_stp_pin, stepper_b_dir_pin,  stp_setp_b_cons);
         let stepper_task_c = StepperCtrlrTask::new(stepper_c_stp_pin, stepper_c_dir_pin,  stp_setp_c_cons);
         //Setup tasks
-        let controller_task = ControllerTask::new([
-            LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_a_prod, SilentStepStick::new()),
-            LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_b_prod, SilentStepStick::new()),
-            LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_c_prod, SilentStepStick::new())]);
+        let motors = [
+            MotorEnum::MotorA(LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_a_prod, SilentStepStick::new(stepper_a_diag_pin), &STEPPERS_STATE[0])),
+            MotorEnum::MotorB(LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_b_prod, SilentStepStick::new(stepper_b_diag_pin), &STEPPERS_STATE[1])),
+            MotorEnum::MotorC(LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_c_prod, SilentStepStick::new(stepper_c_diag_pin), &STEPPERS_STATE[2]))];
+        let controller_task = ControllerTask::new();
 
         // Setup timers
         let mut stepper_main_timer = ctx.device.TIM2.counter_us(&clocks);
@@ -104,15 +122,19 @@ mod app {
 
         //let mono = Systick::new(ctx.core.SYST, 1000000);
         let mono = ctx.device.TIM3.monotonic64_us(&clocks);
-        controller_task_runner::spawn().ok();
+        log::info!("Initialization started...");
+        initializer_task_runner::spawn().ok();
         //tim2_task::spawn().ok();
         (
             Shared {
+                motors,
+                time_tracker: 0,
                 // Initialization of shared resources go here
             },
             Local {
                 // Initialization of local resources go here
                 controller_task,
+                initializer_task: Initializer::new(),
                 stepper_task_a,
                 stepper_task_b,
                 stepper_task_c,
@@ -120,19 +142,32 @@ mod app {
                 time: 0,
                 debug_pin,
                 debug_pin2,
+
             },
             init::Monotonics(mono),
         )
     }
 
-    #[task(local = [controller_task, debug_pin2], shared = [], priority = 1)]
+    #[task(local = [initializer_task], shared = [motors, time_tracker], priority = 1)]
+    fn initializer_task_runner(ctx: initializer_task_runner::Context) {
+        let finished = ctx.local.initializer_task.run(ctx.shared.motors);
+        let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
+        *ctx.shared.time_tracker +=ctx.local.initializer_task.next_run();
+        if finished {
+            log::info!("Initialization done");
+            controller_task_runner::spawn_at(a + ExtU64::micros(*ctx.shared.time_tracker)).unwrap();
+        } else {
+            initializer_task_runner::spawn_at(a + ExtU64::micros(*ctx.shared.time_tracker)).unwrap();
+        }
+    }
+    #[task(local = [controller_task, debug_pin2], shared = [motors, time_tracker], priority = 1)]
     fn controller_task_runner(ctx: controller_task_runner::Context) {
         let _ = ctx.local.debug_pin2.set_high();
-        ctx.local.controller_task.update_stepper_state(&STEPPERS_STATE);
-        ctx.local.controller_task.run();
+        ctx.local.controller_task.run(ctx.shared.motors);
 
         let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
-        controller_task_runner::spawn_at(a + ExtU64::micros(ctx.local.controller_task.next_run())).unwrap();
+        *ctx.shared.time_tracker +=ctx.local.controller_task.next_run();
+        controller_task_runner::spawn_at(a + ExtU64::micros(*ctx.shared.time_tracker)).unwrap();
         let _ = ctx.local.debug_pin2.set_low();
     }
 
