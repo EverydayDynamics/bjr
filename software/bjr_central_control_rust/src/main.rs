@@ -27,3 +27,6 @@ mod plate_state;
 mod motor_state;
 mod value_state;
 mod initializer;
+mod refcell_i2c_device;
+mod plate_angle_sensor;
+mod mutex_i2c_device;

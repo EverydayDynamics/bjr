@@ -2696,7 +2696,7 @@
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "ICM-42670-P" (at 194.31 67.31 0)
-      (effects (font (size 1.27 1.27)) (justify left) hide)
+      (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "bjr_footprint_lib:IC_ICM-42670-P" (at 224.79 66.04 0)
       (effects (font (size 1.27 1.27)) (justify bottom) hide)

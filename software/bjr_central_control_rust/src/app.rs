@@ -15,7 +15,16 @@ mod app {
                                gpiob::PB4,
                                gpiob::PB5,
                                gpiob::PB6,
-                               Output, Input}, prelude::*};
+                               Output, Input},
+                        i2c::I2c,
+                        pac::I2C1,
+                        prelude::*};
+    use core::cell::RefCell;
+    use spin::Mutex;
+    use crate::refcell_i2c_device::RefCellDevice;
+    use core::borrow::BorrowMut;
+    use crate::mutex_i2c_device::MutexDevice;
+    use crate::plate_angle_sensor::PlateAngleSensor;
     use crate::stepper_state::StepperState;
     use crate::controller_task::ControllerTask;
     use crate::actuator_num::NUM_ACTUATOR;
@@ -29,6 +38,8 @@ mod app {
     use stm32f4xx_hal::pac;
     use stm32f4xx_hal::timer::MonoTimer64Us;
     use systick_monotonic::Systick;
+    use icm42670::{prelude::*, Address, Icm42670};
+
 
     //use rtt_target::{rprintln, rtt_init_print};
     use rtt_log;
@@ -47,11 +58,14 @@ mod app {
         motors: [MotorLiteral;3],
         #[lock_free]
         time_tracker: u64,
+        #[lock_free]
+        plate_angle_sensor: Option<PlateAngleSensor<I2c<I2C1>>>,
     }
 
     // Local resources go here
     #[local]
     struct Local {
+        i2c: Option<I2c<I2C1>>,
         controller_task: ControllerTask,
         initializer_task: Initializer,
         stepper_task_a: StepperCtrlrTask<'static, PA5<Output>,PA0<Output>>,
@@ -115,6 +129,9 @@ mod app {
             MotorEnum::MotorC(LinearStepperMotor::new(Lga201s06AUecb019::new(), stp_setp_c_prod, SilentStepStick::new(stepper_c_diag_pin), &STEPPERS_STATE[2]))];
         let controller_task = ControllerTask::new();
 
+        //Setup I2C
+        log::info!("Starting I2C...");
+        let i2c = I2c::new(ctx.device.I2C1, (gpiob.pb8, gpiob.pb9), 400.kHz(), &clocks);
         // Setup timers
         let mut stepper_main_timer = ctx.device.TIM2.counter_us(&clocks);
         stepper_main_timer.start(ExtU32::micros(1000)).unwrap();
@@ -129,10 +146,12 @@ mod app {
             Shared {
                 motors,
                 time_tracker: 0,
+                plate_angle_sensor: None,
                 // Initialization of shared resources go here
             },
             Local {
                 // Initialization of local resources go here
+                i2c: Some(i2c),
                 controller_task,
                 initializer_task: Initializer::new(),
                 stepper_task_a,
@@ -148,9 +167,17 @@ mod app {
         )
     }
 
-    #[task(local = [initializer_task], shared = [motors, time_tracker], priority = 1)]
+    #[task(local = [initializer_task, i2c], shared = [motors, time_tracker, plate_angle_sensor], priority = 1)]
     fn initializer_task_runner(ctx: initializer_task_runner::Context) {
-        let finished = ctx.local.initializer_task.run(ctx.shared.motors);
+        match ctx.shared.plate_angle_sensor{
+            None => {
+                ctx.shared.plate_angle_sensor.replace(PlateAngleSensor::new(0, ctx.local.i2c.take().unwrap()).unwrap());
+            }
+            Some(_) => {
+
+            }
+        }
+        let finished = ctx.local.initializer_task.run(ctx.shared.motors, ctx.shared.plate_angle_sensor.as_mut().unwrap(), *ctx.shared.time_tracker);
         let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
         *ctx.shared.time_tracker +=ctx.local.initializer_task.next_run();
         if finished {
@@ -160,10 +187,10 @@ mod app {
             initializer_task_runner::spawn_at(a + ExtU64::micros(*ctx.shared.time_tracker)).unwrap();
         }
     }
-    #[task(local = [controller_task, debug_pin2], shared = [motors, time_tracker], priority = 1)]
+    #[task(local = [controller_task, debug_pin2], shared = [motors, time_tracker, plate_angle_sensor], priority = 1)]
     fn controller_task_runner(ctx: controller_task_runner::Context) {
         let _ = ctx.local.debug_pin2.set_high();
-        ctx.local.controller_task.run(ctx.shared.motors);
+        ctx.local.controller_task.run(ctx.shared.motors, ctx.shared.plate_angle_sensor.as_mut().unwrap(), ctx.shared.time_tracker);
 
         let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
         *ctx.shared.time_tracker +=ctx.local.controller_task.next_run();
