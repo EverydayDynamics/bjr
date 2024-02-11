@@ -1,6 +1,8 @@
 import json
 import tkinter as tk
 from tkinter import filedialog
+
+import matplotlib
 import matplotlib.pyplot as plt
 from pcb_definitions import BoardData, Unit, Layer, Point, Track
 import itertools
@@ -16,6 +18,7 @@ def open_file_dialog():
 
 
 def plot_tracks(board_data):
+    matplotlib.use('Qt5Agg')
     mm2pts = (72.0/25.4)
     plt.figure()
     plt.gca().set_aspect('equal', adjustable='box')

@@ -3,15 +3,7 @@ from typing import List, NamedTuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import List
-
-
-@dataclass
-class Point:
-    x: float
-    y: float
-
-    def __add__(self, other):
-        return Point(self.x + other.x, self.y + other.y)
+from shapely.geometry import Point
 
 
 @dataclass
