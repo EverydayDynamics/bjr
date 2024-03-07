@@ -40,9 +40,8 @@ impl Initializer
         let accel = controller.run(&setpoint, &state);
         motor.update(accel);
     }
-    pub fn run<MOT, I2C, E>(&mut self, motors: &mut [MOT; NUM_ACTUATOR], maybe_plate_sensor: &mut PlateAngleSensor<I2C>, micros: u64 ) -> bool
+    pub fn run<MOT>(&mut self, motors: &mut [MOT; NUM_ACTUATOR], micros: u64 ) -> bool
         where MOT: Motor+StepperMotor,
-              I2C: Write<Error = E> + WriteRead<Error = E>, E: Debug,
     {
         let mut homed_axes = 0;
         for iter in motors.iter_mut().zip(self.motors_homing_tools.iter_mut()) {
@@ -86,7 +85,6 @@ impl Initializer
             }
 
         }
-        let result = maybe_plate_sensor.update(micros);
         homed_axes == NUM_ACTUATOR
     }
 

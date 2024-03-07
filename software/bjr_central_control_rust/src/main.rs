@@ -30,3 +30,4 @@ mod initializer;
 mod refcell_i2c_device;
 mod plate_angle_sensor;
 mod mutex_i2c_device;
+mod TSC2046_driver;

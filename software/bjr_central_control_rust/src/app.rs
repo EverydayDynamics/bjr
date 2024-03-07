@@ -171,13 +171,13 @@ mod app {
     fn initializer_task_runner(ctx: initializer_task_runner::Context) {
         match ctx.shared.plate_angle_sensor{
             None => {
-                ctx.shared.plate_angle_sensor.replace(PlateAngleSensor::new(0, ctx.local.i2c.take().unwrap()).unwrap());
+                //ctx.shared.plate_angle_sensor.replace(PlateAngleSensor::new(0, ctx.local.i2c.take().unwrap()).unwrap());
             }
             Some(_) => {
 
             }
         }
-        let finished = ctx.local.initializer_task.run(ctx.shared.motors, ctx.shared.plate_angle_sensor.as_mut().unwrap(), *ctx.shared.time_tracker);
+        let finished = ctx.local.initializer_task.run(ctx.shared.motors, *ctx.shared.time_tracker);
         let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
         *ctx.shared.time_tracker +=ctx.local.initializer_task.next_run();
         if finished {
@@ -190,7 +190,7 @@ mod app {
     #[task(local = [controller_task, debug_pin2], shared = [motors, time_tracker, plate_angle_sensor], priority = 1)]
     fn controller_task_runner(ctx: controller_task_runner::Context) {
         let _ = ctx.local.debug_pin2.set_high();
-        ctx.local.controller_task.run(ctx.shared.motors, ctx.shared.plate_angle_sensor.as_mut().unwrap(), ctx.shared.time_tracker);
+        ctx.local.controller_task.run(ctx.shared.motors, ctx.shared.time_tracker);
 
         let a:systick_monotonic::fugit::Instant<u64, 1, 1000000>  = systick_monotonic::Systick::zero();
         *ctx.shared.time_tracker +=ctx.local.controller_task.next_run();
