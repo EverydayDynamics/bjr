@@ -36,7 +36,7 @@ class JsonImportPlugin(pcbnew.ActionPlugin):
         self.name = "Import JSON"
         self.category = "import"
         self.description = "import a cusom plugin"
-        # self.show_toolbar_button = False # Optional, defaults to False
+        self.show_toolbar_button = True # Optional, defaults to False
         # self.icon_file_name = os.path.join(os.path.dirname(__file__), 'simple_plugin.png') # Optional, defaults to ""
 
     def Run(self):

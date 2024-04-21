@@ -16,13 +16,14 @@ class Direction(Enum):
     CCW = "CCW"
 
 class PolySpiral:
-    def __init__(self, poly: Polygon2D, turns, width, spacing, layer, direction: Direction):
+    def __init__(self, poly: Polygon2D, start_angle, turns, width, spacing, layer, direction: Direction):
         self.poly = poly
         self.width = width
         self.spacing = spacing
         self.layer = layer
         self.direction = direction
         self.turns = turns
+        self.start_ange = start_angle
 
     def add2board(self, board):
         degree_step = 5.0
@@ -31,7 +32,8 @@ class PolySpiral:
         if self.direction is Direction.CCW:
             angle_step = -angle_step
             angle_end = -angle_end
-        angle = 0.0
+        angle_end += math.radians(self.start_ange)
+        angle = math.radians(self.start_ange)
         inwards_step = degree_step / 360 * (self.width + self.spacing)
 
         inwards = 0
@@ -107,7 +109,7 @@ def main():
                               Point(57.00000,-8.66025)]
     user_specified_center = Point(0.0, 0.0)
     square = Polygon2D(vertices_truncated_hex, user_specified_center)
-    PsP = PolySpiral(square, 36, min_width, min_spacing, Layer.TOP_COPPER, Direction.CW)
+    PsP = PolySpiral(square, 90 , 33, min_width, min_spacing, Layer.BOTTOM_COPPER, Direction.CCW)
 
     PsP.add2board(board_data)
     plot_tracks(board_data)

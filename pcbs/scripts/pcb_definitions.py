@@ -3,8 +3,12 @@ from typing import List, NamedTuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import List
-from shapely.geometry import Point
 
+
+@dataclass
+class Point:
+    x: float
+    y: float
 
 @dataclass
 class Track:
