@@ -4,13 +4,13 @@
 
 use core::cell::RefCell;
 use cortex_m::interrupt::Mutex;
-use defmt_tester as _;
+use bjr as _;
 use stm32f4xx_hal as hal;
 use stm32f4xx_hal::gpio::{Output, Pin, gpiob::PB6};
 use stm32f4xx_hal::pac::SPI1;
 use stm32f4xx_hal::spi::Spi;
 use tmc5130::Tmc5130;
-use defmt_tester::utils::spidev::{Spidev, SpiDevError};
+use bjr::utils::spidev::{Spidev, SpiDevError};
 static GUARDED_SPI: Mutex<RefCell<Option<Spi<SPI1>>>> =
     Mutex::new(RefCell::new(None));
 struct State<'a> {
@@ -30,7 +30,7 @@ mod tests {
     use stm32f4xx_hal::gpio::PinState;
     use tmc5130::{reg, Tmc5130};
     use tmc5130::reg::Address::CHOPCONF;
-    use defmt_tester::utils::spidev::Spidev;
+    use bjr::utils::spidev::Spidev;
 
     #[init]
     fn setup() -> super::State<'static> {

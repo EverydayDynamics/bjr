@@ -1,7 +1,7 @@
 [package]
 # TODO(1) fix `authors` and `name` if you didn't use `cargo-generate`
 authors = ["tamasfeher <tamas@automata.tech>"]
-name = "defmt-tester"
+name = "bjr"
 edition = "2021"
 version = "0.1.0"
 
@@ -28,7 +28,7 @@ rtic = { version = "2.1.1", features = [ "thumbv7-backend"  ] }
 rtic-monotonics = { version = "1.5.0", features = [ "cortex-m-systick" ]}
 rtic-core = "1.0.0"
 embedded-hal = "1.0.0"
-tmc5130 = {path = "../TMC5130", features = ["defmt"]}
+tmc5130 = {path = "../../../TMC5130", features = ["defmt"]}
 
 [dependencies.stm32f4xx-hal]
 version = "0.20.0"

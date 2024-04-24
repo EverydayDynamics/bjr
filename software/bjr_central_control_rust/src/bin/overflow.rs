@@ -1,12 +1,12 @@
 #![no_main]
 #![no_std]
 
-use defmt_tester as _; // global logger + panicking-behavior + memory layout
+use bjr as _; // global logger + panicking-behavior + memory layout
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
     ack(10, 10);
-    defmt_tester::exit()
+    bjr::exit()
 }
 
 fn ack(m: u32, n: u32) -> u32 {

@@ -2,7 +2,7 @@
 #![no_std]
 //#![feature(type_alias_impl_trait)]
 
-use defmt_tester as _; // global logger + panicking-behavior + memory layout
+use bjr as _; // global logger + panicking-behavior + memory layout
 
 // TODO(7) Configure the `rtic::app` macro
 #[rtic::app(
@@ -69,6 +69,6 @@ mod app {
     // TODO: Add tasks
     #[task(priority = 1)]
     async fn task1(cx: task1::Context) {
-        defmt_tester::exit()
+        bjr::exit()
     }
 }

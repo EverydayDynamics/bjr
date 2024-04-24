@@ -1,7 +1,7 @@
 #![no_main]
 #![no_std]
 
-use defmt_tester as _; // global logger + panicking-behavior + memory layout
+use bjr as _; // global logger + panicking-behavior + memory layout
 use defmt::Format; // <- derive attribute
 
 #[derive(Format)]
@@ -25,5 +25,5 @@ fn main() -> ! {
     let x = 42;
     defmt::error!("x={=u8}", x);
 
-    defmt_tester::exit()
+    bjr::exit()
 }
