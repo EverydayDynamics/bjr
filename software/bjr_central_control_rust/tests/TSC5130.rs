@@ -23,6 +23,7 @@ mod tests {
     use cortex_m::interrupt::Mutex;
     use cortex_m::interrupt;
     use defmt::{assert_eq, unwrap, assert};
+    use defmt::export::acquire;
     use stm32f4xx_hal as hal;
     use hal::{gpio::NoPin, pac, prelude::*};
     use crate::{GUARDED_SPI, State};
@@ -84,28 +85,53 @@ mod tests {
         let mut a1 = reg::A1::from(1000);
         let mut v1 = reg::V1::from(50000);
         let mut amax = reg::AMAX::from(500);
-        let mut vmax = reg::VMAX::from(100000);
+        let mut vmax = reg::VMAX::from(200000);
         let mut dmax = reg::DMAX::from(700);
         let mut d1 = reg::D1::from(1400);
         let mut vstop = reg::VSTOP::from(10);
         let mut rampmode = reg::RAMPMODE::from(0);
         let mut xtarget = reg::XTARGET::default();
-        xtarget.set(-51200);
+        xtarget.set(51200);
         //todo: start running with XTARTGET
-        let result = state.test_driver.write_register(chopconf).unwrap();
-        let result = state.test_driver.write_register(ihold_irun).unwrap();
-        let result = state.test_driver.write_register(tpowerdown).unwrap();
-        let result = state.test_driver.write_register(gconf).unwrap();
-        let result = state.test_driver.write_register(tpwmthrs).unwrap();
-        let result = state.test_driver.write_register(pwmconf).unwrap();
-        let result = state.test_driver.write_register(a1).unwrap();
-        let result = state.test_driver.write_register(v1).unwrap();
-        let result = state.test_driver.write_register(amax).unwrap();
-        let result = state.test_driver.write_register(vmax).unwrap();
-        let result = state.test_driver.write_register(dmax).unwrap();
-        let result = state.test_driver.write_register(d1).unwrap();
-        let result = state.test_driver.write_register(vstop).unwrap();
-        let result = state.test_driver.write_register(rampmode).unwrap();
-        let result = state.test_driver.write_register(xtarget).unwrap();
+        let mut vactual = reg::VACTUAL::default();
+        let mut xtarget2 = reg::State::from(reg::XTARGET::default());
+
+        let b_chopconf = tmc5130::reg::State::from(chopconf);
+        let b_ihold_irun = tmc5130::reg::State::from(ihold_irun);
+        let b_tpowerdown = tmc5130::reg::State::from(tpowerdown);
+        let b_gconf = tmc5130::reg::State::from(gconf);
+        let b_pwmconf = tmc5130::reg::State::from(pwmconf);
+        let b_a1 = tmc5130::reg::State::from(a1);
+        let b_v1 = tmc5130::reg::State::from(v1);
+        let b_amax = tmc5130::reg::State::from(amax);
+        let b_vmax = tmc5130::reg::State::from(vmax);
+        let b_dmax = tmc5130::reg::State::from(dmax);
+        let b_d1 = tmc5130::reg::State::from(d1);
+        let b_vstop = tmc5130::reg::State::from(vstop);
+        let b_rampmode = tmc5130::reg::State::from(rampmode);
+        let b_xtarget = tmc5130::reg::State::from(xtarget);
+        let mut actions = [
+            tmc5130::Action::write(&b_chopconf),
+            tmc5130::Action::write(&b_ihold_irun),
+            tmc5130::Action::write(&b_tpowerdown),
+            tmc5130::Action::write(&b_gconf),
+            tmc5130::Action::write(&b_pwmconf),
+            tmc5130::Action::write(&b_a1),
+            tmc5130::Action::write(&b_v1),
+            tmc5130::Action::write(&b_amax),
+            tmc5130::Action::write(&b_vmax),
+            tmc5130::Action::write(&b_dmax),
+            tmc5130::Action::write(&b_d1),
+            tmc5130::Action::write(&b_vstop),
+            tmc5130::Action::write(&b_rampmode),
+            tmc5130::Action::write(&b_xtarget),
+            tmc5130::Action::read(&mut xtarget2),
+        ];
+
+        defmt::info!("Starting bulk action");
+        let result = state.test_driver.bulk_register_action(&mut actions);
+        defmt::info!("result: {}", result);
+        let state_num: u32 = xtarget2.into();
+        defmt::info!("xtarget data: {}", state_num);
     }
 }

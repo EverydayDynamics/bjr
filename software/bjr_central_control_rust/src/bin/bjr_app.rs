@@ -46,7 +46,6 @@ mod app {
         let token = rtic_monotonics::create_systick_token!();
         rtic_monotonics::systick::Systick::start(cx.core.SYST, sysclk, token);
         task1::spawn().ok();
-
         (
             Shared {
                 // Initialization of shared resources go here
