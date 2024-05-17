@@ -31,6 +31,7 @@ mod tests {
     use stm32f4xx_hal::gpio::PinState;
     use tmc5130::{reg, Tmc5130};
     use tmc5130::reg::Address::CHOPCONF;
+    use tmc5130::reg::XACTUAL;
     use bjr::utils::spidev::Spidev;
 
     #[init]
@@ -67,17 +68,18 @@ mod tests {
         chopconf.set_hstrt(4);
         chopconf.set_hend(1);
         chopconf.set_tbl(2);
-        chopconf.set_vsense(true);
+        //chopconf.set_vsense();
         chopconf.set_chm(false);
         let mut ihold_irun = reg::IHOLD_IRUN::default();
-        ihold_irun.set_ihold(0);
-        ihold_irun.set_irun(16);
+        ihold_irun.set_ihold(1);
+        ihold_irun.set_irun(4);
         ihold_irun.set_ihold_delay(6);
         let mut tpowerdown = reg::TPOWERDOWN::from(10);
         let mut gconf = reg::GCONF::default();
-        let mut tpwmthrs = reg::TPWMTHRS::from(500);
-        let mut pwmconf = reg::PWMCONF::from(500);
-        pwmconf.set_pwm_autoscale(false);
+        //let mut tpwmthrs = reg::TPWMTHRS::from(500);
+        let mut tpwmthrs = reg::TPWMTHRS::from(1000);
+        let mut pwmconf = reg::PWMCONF::default();;
+        pwmconf.set_pwm_autoscale(true);
         pwmconf.set_pwm_ampl(200);
         pwmconf.set_pwm_grad(1);
         pwmconf.set_pwm_freq(0);
@@ -90,16 +92,16 @@ mod tests {
         let mut d1 = reg::D1::from(1400);
         let mut vstop = reg::VSTOP::from(10);
         let mut rampmode = reg::RAMPMODE::from(0);
-        let mut xtarget = reg::XTARGET::default();
+        let mut xtarget = reg::XTARGET::from(51200);
         xtarget.set(51200);
         //todo: start running with XTARTGET
         let mut vactual = reg::VACTUAL::default();
-        let mut xtarget2 = reg::State::from(reg::XTARGET::default());
 
         let b_chopconf = tmc5130::reg::State::from(chopconf);
         let b_ihold_irun = tmc5130::reg::State::from(ihold_irun);
         let b_tpowerdown = tmc5130::reg::State::from(tpowerdown);
         let b_gconf = tmc5130::reg::State::from(gconf);
+        let b_tpwmthrs = tmc5130::reg::State::from(tpwmthrs);
         let b_pwmconf = tmc5130::reg::State::from(pwmconf);
         let b_a1 = tmc5130::reg::State::from(a1);
         let b_v1 = tmc5130::reg::State::from(v1);
@@ -115,6 +117,7 @@ mod tests {
             tmc5130::Action::write(&b_ihold_irun),
             tmc5130::Action::write(&b_tpowerdown),
             tmc5130::Action::write(&b_gconf),
+            tmc5130::Action::write(&b_tpwmthrs),
             tmc5130::Action::write(&b_pwmconf),
             tmc5130::Action::write(&b_a1),
             tmc5130::Action::write(&b_v1),
@@ -125,13 +128,30 @@ mod tests {
             tmc5130::Action::write(&b_vstop),
             tmc5130::Action::write(&b_rampmode),
             tmc5130::Action::write(&b_xtarget),
-            tmc5130::Action::read(&mut xtarget2),
         ];
 
         defmt::info!("Starting bulk action");
         let result = state.test_driver.bulk_register_action(&mut actions);
         defmt::info!("result: {}", result);
-        let state_num: u32 = xtarget2.into();
-        defmt::info!("xtarget data: {}", state_num);
+        let mut xactual_reg = reg::XACTUAL::default();
+        let mut target = 51200;
+        loop {
+            match state.test_driver.read_register::<XACTUAL>() {
+                Ok((status,reg)) => {
+                    let pos: u32 = reg.into();
+                    defmt::info!("Current position:{}, status flags: ({})", pos, status);
+                    if status.position_reached() {
+                        target *= -1;
+                        xtarget.set(target);
+                        if let Err(errer) = state.test_driver.write_register(xtarget) {
+                            defmt::error!("Failed to write register:{}", errer);
+                        }
+                    }
+                }
+                Err(error) => {
+                    defmt::error!("Failed to read register:{}", error);
+                }
+            }
+        }
     }
 }
