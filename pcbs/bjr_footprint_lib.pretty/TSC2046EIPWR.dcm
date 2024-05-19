@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP TSC2046EIPWR
+D 4-Wire Touch Screen Controller with low voltage digital I/O and extended ESD protection
+K
+F http://www.ti.com/lit/gpn/TSC2046E
+$ENDCMP
+#
+#End Doc Library
