@@ -17,6 +17,10 @@ harness = false
 name = "TSC5130"
 harness = false
 
+[[test]]
+name = "TSC2046"
+harness = false
+
 [dependencies]
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7"
@@ -29,6 +33,7 @@ rtic-monotonics = { version = "1.5.0", features = [ "cortex-m-systick" ]}
 rtic-core = "1.0.0"
 embedded-hal = "1.0.0"
 tmc5130 = {path = "../../../TMC5130", features = ["defmt"]}
+tsc2046 = "0.1.0"
 
 [dependencies.stm32f4xx-hal]
 version = "0.20.0"
