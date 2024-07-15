@@ -63,19 +63,19 @@ mod tests {
     }
     #[test]
     fn test_touch(state: &mut super::State<'static>) {
-        loop {
             let result =state.test_driver.get_touch();
             match result {
                 Ok(maybe_touch) => {
-                    if let Some(touch) =maybe_touch{
+                    if let Some(touch) = maybe_touch {
                         defmt::info!("touch detected X:{}, Y:{}, Z:{}",touch.x, touch.y,touch.z)
                     } else {
                         defmt::info!("No touch detected");
-                    }}
+                    }
+                }
                 Err(error) => {
-                    defmt::error!{"{}",error}}
-            };
+                    defmt::error! {"{}",error}
+                }
 
-        }
+            };
     }
 }

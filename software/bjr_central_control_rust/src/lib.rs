@@ -1,6 +1,9 @@
 #![no_main]
 #![no_std]
 pub mod utils;
+pub mod bsp;
+pub mod app;
+
 use cortex_m_semihosting::debug;
 
 use defmt_rtt as _; // global logger

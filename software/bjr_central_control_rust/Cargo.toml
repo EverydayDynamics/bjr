@@ -14,11 +14,19 @@ name = "integration"
 harness = false
 
 [[test]]
+name = "unit_tests"
+harness = false
+
+[[test]]
 name = "TSC5130"
 harness = false
 
 [[test]]
 name = "TSC2046"
+harness = false
+
+[[test]]
+name = "MotorDrive_tests"
 harness = false
 
 [dependencies]
@@ -32,8 +40,9 @@ rtic = { version = "2.1.1", features = [ "thumbv7-backend"  ] }
 rtic-monotonics = { version = "1.5.0", features = [ "cortex-m-systick" ]}
 rtic-core = "1.0.0"
 embedded-hal = "1.0.0"
-tmc5130 = {path = "../../../TMC5130", features = ["defmt"]}
+tmc5130 = { git = "https://github.com/EdBuilds/TMC5130.git", branch = "feature/basic_implementation" ,features = ["defmt"]}
 tsc2046 = "0.1.0"
+heapless = "0.8.0"
 
 [dependencies.stm32f4xx-hal]
 version = "0.20.0"
@@ -80,3 +89,6 @@ lto = 'fat'
 opt-level = 3            # <-
 overflow-checks = false  # <-
 
+[features]
+default = ["mock_board"]
+mock_board = []
