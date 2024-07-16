@@ -25,6 +25,10 @@ pub trait TouchSensor {
 pub trait Button{
     fn is_pressed(&mut self) -> bool;
 }
+
+pub trait Monotonic {
+    fn current_instance(&mut self) -> u64;
+}
 #[derive(Debug)]
 pub enum DeviceError {
     CommunicationError,
