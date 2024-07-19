@@ -1,3 +1,4 @@
+use core::fmt::Arguments;
 pub trait BoardSupport {
     fn get_temperature_sensor(&self) -> &dyn TemperatureSensor;
     fn get_stepper_motor_controller(&self) -> &dyn StepperMotorController;
@@ -34,6 +35,15 @@ pub trait Button{
 
 pub trait Monotonic {
     fn current_time(&mut self) -> u64;
+}
+
+
+pub trait Logger {
+    fn trace(&self, args: Arguments<'_>);
+    fn debug(&self, args: Arguments<'_>);
+    fn info(&self, args: Arguments<'_>);
+    fn warn(&self, args: Arguments<'_>);
+    fn error(&self, args: Arguments<'_>);
 }
 #[derive(Debug)]
 pub enum DeviceError {

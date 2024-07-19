@@ -1,0 +1,11 @@
+#![no_main]
+#![no_std]
+
+use bjr_bsp as _; // global logger + panicking-behavior + memory layout
+
+#[cortex_m_rt::entry]
+fn main() -> ! {
+    defmt::println!("Hello, world!");
+
+    bjr_bsp::exit()
+}

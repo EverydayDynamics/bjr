@@ -9,6 +9,7 @@ pub struct PlateState {
     angle: [KinState;2],
 }
 
+#[derive(Default)]
 pub struct PlateDelta {
     height: KinState,
     angle: [KinState;2],
@@ -22,4 +23,7 @@ pub struct ControlInputs{
 
 pub struct ControlOutputs{
     motor_velocities: [f32;2],
+}
+pub struct TelemetryPacket{
+
 }

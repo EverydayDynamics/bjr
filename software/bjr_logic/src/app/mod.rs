@@ -8,3 +8,5 @@ mod control_primitives;
 mod inverse_kinematics;
 mod ballpath_generator;
 mod limits;
+mod parameter_manager;
+mod event_queue;

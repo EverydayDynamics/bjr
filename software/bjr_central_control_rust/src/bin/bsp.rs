@@ -11,7 +11,6 @@ use heapless::mpmc::Q8;
 use bjr::app::event::GlobEvent;
 static EVENTQUEUE : Q8<GlobEvent> = Q8::new();
 
-#[cfg(not(feature = "mock_board"))]
 #[cortex_m_rt::entry]
 fn main() -> ! {
 

@@ -1,6 +1,5 @@
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
-use crate::bsp::traits::Button;
 use crate::app::button_handler::ButtonHandler;
 use crate::app::event_handler::EventHandler;
 use crate::app::feedforward_generator::FFGen;
@@ -8,8 +7,6 @@ use embedded_time::duration::*;
 use crate::app::ballpath_generator::BallpathGenerator;
 use crate::app::control_primitives::{ControlInputs, ControlOutputs, KinState};
 use crate::app::control_runner::ControlRunner;
-use core::default;
-use stm32f4xx_hal::gpio::Output;
 
 struct Inputs {
    measured_plate_angle: [KinState;2],
@@ -27,12 +24,13 @@ pub struct LogicRunner<'a> {
     ballpath_generator: BallpathGenerator,
     control_runner: ControlRunner,
 }
+
 impl<'a> LogicRunner<'a> {
     pub fn new(button_handler: ButtonHandler<'a>, event_queue: &'static Q8<GlobEvent>) -> Self {
         LogicRunner{
             button_handler,
             event_queue,
-            event_handler: EventHandler::new(event_queue),
+            event_handler: EventHandler::new(),
             ffgen: FFGen::new(),
             ballpath_generator: BallpathGenerator::new(),
             control_runner: ControlRunner{},
@@ -41,7 +39,7 @@ impl<'a> LogicRunner<'a> {
     fn read_inputs(&mut self) -> Inputs{
         todo!()
     }
-    fn write_outputs(&mut self, outputs: Outputs) {
+    fn write_outputs(&mut self, outputs: Outputs){
         todo!()
     }
 
