@@ -1,10 +1,13 @@
-#![no_main]
-#![no_std]
+#[cfg_attr(not(feature = "mock_board"), no_main)]
+#[cfg_attr(not(feature = "mock_board"), no_std)]
 //#![feature(type_alias_impl_trait)]
 
+#[cfg(not(feature = "mock_board"))]
 use bjr as _; // global logger + panicking-behavior + memory layout
 
 // TODO(7) Configure the `rtic::app` macro
+
+#[cfg(not(feature = "mock_board"))]
 #[rtic::app(
 // TODO: Replace `some_hal::pac` with the path to the PAC
 device = stm32f4xx_hal::pac,
@@ -71,3 +74,5 @@ mod app {
         bjr::exit()
     }
 }
+#[cfg(feature = "mock_board")]
+fn main() -> ! {loop{}}

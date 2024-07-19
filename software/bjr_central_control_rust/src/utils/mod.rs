@@ -1,3 +1,2 @@
+#[cfg(not(feature = "mock_board"))]
 pub mod spidev;
-pub mod MotorDrive;
-pub mod PlatformManager;

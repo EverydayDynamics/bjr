@@ -1,3 +1,4 @@
+use crate::bsp::traits::MotorState;
 use super::super::traits::{StepperMotorController, DeviceError};
 
 pub(super) struct MyBoardStepperMotorController {
@@ -11,18 +12,12 @@ impl MyBoardStepperMotorController {
 }
 
 impl StepperMotorController for MyBoardStepperMotorController {
-    fn set_speed(&mut self, speed: u32) -> Result<(), DeviceError> {
-        // Implement speed setting logic
+
+    fn set_run_values(&mut self, speed: i32, accel: i32) -> Result<(), DeviceError> {
         todo!()
     }
 
-    fn move_steps(&mut self, steps: i32) -> Result<(), DeviceError> {
-        // Implement step movement logic
-        todo!()
-    }
-
-    fn get_position(&self) -> Result<i32, DeviceError> {
-        // Implement position reading logic
+    fn get_state(&self) -> Result<MotorState, DeviceError> {
         todo!()
     }
 }

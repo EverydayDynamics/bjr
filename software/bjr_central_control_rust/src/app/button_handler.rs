@@ -29,7 +29,6 @@ impl<'a> ButtonHandler<'a> {
 }
 
 // Example usage
-#[defmt_test::tests]
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,6 +1,7 @@
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 
+#[derive(Clone, Copy)]
 pub enum State {
     Initializing,
     Homing,

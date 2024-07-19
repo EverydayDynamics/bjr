@@ -7,11 +7,17 @@ pub trait BoardSupport {
 pub trait TemperatureSensor {
     fn read_temperature(&self) -> Result<f32, DeviceError>;
 }
-
+pub trait MotorEnabler {
+    fn set_enable(&mut self, enable: bool);
+}
+pub struct MotorState {
+    pub velocity: i32,
+    pub position: i32,
+}
 pub trait StepperMotorController {
-    fn set_speed(&mut self, speed: u32) -> Result<(), DeviceError>;
-    fn move_steps(&mut self, steps: i32) -> Result<(), DeviceError>;
-    fn get_position(&self) -> Result<i32, DeviceError>;
+
+    fn set_run_values(&mut self, speed: i32, accel: i32) -> Result<(), DeviceError>;
+    fn get_state(&self) -> Result<MotorState, DeviceError>;
 }
 
 pub struct Point {
@@ -27,7 +33,7 @@ pub trait Button{
 }
 
 pub trait Monotonic {
-    fn current_instance(&mut self) -> u64;
+    fn current_time(&mut self) -> u64;
 }
 #[derive(Debug)]
 pub enum DeviceError {
