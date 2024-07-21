@@ -1,3 +1,4 @@
+#![no_std]
 use core::fmt::Arguments;
 pub trait BoardSupport {
     fn get_temperature_sensor(&self) -> &dyn TemperatureSensor;
@@ -14,11 +15,21 @@ pub trait MotorEnabler {
 pub struct MotorState {
     pub velocity: i32,
     pub position: i32,
+    pub limit_reached: bool,
+}
+pub enum MotorMode {
+    PositionCtrl,
+    VelocityCtrl,
+}
+pub struct MotorInput {
+    pub velocity: i32,
+    pub acceleration: i32,
+    pub position: i32,
+    pub mode: MotorMode,
 }
 pub trait StepperMotorController {
-
-    fn set_run_values(&mut self, speed: i32, accel: i32) -> Result<(), DeviceError>;
-    fn get_state(&self) -> Result<MotorState, DeviceError>;
+    fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
+    fn get_state(&self) -> Result<MotorState, StepperDeviceError>;
 }
 
 pub struct Point {
@@ -50,4 +61,23 @@ pub enum DeviceError {
     CommunicationError,
     InvalidParameter,
     HardwareFailure,
+}
+#[derive(Debug)]
+pub enum StepperDeviceError {
+    CommunicationError(CommsError),
+    DriverError,
+    UnexpectedReset,
+    InvalidParameter,
+    HardwareFailure,
+}
+#[derive(Debug)]
+pub enum CommsError {
+    SPIMutex,
+    SPICSPIn,
+    SPIOverrun,
+    SPICRIC,
+    SPIModeFault,
+    SPIFrameFormat,
+    NotImplemented,
+    Unknown,
 }

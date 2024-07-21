@@ -1,41 +1,21 @@
 #![no_main]
 #![no_std]
 
-use cortex_m_semihosting::debug;
 
-use defmt_rtt as _; // global logger
 
-// TODO(5) adjust HAL import
-// use some_hal as _; // memory layout
 
-use panic_probe as _;
+#[cfg(feature = "mock_board")]
+pub mod mock_board;
+#[cfg(feature = "main_board")]
+pub mod main_board;
+mod utils;
+mod devices;
+pub mod boards;
 
-// same panicking *behavior* as `panic-probe` but doesn't print a panic message
-// this prevents the panic message being printed *twice* when `defmt::panic` is invoked
-#[defmt::panic_handler]
-fn panic() -> ! {
-    cortex_m::asm::udf()
-}
-
-/// Terminates the application and makes a semihosting-capable debug tool exit
-/// with status code 0.
-pub fn exit() -> ! {
-    loop {
-        debug::exit(debug::EXIT_SUCCESS);
-    }
-}
-
-/// Hardfault handler.
-///
-/// Terminates the application and makes a semihosting-capable debug tool exit
-/// with an error. This seems better than the default, which is to spin in a
-/// loop.
-#[cortex_m_rt::exception]
-unsafe fn HardFault(_frame: &cortex_m_rt::ExceptionFrame) -> ! {
-    loop {
-        debug::exit(debug::EXIT_FAILURE);
-    }
-}
+#[cfg(feature = "mock_board")]
+pub use mock_board::MyBoard as Board;
+#[cfg(feature = "main_board")]
+pub use main_board::MyBoard as Board;
 
 // defmt-test 0.3.0 has the limitation that this `#[tests]` attribute can only be used
 // once within a crate. the module can be in any file but there can only be at most
@@ -43,10 +23,34 @@ unsafe fn HardFault(_frame: &cortex_m_rt::ExceptionFrame) -> ! {
 #[cfg(test)]
 #[defmt_test::tests]
 mod unit_tests {
+    use bsp_traits::BoardSupport;
     use defmt::assert;
+    use crate::boards::BjrBoardSupport;
+    use super::*;
 
+    struct State { // state shared between `#[test]` functions
+        pub board: Board
+    }
+    #[init]
+    fn init() -> State {
+        let board = Board::new().unwrap();
+        State{
+            board
+        }
+    }
     #[test]
     fn it_works() {
         assert!(true)
     }
+    #[test]
+    fn button_use(state: &mut State) {
+        let button = state.board.get_button();
+        assert_eq!(button.is_pressed(), false);
+    }
+
+    #[test]
+    fn motor_use(state: &mut State) {
+        let controllers = state.board.get_stepper_motor_controllers();
+    }
+
 }
