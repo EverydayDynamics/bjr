@@ -87,7 +87,10 @@ const RAMPMODE_VEL_MODE_POS: u8 = 1;
 const RAMPMODE_VEL_MODE_NEG: u8 = 2;
 const RAMPMODE_HOLD: u8 = 3;
 
-impl<SPI> StepperMotorController for TMC5130StepperDev<SPI> {
+impl<SPI> StepperMotorController for TMC5130StepperDev<SPI>
+where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
+      SPI: embedded_hal::spi::SpiDevice
+{
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
         let vel_abs = inputs.velocity.abs() as u32;
         let acc_abs = inputs.acceleration.abs() as u16;
@@ -108,20 +111,41 @@ impl<SPI> StepperMotorController for TMC5130StepperDev<SPI> {
             }
         }
 
+        let mut drv_status_binding = tmc5130::reg::State::from(*self.map.drv_status_mut());
         let mut actions = [
-            tmc5130::Action::read(&mut tmc5130::reg::State::from(self.map.drv_status())),
+            tmc5130::Action::read(&mut drv_status_binding),
             tmc5130::Action::write(self.map.state(reg::Address::RAMPMODE)),
-            tmc5130::Action::write(self.map.state(reg::Address::VMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::AMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::DMAX)),
+            tmc5130::Action::write(self.map.state(reg::Address::VMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::XTARGET)),
         ];
         let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         get_error_from_spistatus(status)?;
+        self.map.drv_status_mut().0 = drv_status_binding.into();
         Ok(())
     }
 
-    fn get_state(&self) -> Result<MotorState, StepperDeviceError> {
-        todo!()
+    fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
+
+        let mut ramp_stat_binding = reg::State::RAMP_STAT(Default::default());
+        let mut vactual_binding = reg::State::VACTUAL(Default::default());
+        let mut xactual_binding = reg::State::XACTUAL(Default::default());
+        let mut actions = [
+
+            tmc5130::Action::read(&mut ramp_stat_binding),
+            tmc5130::Action::read(&mut vactual_binding),
+            tmc5130::Action::read(&mut xactual_binding),
+        ];
+        let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        get_error_from_spistatus(status)?;
+        *self.map.vactual_mut() = *vactual_binding.reg().unwrap();
+        *self.map.xactual_mut() = *xactual_binding.reg().unwrap();
+        *self.map.ramp_stat_mut() = *ramp_stat_binding.reg().unwrap();
+        Ok(MotorState{
+            velocity: self.map.vactual().get(),
+            position: self.map.xactual().get(),
+            limit_reached: self.map.ramp_stat().status_stop_l(),
+        })
     }
 }
