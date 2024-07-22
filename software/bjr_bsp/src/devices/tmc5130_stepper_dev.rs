@@ -1,5 +1,6 @@
 use bsp_traits::{MotorState, StepperMotorController, StepperDeviceError, MotorInput, MotorMode};
 use tmc5130::{reg, Tmc5130};
+use tmc5130::reg::IOIN;
 use crate::utils::error_wrapper::ErrorWrapper;
 
 pub struct TMC5130StepperDev<SPI> {
@@ -8,10 +9,11 @@ pub struct TMC5130StepperDev<SPI> {
 }
 
 fn get_error_from_spistatus(status: reg::SPISTATUS) -> Result<(),StepperDeviceError>{
-    if (status.driver_error()) {
+    if status.driver_error() {
         Err(StepperDeviceError::DriverError)
-    } else if (status.reset_flag()){
-        Err(StepperDeviceError::UnexpectedReset)
+    } else if status.reset_flag() {
+        //Err(StepperDeviceError::UnexpectedReset)
+        Ok(())
     } else {
         Ok(())
     }
@@ -21,6 +23,19 @@ impl<SPI> TMC5130StepperDev<SPI>
 where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
       SPI: embedded_hal::spi::SpiDevice
 {
+    fn self_test(&mut self)-> Result<(),StepperDeviceError>{
+        const EXPECTED_IOIN_VERSION: u16 = 17;
+        let (status,read_ioin) = self.dev_driver.read_register::<IOIN>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        get_error_from_spistatus(status)?;
+        *self.map.ioin_mut() = read_ioin;
+        defmt::println!("Ioin version:{}", read_ioin.version());
+        if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
+            Err(StepperDeviceError::SelfTestVersionMismatch)
+        }else {
+            Ok(())
+        }
+
+    }
     fn initial_register_set(&mut self)-> Result<(),StepperDeviceError>{
         self.map.chopconf_mut().set_toff(3);
         self.map.chopconf_mut().set_hstrt(4);
@@ -73,11 +88,12 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
 
     }
     pub fn new(spi:SPI)->Result<Self, StepperDeviceError> {
-        let mut dev_driver= Tmc5130::new(spi);
+        let dev_driver= Tmc5130::new(spi);
         let mut stepper_device = TMC5130StepperDev{
             dev_driver,
             map: reg::Map::default(),
         };
+        stepper_device.self_test()?;
         stepper_device.initial_register_set()?;
         Ok(stepper_device)
     }
@@ -95,6 +111,9 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         let vel_abs = inputs.velocity.abs() as u32;
         let acc_abs = inputs.acceleration.abs() as u16;
         self.map.vmax_mut().set(vel_abs);
+        self.map.v1_mut().set(vel_abs);
+        self.map.d1_mut().set(acc_abs);
+        self.map.a1_mut().set(acc_abs);
         self.map.amax_mut().set(acc_abs);
         self.map.dmax_mut().set(acc_abs);
         self.map.xtarget_mut().set(inputs.position);
@@ -118,6 +137,9 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
             tmc5130::Action::write(self.map.state(reg::Address::AMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::DMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::VMAX)),
+            tmc5130::Action::write(self.map.state(reg::Address::V1)),
+            tmc5130::Action::write(self.map.state(reg::Address::D1)),
+            tmc5130::Action::write(self.map.state(reg::Address::A1)),
             tmc5130::Action::write(self.map.state(reg::Address::XTARGET)),
         ];
         let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
@@ -132,10 +154,9 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         let mut vactual_binding = reg::State::VACTUAL(Default::default());
         let mut xactual_binding = reg::State::XACTUAL(Default::default());
         let mut actions = [
-
             tmc5130::Action::read(&mut ramp_stat_binding),
-            tmc5130::Action::read(&mut vactual_binding),
             tmc5130::Action::read(&mut xactual_binding),
+            tmc5130::Action::read(&mut vactual_binding),
         ];
         let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         get_error_from_spistatus(status)?;

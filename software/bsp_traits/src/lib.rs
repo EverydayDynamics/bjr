@@ -2,7 +2,7 @@
 use core::fmt::Arguments;
 pub trait BoardSupport {
     fn get_temperature_sensor(&self) -> &dyn TemperatureSensor;
-    fn get_stepper_motor_controller(&self) -> &dyn StepperMotorController;
+    fn get_stepper_motor_controller(&mut self) -> &dyn StepperMotorController;
     fn get_button(&mut self) -> & mut dyn Button;
 }
 
@@ -12,6 +12,7 @@ pub trait TemperatureSensor {
 pub trait MotorEnabler {
     fn set_enable(&mut self, enable: bool);
 }
+#[derive(Debug)]
 pub struct MotorState {
     pub velocity: i32,
     pub position: i32,
@@ -65,6 +66,7 @@ pub enum DeviceError {
 #[derive(Debug)]
 pub enum StepperDeviceError {
     CommunicationError(CommsError),
+    SelfTestVersionMismatch,
     DriverError,
     UnexpectedReset,
     InvalidParameter,
