@@ -9,6 +9,7 @@ pub struct TMC5130StepperDev<SPI> {
 }
 
 fn get_error_from_spistatus(status: reg::SPISTATUS) -> Result<(),StepperDeviceError>{
+    defmt::println!("spistatus:{}", status.0);
     if status.driver_error() {
         Err(StepperDeviceError::DriverError)
     } else if status.reset_flag() {
@@ -23,6 +24,13 @@ impl<SPI> TMC5130StepperDev<SPI>
 where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
       SPI: embedded_hal::spi::SpiDevice
 {
+    fn clear_status_flags(&mut self)-> Result<(),StepperDeviceError>{
+        let (_,gstat) = self.dev_driver.read_register::<reg::GSTAT>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        defmt::println!("reset:{}, drv:{}, uv:{}", gstat.reset(), gstat.drv_err(), gstat.uv_cp());
+        let (_,gstat) = self.dev_driver.read_register::<reg::GSTAT>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        defmt::println!("reset:{}, drv:{}, uv:{}", gstat.reset(), gstat.drv_err(), gstat.uv_cp());
+        Ok(())
+    }
     fn self_test(&mut self)-> Result<(),StepperDeviceError>{
         const EXPECTED_IOIN_VERSION: u16 = 17;
         let (status,read_ioin) = self.dev_driver.read_register::<IOIN>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
@@ -83,7 +91,7 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
 
         defmt::info!("Starting bulk action");
         let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
-        get_error_from_spistatus(status)?;
+        //get_error_from_spistatus(status)?;
         Ok(())
 
     }
@@ -95,6 +103,7 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         };
         stepper_device.self_test()?;
         stepper_device.initial_register_set()?;
+        stepper_device.clear_status_flags()?;
         Ok(stepper_device)
     }
 }

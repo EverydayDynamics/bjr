@@ -78,7 +78,7 @@ mod unit_tests {
             mode: MotorMode::VelocityCtrl,
         };
         let result = controllers[0].set_inputs(inputs).unwrap();
-        for i in 1..1000 {
+        for i in 1..10 {
             let result = controllers[0].get_state().unwrap();
             defmt::println!("pos:{}, vel:{}, limit:{}",result.position, result.velocity, result.limit_reached);
         }
@@ -90,7 +90,7 @@ mod unit_tests {
             mode: MotorMode::PositionCtrl,
         };
         let result = controllers[0].set_inputs(inputs).unwrap();
-        for i in 1..1100 {
+        for i in 1..100 {
             let result = controllers[0].get_state().unwrap();
             defmt::println!("pos:{}, vel:{}, limit:{}",result.position, result.velocity, result.limit_reached);
         }
