@@ -1,28 +1,69 @@
 #![no_std]
 
-use core::sync::atomic::{AtomicI32, AtomicU32, Atomic,Ordering};
+use core::sync::atomic::{AtomicI32, AtomicU32, Ordering};
+use atomic_float::AtomicF32;
 use core::marker::PhantomData;
 use core::default;
+use std::sync::atomic::AtomicBool;
+
 // Parameter types
-pub struct Param1;
-pub struct Param2;
-pub struct LongPressThresholdMs;
 // Add more parameter types as needed
 
-// Trait to associate types with their atomic representations
 pub trait ParameterType {
     type AtomicType;
     type ReturnType;
     fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType;
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType;
 }
+macro_rules! generate_parameter_types {
+    ($(($atomic_type:ty, $return_type:ty, $member:ident, $default:expr)),* $(,)?) => {
+        $(
+            pub struct $member;
+
+            impl ParameterType for $member {
+                type AtomicType = $atomic_type;
+                type ReturnType = $return_type;
+
+                fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
+                    &param_storage.$member
+                }
+
+                fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {
+                    atomic.load(std::sync::atomic::Ordering::Relaxed)
+                }
+            }
+        )*
+
+        pub struct ParameterStorage {
+            $(
+                pub $member: $atomic_type,
+            )*
+        }
+
+        impl ParameterStorage {
+            const fn default() -> Self {
+                Self {
+                    $(
+                        $member: <$atomic_type>::new($default),
+                    )*
+                }
+            }
+        }
+    };
+}
+generate_parameter_types!(
+    (AtomicF32, f32, MotorM2Ustep, 440.0),
+    (AtomicU32, u32, LongPressThresholdMs, 1000),
+    (AtomicBool, bool, Mute, false)
+);
 
 // Implement ParameterType for each parameter
 impl ParameterType for i32 {
     type AtomicType = AtomicI32;
     type ReturnType = i32;
     fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-        &param_storage.param1
+        //&param_storage.param1
+        todo!()
     }
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {atomic.load(Ordering::Relaxed)}
 }
@@ -31,37 +72,10 @@ impl ParameterType for u32 {
     type AtomicType = AtomicU32;
     type ReturnType = u32;
     fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-        &param_storage.param2
+        //&param_storage.param2
+        todo!()
     }
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {atomic.load(Ordering::Relaxed)}
-}
-impl ParameterType for LongPressThresholdMs {
-    type AtomicType = AtomicU32;
-    type ReturnType = u32;
-    fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-        &param_storage.long_press_threshold_ms
-    }
-    fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {atomic.load(Ordering::Relaxed)}
-}
-
-//impl ParameterType for LongPressThresholdUs {
-//    type AtomicType = AtomicU32;
-//    fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-//        &param_storage.long_press_threshold_us
-//    }
-//    fn atomic_load(atomic: &Self::AtomicType) -> Self {
-//        atomic.load(Ordering::Relaxed)
-//    }
-//}
-
-
-// Storage for parameters
-#[derive(Default)]
-struct ParameterStorage {
-    param1: AtomicI32,
-    param2: AtomicU32,
-    long_press_threshold_ms: AtomicU32
-    // Add more parameters as needed
 }
 
 // Parameter manager
@@ -73,11 +87,7 @@ pub struct ParameterManager {
 impl ParameterManager {
     pub const fn new() -> Self {
         Self {
-            storage: ParameterStorage{
-                param1: AtomicI32::new(0),
-                param2: AtomicU32::new(0),
-                long_press_threshold_ms: AtomicU32::new(1000),
-            }
+            storage: ParameterStorage::default()
         }
     }
 
@@ -89,7 +99,6 @@ impl ParameterManager {
     // Optional: Add a set method if needed
     pub fn set<T: ParameterType>(&self, value: T) {
         let atomic = T::get_atomic(&self.storage);
-        todo!()
     }
 
 }

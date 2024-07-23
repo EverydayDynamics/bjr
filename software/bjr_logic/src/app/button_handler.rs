@@ -34,7 +34,9 @@ impl<'a> ButtonHandler<'a> {
             } else {
                 // state changed to released
                 let press_duration = call_time - self.press_start;
-                let event_to_send = if press_duration > Milliseconds::new(self.parameter_manager.get::<LongPressThresholdMs>()) {
+                let maram = self.parameter_manager.get::<LongPressThresholdMs>();
+                println!("paramerter:{:?}", maram);
+                let event_to_send = if press_duration > Milliseconds::new(1000u64) {
                     GlobEvent::ButtonLongPress
                 } else {
                     GlobEvent::ButtonShortPress

@@ -10,3 +10,4 @@ mod ballpath_generator;
 mod limits;
 mod parameter_manager;
 mod event_queue;
+mod motor_handler;

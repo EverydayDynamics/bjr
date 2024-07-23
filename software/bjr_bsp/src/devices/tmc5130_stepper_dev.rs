@@ -44,7 +44,7 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         }
 
     }
-    fn initial_register_set(&mut self)-> Result<(),StepperDeviceError>{
+    fn initial_register_set(&mut self)-> Result<(),StepperDeviceError> {
         self.map.chopconf_mut().set_toff(3);
         self.map.chopconf_mut().set_hstrt(4);
         self.map.chopconf_mut().set_hend(1);
