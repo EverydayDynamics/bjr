@@ -2,16 +2,12 @@
 
 use core::sync::atomic::{AtomicI32, AtomicU32, Ordering};
 use atomic_float::AtomicF32;
-use core::marker::PhantomData;
-use core::default;
 use std::sync::atomic::AtomicBool;
-
-// Parameter types
-// Add more parameter types as needed
+use std::cmp::PartialOrd;
 
 pub trait ParameterType {
     type AtomicType;
-    type ReturnType;
+    type ReturnType: PartialOrd;
     fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType;
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType;
 }
@@ -54,30 +50,12 @@ macro_rules! generate_parameter_types {
 generate_parameter_types!(
     (AtomicF32, f32, MotorM2Ustep, 440.0),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
+    (AtomicF32, f32, MotorUpperPosLimit, 1e6),
+    (AtomicF32, f32, MotorLowerPosLimit, -1e6),
+    (AtomicF32, f32, MotorUpperVelLimit, 1e6),
+    (AtomicF32, f32, MotorLowerVelLimit, -1e6),
     (AtomicBool, bool, Mute, false)
 );
-
-// Implement ParameterType for each parameter
-impl ParameterType for i32 {
-    type AtomicType = AtomicI32;
-    type ReturnType = i32;
-    fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-        //&param_storage.param1
-        todo!()
-    }
-    fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {atomic.load(Ordering::Relaxed)}
-}
-
-impl ParameterType for u32 {
-    type AtomicType = AtomicU32;
-    type ReturnType = u32;
-    fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
-        //&param_storage.param2
-        todo!()
-    }
-    fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {atomic.load(Ordering::Relaxed)}
-}
-
 // Parameter manager
 
 pub struct ParameterManager {
@@ -107,6 +85,6 @@ impl ParameterManager {
 static PARAMETER_MANAGER: ParameterManager = ParameterManager::new();
 
 // Public function to access the manager
-pub fn get_parameter_manager() -> &'static ParameterManager {
+pub fn parameter_manager() -> &'static ParameterManager {
     &PARAMETER_MANAGER
 }

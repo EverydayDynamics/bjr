@@ -5,7 +5,7 @@ use crate::app::event_handler::EventHandler;
 use crate::app::feedforward_generator::FFGen;
 use embedded_time::duration::*;
 use crate::app::ballpath_generator::BallpathGenerator;
-use crate::app::control_primitives::{ControlInputs, ControlOutputs, KinState};
+use crate::app::control_primitives::{ControlInputs, KinState};
 use crate::app::control_runner::ControlRunner;
 
 struct Inputs {
@@ -64,6 +64,6 @@ impl<'a> LogicRunner<'a> {
         let inputs = self.read_inputs();
         let outputs = self.calculate_logic(inputs);
         self.write_outputs(outputs);
-        return Microseconds::default();
+        Microseconds::default()
     }
 }

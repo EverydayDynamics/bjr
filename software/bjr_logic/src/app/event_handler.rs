@@ -21,6 +21,6 @@ impl EventHandler {
         }
     }
     pub fn handle_events(&mut self) -> Option<State>{
-        return None;
+        None
     }
 }

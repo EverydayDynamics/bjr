@@ -1,8 +1,8 @@
 #[derive(Default)]
 pub struct KinState{
-    pos: f32,
-    speed: f32,
-    accel: f32,
+    pub pos: f32,
+    pub speed: f32,
+    pub accel: f32,
 }
 pub struct PlateState {
     height: KinState,

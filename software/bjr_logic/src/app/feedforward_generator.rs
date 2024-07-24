@@ -12,9 +12,7 @@ impl FFGen {
         FFGen{active_anim_func: default}
     }
     pub fn new_state(&mut self, state: State, change_time: Microseconds) {
-        self.active_anim_func = match state {
-            _ => {default}
-        }
+        self.active_anim_func = default
     }
     pub fn get_ff(&mut self, time: Microseconds) -> PlateDelta{
         (self.active_anim_func)(time)

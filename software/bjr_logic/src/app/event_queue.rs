@@ -7,6 +7,6 @@ pub fn get_event_queue() -> &'static Q8<GlobEvent> {
 }
 
 pub fn drain_event_queue()  {
-    while (EVENT_QUEUE.dequeue()!=None){}
+    while EVENT_QUEUE.dequeue().is_some(){}
 
 }
