@@ -18,6 +18,7 @@ pub struct MotorState {
     pub position: i32,
     pub limit_reached: bool,
 }
+#[derive(Copy, Clone)]
 pub enum MotorMode {
     PositionCtrl,
     VelocityCtrl,

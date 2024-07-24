@@ -3,10 +3,12 @@ use crate::app::parameter_manager::{MotorLowerPosLimit, MotorLowerVelLimit, Moto
 pub struct LimitChecker {
 
 }
+#[derive(PartialEq, Debug)]
 pub struct LimitReport<T>{
     limit: T,
     value: T,
 }
+#[derive(PartialEq, Debug)]
 pub enum LimitError<T>{
     OverLimit(LimitReport<T>),
     UnderLimit(LimitReport<T>),
@@ -63,8 +65,8 @@ pub struct MotorVelLimit{
     enabled: bool,
 }
 impl MotorVelLimit {
-    pub fn new(enabled: bool) -> MotorPosLimit {
-        MotorPosLimit {enabled}
+    pub fn new(enabled: bool) -> MotorVelLimit {
+        MotorVelLimit {enabled}
     }
 }
 impl Limit<f32> for MotorVelLimit {
@@ -75,5 +77,36 @@ impl Limit<f32> for MotorVelLimit {
     }
     fn enable(&mut self, enable: bool) {
         self.enabled = enable;
+    }
+}
+#[cfg(test)]
+mod tests {
+    use embedded_time::duration::Microseconds;
+    use heapless::mpmc::Q8;
+    use super::*;
+    use mockall::mock;
+    use crate::app::event::GlobEvent;
+    use crate::app::event_queue::drain_event_queue;
+    use crate::app::parameter_manager::parameter_manager;
+
+    #[test]
+    fn test_limit_within() {
+        let mut test_motor_vel_limit = MotorVelLimit::new(true);
+        assert_eq!(test_motor_vel_limit.check(10f32), Ok(()));
+    }
+    #[test]
+    fn test_limit_above() {
+        let mut test_motor_vel_limit = MotorVelLimit::new(true);
+        assert_eq!(test_motor_vel_limit.check(1e7), Err(LimitError::OverLimit(LimitReport{ limit: 1e6, value: 1e7 })));
+    }
+    #[test]
+    fn test_limit_below() {
+        let mut test_motor_vel_limit = MotorVelLimit::new(true);
+        assert_eq!(test_motor_vel_limit.check(-1e7), Err(LimitError::UnderLimit(LimitReport{ limit: -1e6, value: -1e7 })));
+    }
+    #[test]
+    fn test_limit_above_disabled() {
+        let mut test_motor_vel_limit = MotorVelLimit::new(false);
+        assert_eq!(test_motor_vel_limit.check(1e7), Ok(()));
     }
 }

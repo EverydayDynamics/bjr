@@ -11,3 +11,4 @@ mod limits;
 mod parameter_manager;
 mod event_queue;
 mod motor_handler;
+mod error_handler;
