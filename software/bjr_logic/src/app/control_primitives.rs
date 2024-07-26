@@ -1,4 +1,4 @@
-#[derive(Default)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct KinState{
     pub pos: f32,
     pub speed: f32,

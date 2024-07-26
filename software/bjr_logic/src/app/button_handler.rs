@@ -1,10 +1,8 @@
 use crate::app::parameter_manager::{parameter_manager, LongPressThresholdMs};
 use bsp_traits::Button;
 use crate::app::event::GlobEvent;
-use embedded_time::{duration::*, rate::*};
+use embedded_time::{duration::*};
 use heapless::mpmc::Q8;
-use crate::app::event_queue::get_event_queue;
-use crate::app::parameter_manager::ParameterManager;
 // Define a trait for the button hardware interface
 
 // Define the possible button events

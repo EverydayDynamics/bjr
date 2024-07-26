@@ -81,13 +81,7 @@ impl Limit<f32> for MotorVelLimit {
 }
 #[cfg(test)]
 mod tests {
-    use embedded_time::duration::Microseconds;
-    use heapless::mpmc::Q8;
     use super::*;
-    use mockall::mock;
-    use crate::app::event::GlobEvent;
-    use crate::app::event_queue::drain_event_queue;
-    use crate::app::parameter_manager::parameter_manager;
 
     #[test]
     fn test_limit_within() {

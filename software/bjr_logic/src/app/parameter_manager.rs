@@ -1,6 +1,4 @@
-#![no_std]
-
-use core::sync::atomic::{AtomicI32, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32};
 use atomic_float::AtomicF32;
 use std::sync::atomic::AtomicBool;
 use std::cmp::PartialOrd;
@@ -8,7 +6,9 @@ use std::cmp::PartialOrd;
 pub trait ParameterType {
     type AtomicType;
     type ReturnType: PartialOrd;
+
     fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType;
+    fn atomic_store(value: <Self as ParameterType>::ReturnType, atomic: &Self::AtomicType);
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType;
 }
 macro_rules! generate_parameter_types {
@@ -20,12 +20,16 @@ macro_rules! generate_parameter_types {
                 type AtomicType = $atomic_type;
                 type ReturnType = $return_type;
 
-                fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType {
+
+                fn get_atomic(param_storage: &ParameterStorage) -> &Self::AtomicType{
                     &param_storage.$member
+                }
+                fn atomic_store(value: <Self as ParameterType>::ReturnType, atomic: &Self::AtomicType) {
+                    atomic.store(value, core::sync::atomic::Ordering::Relaxed);
                 }
 
                 fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType {
-                    atomic.load(std::sync::atomic::Ordering::Relaxed)
+                    atomic.load(core::sync::atomic::Ordering::Relaxed)
                 }
             }
         )*
@@ -54,6 +58,9 @@ generate_parameter_types!(
     (AtomicF32, f32, MotorLowerPosLimit, -1e6),
     (AtomicF32, f32, MotorUpperVelLimit, 1e6),
     (AtomicF32, f32, MotorLowerVelLimit, -1e6),
+    (AtomicF32, f32, HomingHighVelocity, 1e3),
+    (AtomicF32, f32, HomingLowVelocity, 1e2),
+    (AtomicF32, f32, HomingSafePosition, 2e-3),
     (AtomicBool, bool, Mute, false)
 );
 // Parameter manager
@@ -75,8 +82,9 @@ impl ParameterManager {
     }
 
     // Optional: Add a set method if needed
-    pub fn set<T: ParameterType>(&self, value: T) {
+    pub fn set<T: ParameterType>(&self, value: T::ReturnType) {
         let atomic = T::get_atomic(&self.storage);
+        T::atomic_store(value, atomic)
     }
 
 }

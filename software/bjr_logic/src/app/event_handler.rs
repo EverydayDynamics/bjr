@@ -1,6 +1,7 @@
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum State {
+    Default,
     Initializing,
     Homing,
     RunningCenterHold,
@@ -20,7 +21,7 @@ impl EventHandler {
             state: State::Off,
         }
     }
-    pub fn handle_events(&mut self) -> Option<State>{
-        None
+    pub fn handle_events(&mut self) -> State{
+        State::Default
     }
 }

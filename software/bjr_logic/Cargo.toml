@@ -8,6 +8,8 @@ bsp_traits = { path = "../bsp_traits", version = "0.1.0" }
 embedded-time = "0.12.1"
 heapless = "0.8.0"
 atomic_float = "1.0.0"
+[features]
+panic_unwind = []
 
 [dev-dependencies]
 mockall = "0.12.1"
