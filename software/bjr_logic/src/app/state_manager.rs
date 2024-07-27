@@ -1,5 +1,6 @@
 use embedded_time::duration::Microseconds;
 use crate::app::event_handler::State;
+use crate::app::event_queue::get_event_queue;
 use crate::app::io_manager::IOManager;
 use crate::app::state_runner_selector::StateRunnerSelector;
 use crate::app::state_runner::StateRunnerError;
@@ -29,7 +30,7 @@ where
             self.current_state = state;
         }
         let runner = self.runners.get_runner(self.current_state);
-        runner.update(&mut self.io_manager, call_time)?;
+        runner.update(&mut self.io_manager, call_time, get_event_queue())?;
         Ok(())
     }
 }
@@ -44,7 +45,8 @@ mod tests {
     use crate::app::io_manager::{Inputs, Outputs, IOManagerError};
     use crate::app::state_runner::RunnableState;
     use crate::app::control_primitives::KinState;
-    use crate::app::motor_handler::ControlMode;
+    use crate::app::motor_handler::{ControlMode, MotorStatus};
+    use crate::app::event_queue::EventQueue;
 
     mock! {
         pub TestStateRunnerSelector {}
@@ -56,7 +58,7 @@ mod tests {
         pub TestRunnableState {}
         impl<'a> RunnableState for TestRunnableState {
             fn entry(&mut self, call_time: Microseconds<u64>);
-            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>) -> Result<(),StateRunnerError>;
+            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
             fn exit(&mut self, call_time: Microseconds<u64>);
         }
     }
@@ -64,7 +66,7 @@ mod tests {
         pub TestRunnableState2 {}
         impl<'a> RunnableState for TestRunnableState2 {
             fn entry(&mut self, call_time: Microseconds<u64>);
-            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>) -> Result<(),StateRunnerError>;
+            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
             fn exit(&mut self, call_time: Microseconds<u64>);
         }
     }
@@ -74,8 +76,8 @@ mod tests {
         impl<'a> IOManager for TestIOManager {
             fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
             fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
-            fn read_motor_inputs(&mut self) -> Result<[(KinState, bool); 3], IOManagerError>;
-            fn write_motor_outputs(&mut self, output: [(KinState, ControlMode);3]) -> Result<(), IOManagerError>;
+            fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
+            fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
         }
     }
 
@@ -92,8 +94,8 @@ mod tests {
             .with( predicate::eq(Microseconds::new(0)))
             .returning(|_|());
         mock_testrunnablestate_init.expect_update()
-            .with(predicate::always(), predicate::eq(Microseconds::new(0)))
-            .returning(|_,_|Ok(()));
+            .with(predicate::always(), predicate::eq(Microseconds::new(0)),predicate::always())
+            .returning(|_,_,_|Ok(()));
         mock_state_runner_selector.expect_get_runner()
             .with(eq(State::Default))
             .return_var(Box::new(mock_testrunnablestate_default));

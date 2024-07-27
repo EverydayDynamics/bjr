@@ -159,23 +159,24 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
 
-        let mut ramp_stat_binding = reg::State::RAMP_STAT(Default::default());
         let mut vactual_binding = reg::State::VACTUAL(Default::default());
         let mut xactual_binding = reg::State::XACTUAL(Default::default());
         let mut actions = [
-            tmc5130::Action::read(&mut ramp_stat_binding),
             tmc5130::Action::read(&mut xactual_binding),
             tmc5130::Action::read(&mut vactual_binding),
         ];
         let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+
         get_error_from_spistatus(status)?;
         *self.map.vactual_mut() = *vactual_binding.reg().unwrap();
         *self.map.xactual_mut() = *xactual_binding.reg().unwrap();
-        *self.map.ramp_stat_mut() = *ramp_stat_binding.reg().unwrap();
         Ok(MotorState{
             velocity: self.map.vactual().get(),
             position: self.map.xactual().get(),
-            limit_reached: self.map.ramp_stat().status_stop_l(),
+            limit_reached: status.status_stop_l(),
+            velocity_reached: status.velocity_reached(),
+            position_reached: status.position_reached(),
+            standstill: status.standstill(),
         })
     }
 }

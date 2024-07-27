@@ -17,6 +17,9 @@ pub struct MotorState {
     pub velocity: i32,
     pub position: i32,
     pub limit_reached: bool,
+    pub velocity_reached: bool,
+    pub position_reached: bool,
+    pub standstill: bool,
 }
 #[derive(Copy, Clone)]
 pub enum MotorMode {
@@ -64,7 +67,7 @@ pub enum DeviceError {
     InvalidParameter,
     HardwareFailure,
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum StepperDeviceError {
     CommunicationError(CommsError),
     SelfTestVersionMismatch,
@@ -73,7 +76,7 @@ pub enum StepperDeviceError {
     InvalidParameter,
     HardwareFailure,
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum CommsError {
     SPIMutex,
     SPICSPIn,

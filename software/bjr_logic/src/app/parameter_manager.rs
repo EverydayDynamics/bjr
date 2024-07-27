@@ -58,10 +58,12 @@ generate_parameter_types!(
     (AtomicF32, f32, MotorLowerPosLimit, -1e6),
     (AtomicF32, f32, MotorUpperVelLimit, 1e6),
     (AtomicF32, f32, MotorLowerVelLimit, -1e6),
+    //homing params
     (AtomicF32, f32, HomingHighVelocity, 1e3),
     (AtomicF32, f32, HomingLowVelocity, 1e2),
     (AtomicF32, f32, HomingSafePosition, 2e-3),
-    (AtomicBool, bool, Mute, false)
+    (AtomicF32, f32, HomingMaxTravel, 2e-2),
+    (AtomicF32, f32, HomingAccel, 2e3),
 );
 // Parameter manager
 

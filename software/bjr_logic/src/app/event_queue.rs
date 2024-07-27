@@ -2,7 +2,8 @@ use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 
 static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
-pub fn get_event_queue() -> &'static Q8<GlobEvent> {
+pub type EventQueue = &'static Q8<GlobEvent>;
+pub fn get_event_queue() -> EventQueue {
     &EVENT_QUEUE
 }
 

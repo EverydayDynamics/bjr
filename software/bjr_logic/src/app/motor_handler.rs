@@ -4,12 +4,19 @@ use crate::app::limits::{LimitError, MotorPosLimit, MotorVelLimit, Limit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use crate::app::consts::MOTOR_NUM;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum ControlMode {
     Position,
     Velocity,
 }
-#[derive(Debug)]
+#[derive(Default, Copy, Clone)]
+pub struct MotorStatus {
+   pub limit_reached: bool,
+    pub position_reached: bool,
+    pub velocity_reached: bool,
+    pub standstill: bool,
+}
+#[derive(Debug, PartialEq)]
 pub enum MotorHandlerError {
     MotorError(StepperDeviceError, usize),
     MotorPositionLimitError(LimitError<f32>, usize),
@@ -32,8 +39,8 @@ impl MotorHandler<'_> {
             vellim,
         }
     }
-    pub fn get_motor_state(&mut self) -> Result<[(KinState, bool);MOTOR_NUM], MotorHandlerError> {
-       let mut state:[(KinState, bool);MOTOR_NUM] = Default::default();
+    pub fn get_motor_state(&mut self) -> Result<[(KinState, MotorStatus);MOTOR_NUM], MotorHandlerError> {
+       let mut state:[(KinState, MotorStatus);MOTOR_NUM] = Default::default();
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
         for motor_idx in 0..MOTOR_NUM {
             let motstate = self.motors[motor_idx].get_state().map_err(|e|MotorHandlerError::MotorError(e, motor_idx))?;
@@ -43,7 +50,13 @@ impl MotorHandler<'_> {
             kinstate.pos = (motstate.position as f64 /motm2us as f64) as f32;
             self.vellim.check(kinstate.speed).map_err(|e|MotorHandlerError::MotorVelocityLimitError(e, motor_idx))?;
             self.poslim.check(kinstate.pos).map_err(|e|MotorHandlerError::MotorPositionLimitError(e, motor_idx))?;
-            state[motor_idx] = (kinstate, motstate.limit_reached)
+            let status = MotorStatus{
+                limit_reached: motstate.limit_reached,
+                position_reached: motstate.position_reached,
+                velocity_reached: motstate.velocity_reached,
+                standstill: motstate.standstill,
+            };
+            state[motor_idx] = (kinstate, status)
         }
         Ok(state)
     }
