@@ -1,10 +1,12 @@
+use core::fmt::Display;
+use core::fmt::{Formatter};
 use bsp_traits::{StepperMotorController, StepperDeviceError, MotorInput, MotorMode};
 use crate::app::control_primitives::KinState;
 use crate::app::limits::{LimitError, MotorPosLimit, MotorVelLimit, Limit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use crate::app::consts::MOTOR_NUM;
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum ControlMode {
     Position,
     Velocity,
@@ -16,12 +18,22 @@ pub struct MotorStatus {
     pub velocity_reached: bool,
     pub standstill: bool,
 }
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum MotorHandlerError {
     MotorError(StepperDeviceError, usize),
     MotorPositionLimitError(LimitError<f32>, usize),
     MotorVelocityLimitError(LimitError<f32>, usize),
     InputOverflow,
+}
+impl Display for MotorHandlerError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            MotorHandlerError::MotorError(e, idx) => {write!(f, "Motor Handler Motor error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::MotorPositionLimitError(e, idx) => {write!(f, "MotorHandler Position limit error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::MotorVelocityLimitError(e, idx) => {write!(f, "MotorHandler Velocity limit error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::InputOverflow => {write!(f, "MotorHandler Input value overflow")}
+        }
+    }
 }
 
 pub struct MotorHandler<'a> {
@@ -69,9 +81,9 @@ impl MotorHandler<'_> {
                ControlMode::Velocity => MotorMode::VelocityCtrl,
            };
            let input = MotorInput{
-               velocity: ((inputs[motor_idx].0.speed *motm2us) as i32).try_into().map_err(|e|MotorHandlerError::InputOverflow)?,
-               acceleration: ((inputs[motor_idx].0.accel *motm2us)as i32).try_into().map_err(|e|MotorHandlerError::InputOverflow)?,
-               position: ((inputs[motor_idx].0.pos *motm2us) as i32).try_into().map_err(|e|MotorHandlerError::InputOverflow)?,
+               velocity: ((inputs[motor_idx].0.speed *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+               acceleration: ((inputs[motor_idx].0.accel *motm2us)as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+               position: ((inputs[motor_idx].0.pos *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
                mode: motor_mode,
            };
             self.motors[motor_idx].set_inputs(input).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))?;

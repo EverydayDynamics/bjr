@@ -1,5 +1,6 @@
 use core::cell::RefCell;
-use bsp_traits::{Button, CommsError, StepperDeviceError};
+use core::fmt::Arguments;
+use bsp_traits::{Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, StepperDeviceError};
 use bsp_traits::StepperMotorController;
 use bsp_traits::TemperatureSensor;
 use crate::boards::{BjrBoardSupport, BoardCreationError};
@@ -21,8 +22,12 @@ use crate::utils::spidev::{Spidev, SpiDevError};
 
 // global logger
 pub struct MyBoard {
-    button: GpioButton<Pin<'B', 5>>,
-    stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
+    pub button: Option<GpioButton<Pin<'B', 5>>>,
+    pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
+    pub stp_motor_drive_b: Dummy,
+    pub stp_motor_drive_c: Dummy,
+    pub motor_enabler: Dummy,
+    pub log_device: Dummy,
 
 }
 
@@ -54,24 +59,38 @@ impl MyBoard {
         let stp_motor_drive_a = TMC5130StepperDev::new(driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
         let button = GpioButton::new(button_pin);
         Ok(MyBoard {
-            button,
+            button: Some(button),
             stp_motor_drive_a,
+            log_device: Dummy{},
+            stp_motor_drive_b: Dummy{},
+            stp_motor_drive_c: Dummy{},
+            motor_enabler: Dummy{},
         })
     }
 }
-
 impl BjrBoardSupport for MyBoard {
-    fn get_temperature_sensor(&self) -> &dyn TemperatureSensor {
-        todo!()
+    fn get_stepper_motor_controller_a(&mut self) -> impl StepperMotorController {
+        Dummy{}
     }
 
-    fn get_stepper_motor_controllers(&mut self) -> [&mut dyn StepperMotorController; 1] {
-        [
-            &mut self.stp_motor_drive_a,
-        ]
+    fn get_stepper_motor_controller_b(&mut self) -> impl StepperMotorController {
+        Dummy{}
     }
-    fn get_button(&mut self) -> & mut dyn Button {
-        &mut self.button
+
+    fn get_stepper_motor_controller_c(&mut self) -> impl StepperMotorController {
+        Dummy{}
+    }
+
+    fn get_button(& self) -> impl Button {
+        Dummy{}
+    }
+
+    fn get_motor_enabler(&mut self) -> impl MotorEnabler {
+        Dummy{}
+    }
+
+    fn get_log_device(&mut self) -> impl Logger {
+        Dummy{}
     }
 }
 
@@ -102,5 +121,46 @@ impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error>
 {
     fn into(self) -> CommsError {
         CommsError::NotImplemented
+    }
+}
+pub struct Dummy {}
+impl MotorEnabler for Dummy {
+    fn set_enable(&mut self, enable: bool) {
+        todo!()
+    }
+}
+impl StepperMotorController for Dummy {
+    fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
+        todo!()
+    }
+
+    fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
+        todo!()
+    }
+}
+impl Logger for Dummy {
+    fn trace(&self, args: Arguments<'_>) {
+        todo!()
+    }
+
+    fn debug(&self, args: Arguments<'_>) {
+        todo!()
+    }
+
+    fn info(&self, args: Arguments<'_>) {
+        todo!()
+    }
+
+    fn warn(&self, args: Arguments<'_>) {
+        todo!()
+    }
+
+    fn error(&self, args: Arguments<'_>) {
+        todo!()
+    }
+}
+impl Button for Dummy {
+    fn is_pressed(&mut self) -> bool {
+        todo!()
     }
 }

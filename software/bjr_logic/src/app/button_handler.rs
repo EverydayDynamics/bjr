@@ -1,11 +1,21 @@
+use core::fmt::{Display, Formatter};
 use crate::app::parameter_manager::{parameter_manager, LongPressThresholdMs};
 use bsp_traits::Button;
 use crate::app::event::GlobEvent;
 use embedded_time::{duration::*};
 use heapless::mpmc::Q8;
-// Define a trait for the button hardware interface
 
-// Define the possible button events
+pub enum ButtonHandlerError {
+    QueueFull(GlobEvent)
+}
+impl Display for ButtonHandlerError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ButtonHandlerError::QueueFull(ge) => {write!(f,"ButtonHandlerError Queue Full. Dropped msg: {}", ge)}
+        }
+    }
+}
+
 pub struct ButtonHandler<'a> {
     button: &'a mut dyn Button,
     event_handler: &'static Q8<GlobEvent>,
@@ -23,7 +33,7 @@ impl<'a> ButtonHandler<'a> {
         }
     }
 
-    pub fn update(&mut self, call_time: Microseconds<u64>) {
+    pub fn update(&mut self, call_time: Microseconds<u64>) -> Result<(),ButtonHandlerError>{
         let currently_pressed = self.button.is_pressed();
         if self.last_state != currently_pressed {
             // State change detected!
@@ -38,10 +48,11 @@ impl<'a> ButtonHandler<'a> {
                 } else {
                     GlobEvent::ButtonShortPress
                 };
-                self.event_handler.enqueue(event_to_send).unwrap();
+                self.event_handler.enqueue(event_to_send).map_err(|e|ButtonHandlerError::QueueFull(e))?;
             }
         }
-        self.last_state = currently_pressed
+        self.last_state = currently_pressed;
+        Ok(())
     }
 }
 
@@ -75,7 +86,7 @@ static EVENT_QUEUE_3: Q8<GlobEvent> = Q8::new();
             let call_time = call_rate*run_num;
             test_button_handler.update(call_time);
         }
-        assert_eq!(EVENT_QUEUE_1.dequeue(), None);
+        assert!(EVENT_QUEUE_1.dequeue()== None);
     }
     #[test]
     fn test_button_handler_shortpress() {
@@ -97,8 +108,8 @@ static EVENT_QUEUE_3: Q8<GlobEvent> = Q8::new();
             let call_time = call_rate*run_num;
             test_button_handler.update(call_time);
         }
-        assert_eq!(EVENT_QUEUE_2.dequeue(), Some(GlobEvent::ButtonShortPress));
-        assert_eq!(EVENT_QUEUE_2.dequeue(), None);
+        assert!(EVENT_QUEUE_2.dequeue()== Some(GlobEvent::ButtonShortPress));
+        assert!(EVENT_QUEUE_2.dequeue()== None);
         drain_event_queue();
     }
 
@@ -125,9 +136,9 @@ fn test_button_handler_longnshort_press() {
         let call_time = call_rate*run_num;
         test_button_handler.update(call_time);
     }
-    assert_eq!(EVENT_QUEUE_3.dequeue(), Some(GlobEvent::ButtonLongPress));
-    assert_eq!(EVENT_QUEUE_3.dequeue(), Some(GlobEvent::ButtonShortPress));
-    assert_eq!(EVENT_QUEUE_3.dequeue(), None);
+    assert!(EVENT_QUEUE_3.dequeue() == Some(GlobEvent::ButtonLongPress));
+    assert!(EVENT_QUEUE_3.dequeue() == Some(GlobEvent::ButtonShortPress));
+    assert!(EVENT_QUEUE_3.dequeue() == None);
     drain_event_queue();
 }
 }

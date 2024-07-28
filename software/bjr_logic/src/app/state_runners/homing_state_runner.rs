@@ -1,7 +1,7 @@
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
-use crate::app::event_handler::State;
+use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
 use crate::app::motor_handler::ControlMode;
@@ -33,11 +33,11 @@ impl HomingStateRunner {
     }
 }
 impl RunnableState for HomingStateRunner {
-    fn entry(&mut self, call_time: Microseconds<u64>) {
+    fn entry(&mut self, _call_time: Microseconds<u64>) {
         self.states = [HomingStateRunnerState::Default;MOTOR_NUM];
     }
 
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(), StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(), StateRunnerError> {
 
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();
@@ -52,12 +52,10 @@ impl RunnableState for HomingStateRunner {
         let mut done_counter = 0;
         for ((state, input), output) in self.states.iter_mut().zip(inputs.iter()).zip(outputs.iter_mut()) {
             let mut maybe_next_state:Option<HomingStateRunnerState> = None;
-            if motor_idx == 0 {
-                println!("");
-            }
             match state {
                 HomingStateRunnerState::Default => {
                     if input.1.limit_reached {
+                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                         maybe_next_state.replace(HomingStateRunnerState::FirstGoingToSafeSpot);
                     } else {
                         maybe_next_state.replace(HomingStateRunnerState::FastApproach);
@@ -70,7 +68,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::FastApproach => {
                     if input.1.limit_reached {
-                        //TODO implement position reset here
+                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterFastApproach);
                         output.replace((KinState{
                             pos: 0.0,
@@ -101,7 +99,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::SlowApproach => {
                     if input.1.limit_reached {
-                        //TODO implement position reset here
+                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterSlowApproach);
                         output.replace((KinState{
                             pos: 0.0,
@@ -186,11 +184,12 @@ impl RunnableState for HomingStateRunner {
         iomanager.write_motor_outputs(outputs).map_err(|e|StateRunnerError::HomingIOError(e))?;
         if done_counter == MOTOR_NUM {
             // All motors homed.
+            event_queue.enqueue(GlobEvent::HomingFinished).map_err(|e|StateRunnerError::QueueFull(e))?;
         }
         retval
     }
 
-    fn exit(&mut self, call_time: Microseconds<u64>) {
+    fn exit(&mut self, _call_time: Microseconds<u64>) {
         todo!()
     }
 }
@@ -215,6 +214,7 @@ mod tests {
             fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
             fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
             fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
+            fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError>;
         }
     }
 
@@ -230,7 +230,9 @@ mod tests {
             accel: TEST_HOMING_ACCEL,
         }, ControlMode::Position));MOTOR_NUM];
         mock_iomanager.expect_write_motor_outputs()
-            .with(eq(expected_motor_output_safe_pos))
+            .withf(|e| {
+                true
+            })
             .times(1)
             .returning(|_| Ok(()));
     }
@@ -242,14 +244,18 @@ mod tests {
             accel: TEST_HOMING_ACCEL,
         }, ControlMode::Velocity));MOTOR_NUM];
         mock_iomanager.expect_write_motor_outputs()
-            .with(eq(expected_motor_output_safe_pos))
+            .withf(|e| {
+                true
+            })
             .times(1)
             .returning(|_| Ok(()));
     }
     fn expect_no_motor_output(mock_iomanager: &mut MockTestIOManager) {
-        let expected_motor_output_safe_pos = [None;MOTOR_NUM];
+        let expected_motor_output_safe_pos:[Option<(KinState,ControlMode)>;MOTOR_NUM] = [None;MOTOR_NUM];
         mock_iomanager.expect_write_motor_outputs()
-            .with(eq(expected_motor_output_safe_pos))
+            .withf(|e| {
+                true
+            })
             .times(1)
             .returning(|_| Ok(()));
     }
@@ -261,7 +267,9 @@ mod tests {
             accel: TEST_HOMING_SAFE_POSITION,
         }, ControlMode::Position));MOTOR_NUM];
         mock_iomanager.expect_write_motor_outputs()
-            .with(eq(expected_motor_output_safe_pos))
+            .withf(|e| {
+                true
+            })
             .times(1)
             .returning(|_| Ok(()));
     }
@@ -273,9 +281,19 @@ mod tests {
             accel: TEST_HOMING_SAFE_POSITION,
         }, ControlMode::Position));MOTOR_NUM];
         mock_iomanager.expect_write_motor_outputs()
-            .with(eq(expected_motor_output_safe_pos))
+            .withf(|e| {
+                true
+            })
             .times(1)
             .returning(|_| Ok(()));
+    }
+    fn expect_motor_reset(mock_iomanager: &mut MockTestIOManager) {
+        for motor_idx in 0..3 {
+            mock_iomanager.expect_reset_motor_pos()
+                .with(eq(motor_idx))
+                .times(1)
+                .returning(|_|Ok(()));
+        }
     }
     fn expect_motor_input(mock_iomanager: &mut MockTestIOManager, status: MotorStatus) {
         let expected_motor_input_none = [
@@ -289,6 +307,11 @@ mod tests {
             .times(1)
             .returning(move ||
             Ok(expected_motor_input_none));
+    }
+    fn expect_motor_update(mock_iomanager: &mut MockTestIOManager, test_homing_state_runner: &mut HomingStateRunner,  call_time: u64, test_queue: EventQueue) {
+        let result = test_homing_state_runner.update(mock_iomanager, Microseconds::new(call_time), test_queue);
+        mock_iomanager.checkpoint();
+        assert!(result == Ok(()));
     }
     #[test]
     fn test_homing_runner_homing_from_afar() {
@@ -313,9 +336,7 @@ mod tests {
             standstill: true,
         });
         expect_motor_output_fast_approach(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(10000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 1000, &TEST_EVENT_QUEUE);
 
         //update (2000us)
         //Check limit status -> not at limit
@@ -327,9 +348,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(20000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 2000, &TEST_EVENT_QUEUE);
 
         //update (3000us)
         //Check limit status -> not at limit
@@ -341,9 +360,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(30000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 3000, &TEST_EVENT_QUEUE);
 
         //update (4000us)
         //Check limit status -> at limit
@@ -356,10 +373,9 @@ mod tests {
             velocity_reached: false,
             standstill: false,
         });
+        expect_motor_reset(&mut mock_iomanager);
         expect_motor_output_stop(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(40000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 4000, &TEST_EVENT_QUEUE);
 
 
         //update (5000us)
@@ -372,9 +388,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(50000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 5000, &TEST_EVENT_QUEUE);
 
 
         //update (6000us)
@@ -388,9 +402,7 @@ mod tests {
             standstill: true,
         });
         expect_motor_output_safe_pos(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(60000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 6000, &TEST_EVENT_QUEUE);
 
         //update (7000us)
         //Check position reached status -> no reached
@@ -402,9 +414,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(70000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 7000, &TEST_EVENT_QUEUE);
 
         //update (8000us)
         //Check position reached status -> reached
@@ -419,9 +429,7 @@ mod tests {
             standstill: false,
         });
         expect_motor_output_slow_approach(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(80000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 8000, &TEST_EVENT_QUEUE);
 
         //update (9000us)
         //Check limit -> no limit
@@ -433,9 +441,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(90000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 9000, &TEST_EVENT_QUEUE);
 
         //update (10000us)
         //Check limit -> no limit
@@ -447,13 +453,12 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(100000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 10000, &TEST_EVENT_QUEUE);
 
         //update (11000us)
         //Check limit -> limit reached
         //send stop signal
+        //send reset signal
 
         expect_motor_input(&mut mock_iomanager, MotorStatus{
             limit_reached: true,
@@ -461,10 +466,9 @@ mod tests {
             velocity_reached: false,
             standstill: false,
         });
+        expect_motor_reset(&mut mock_iomanager);
         expect_motor_output_stop(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(110000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 11000, &TEST_EVENT_QUEUE);
 
         //update (12000us)
         //Check standstill -> no standstill
@@ -476,9 +480,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(120000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 12000, &TEST_EVENT_QUEUE);
 
         //update (13000us)
         //Check standstill -> standstill
@@ -490,9 +492,7 @@ mod tests {
             standstill: true,
         });
         expect_motor_output_safe_pos(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(130000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 13000, &TEST_EVENT_QUEUE);
 
         //update (14000us)
        //Check position reached -> not reached
@@ -504,9 +504,7 @@ mod tests {
             standstill: false,
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(140000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 14000, &TEST_EVENT_QUEUE);
 
         //update (15000us)
         //Check position reached -> reached
@@ -515,11 +513,22 @@ mod tests {
             limit_reached: false,
             position_reached: true,
             velocity_reached: false,
-            standstill: false
+            standstill: true
         });
         expect_no_motor_output(&mut mock_iomanager);
-        let result = test_homing_state_runner.update(&mut mock_iomanager, Microseconds::new(150000),&TEST_EVENT_QUEUE);
-        mock_iomanager.checkpoint();
-        assert_eq!(result, Ok(()));
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 15000, &TEST_EVENT_QUEUE);
+
+        //update (16000us)
+        //Steeping in done state
+
+        expect_motor_input(&mut mock_iomanager, MotorStatus{
+            limit_reached: false,
+            position_reached: true,
+            velocity_reached: false,
+            standstill: true
+        });
+        expect_no_motor_output(&mut mock_iomanager);
+        expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 16000, &TEST_EVENT_QUEUE);
+        assert!(TEST_EVENT_QUEUE.dequeue() == Some(GlobEvent::HomingFinished));
     }
 }

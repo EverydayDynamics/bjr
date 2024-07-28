@@ -1,7 +1,5 @@
 use core::sync::atomic::{AtomicU32};
 use atomic_float::AtomicF32;
-use std::sync::atomic::AtomicBool;
-use std::cmp::PartialOrd;
 
 pub trait ParameterType {
     type AtomicType;
@@ -63,6 +61,8 @@ generate_parameter_types!(
     (AtomicF32, f32, HomingLowVelocity, 1e2),
     (AtomicF32, f32, HomingSafePosition, 2e-3),
     (AtomicF32, f32, HomingMaxTravel, 2e-2),
+
+    (AtomicU32, u32, LogicRunnerPeriodUs, 1000),
     (AtomicF32, f32, HomingAccel, 2e3),
 );
 // Parameter manager

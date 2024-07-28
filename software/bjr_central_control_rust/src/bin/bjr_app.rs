@@ -1,8 +1,10 @@
-#[cfg(no_main)]
-#[cfg(no_std)]
+#![no_main]
+#![no_std]
 
 use bjr as _; // global logger + panicking-behavior + memory layout
-
+use bjr_logic::app::logic_runner::LogicRunner;
+use bjr_logic::app::button_handler::ButtonHandler;
+use bjr_bsp::main_board::MyBoard;
 // TODO(7) Configure the `rtic::app` macro
 
 #[rtic::app(
@@ -21,7 +23,23 @@ mod app {
         prelude::*,
     };
     use core::cell::RefCell;
+    use bjr_bsp::boards::BjrBoardSupport;
+    use bjr_bsp::main_board::MyBoard;
+    use bjr_logic::app::button_handler::ButtonHandler;
+    use bjr_logic::app::error_handler::ErrorHandler;
+    use bjr_logic::app::event_handler::EventHandler;
+    use bjr_logic::app::event_queue::get_event_queue;
+    use bjr_logic::app::io_manager::DefaultIOManager;
+    use bjr_logic::app::limits::{MotorPosLimit, MotorVelLimit};
+    use bjr_logic::app::logic_runner;
+    use bjr_logic::app::logic_runner::LogicRunner;
+    use bjr_logic::app::motor_handler::MotorHandler;
+    use bjr_logic::app::state_manager::StateManager;
+    use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
+    use bsp_traits::{MotorInput, StepperMotorController};
     use cortex_m::interrupt::{self, Mutex};
+    use defmt::error;
+
     // Shared resources go here
     #[shared]
     struct Shared {
@@ -33,10 +51,32 @@ mod app {
     struct Local {
         // TODO: Add resources
     }
-
     #[init]
     fn init(cx: init::Context) -> (Shared, Local) {
+        let board_result = MyBoard::new();
+        match board_result {
+            Ok(mut board) => {
 
+                let event_queue = get_event_queue();
+                let mut button = board.button.take().unwrap();
+                let button_handler = ButtonHandler::new(&mut button,event_queue);
+                let motors = [
+                    &mut board.stp_motor_drive_a as &mut dyn StepperMotorController,
+                    &mut board.stp_motor_drive_b as &mut dyn StepperMotorController,
+                    &mut board.stp_motor_drive_c as &mut dyn StepperMotorController];
+                let motor_handler = MotorHandler::new(motors, MotorPosLimit::new(true), MotorVelLimit::new(true));
+                let io_manager = DefaultIOManager::new(motor_handler);
+                let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
+                let event_handler = EventHandler::new();
+                let error_handler = ErrorHandler::new(&mut board.motor_enabler, &mut board.log_device, event_queue);
+                let logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler);
+            }
+            Err(error) => {
+                defmt::error!("Couldn't create board: {}", defmt::Display2Format(&error));
+                panic!();
+            }
+        }
+        //let logic_runner = LogicRunner::new((), &Default::default(), (), (), ());
         // TODO setup monotonic if used
         let rcc = cx.device.RCC.constrain();
         let clocks = rcc.cfgr.sysclk(150.MHz()).freeze();

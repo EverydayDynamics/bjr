@@ -1,5 +1,5 @@
 #![no_std]
-use core::fmt::Arguments;
+use core::fmt::{Arguments, Display, Formatter};
 pub trait BoardSupport {
     fn get_temperature_sensor(&self) -> &dyn TemperatureSensor;
     fn get_stepper_motor_controller(&mut self) -> &dyn StepperMotorController;
@@ -12,7 +12,6 @@ pub trait TemperatureSensor {
 pub trait MotorEnabler {
     fn set_enable(&mut self, enable: bool);
 }
-#[derive(Debug)]
 pub struct MotorState {
     pub velocity: i32,
     pub position: i32,
@@ -61,13 +60,12 @@ pub trait Logger {
     fn warn(&self, args: Arguments<'_>);
     fn error(&self, args: Arguments<'_>);
 }
-#[derive(Debug)]
 pub enum DeviceError {
     CommunicationError,
     InvalidParameter,
     HardwareFailure,
 }
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum StepperDeviceError {
     CommunicationError(CommsError),
     SelfTestVersionMismatch,
@@ -76,7 +74,19 @@ pub enum StepperDeviceError {
     InvalidParameter,
     HardwareFailure,
 }
-#[derive(Debug, PartialEq)]
+impl Display for StepperDeviceError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            StepperDeviceError::CommunicationError(e) => {write!(f,"StepperDevice Communication error: {}", e)}
+            StepperDeviceError::SelfTestVersionMismatch => {write!(f,"StepperDevice Self Test Failure")}
+            StepperDeviceError::DriverError => {write!(f,"StepperDevice driver error")}
+            StepperDeviceError::UnexpectedReset => {write!(f,"StepperDevice Unexpected Reset")}
+            StepperDeviceError::InvalidParameter => {write!(f,"StepperDevice Invalid Parameter")}
+            StepperDeviceError::HardwareFailure => {write!(f,"StepperDevice Hardware Failure")}
+        }
+    }
+}
+#[derive(PartialEq, Copy, Clone)]
 pub enum CommsError {
     SPIMutex,
     SPICSPIn,
@@ -86,4 +96,18 @@ pub enum CommsError {
     SPIFrameFormat,
     NotImplemented,
     Unknown,
+}
+impl Display for CommsError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            CommsError::SPIMutex => {write!(f,"CommsError SPIMutex")}
+            CommsError::SPICSPIn => {write!(f,"CommsError SPICSPIn")}
+            CommsError::SPIOverrun => {write!(f,"CommsError SPIOverrun")}
+            CommsError::SPICRIC => {write!(f,"CommsError SPICRIC")}
+            CommsError::SPIModeFault => {write!(f,"CommsError SPIModeFault")}
+            CommsError::SPIFrameFormat => {write!(f,"CommsError SPIFrameFormat")}
+            CommsError::NotImplemented => {write!(f,"CommsError NotImplemented")}
+            CommsError::Unknown => {write!(f,"CommsError Unknown")}
+        }
+    }
 }

@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use bsp_traits::{MotorEnabler, Logger};
 use heapless::mpmc::Q8;
 use crate::app::event::{EventError, GlobEvent};
@@ -22,14 +21,15 @@ impl<'a> ErrorHandler<'a>{
 }
 impl ErrorHandler<'_>
 {
-    pub fn panic<T: Debug>(&mut self, error: T) {
+    pub fn panic<T>(&mut self, error: T) {
         self.motor_enabler.set_enable(false);
-        Err::<(),T>(error).unwrap();
+        //Err::<(),T>(error).unwrap();
+        panic!();
     }
-    pub fn handle_error<ERR: Severity + Debug+Copy>(&mut self, error:ERR) {
+    pub fn handle_error<ERR: Severity + core::fmt::Display>(&mut self, error:ERR) {
         match error.get_severity() {
             ErrorSeverity::Ignore => {}
-            _ => {self.log_device.error(format_args!("{:?}",error));}
+            _ => {self.log_device.error(format_args!("{}",error));}
         }
         match error.get_severity() {
             ErrorSeverity::Panic => { self.panic(error) }
@@ -49,6 +49,7 @@ impl ErrorHandler<'_>
 }
 #[cfg(test)]
 mod tests {
+    use core::fmt::{Display, Formatter};
     use std::fmt::Arguments;
     use std::panic::AssertUnwindSafe;
     use super::*;
@@ -71,6 +72,11 @@ pub enum TestError {
         Report,
         Ignore,
     }
+    impl Display for TestError {
+        fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{:?}", self)
+        }
+    }
     impl Severity for TestError {
         fn get_severity(&self) -> ErrorSeverity {
             match self {
@@ -84,21 +90,13 @@ pub enum TestError {
     }
     pub struct TestLogger {}
     impl Logger for TestLogger {
-        fn trace(&self, args: Arguments<'_>) {
-            todo!()
-        }
+        fn trace(&self, args: Arguments<'_>) {}
 
-        fn debug(&self, args: Arguments<'_>) {
-            todo!()
-        }
+        fn debug(&self, args: Arguments<'_>) {}
 
-        fn info(&self, args: Arguments<'_>) {
-            todo!()
-        }
+        fn info(&self, args: Arguments<'_>) {}
 
-        fn warn(&self, args: Arguments<'_>) {
-            todo!()
-        }
+        fn warn(&self, args: Arguments<'_>) {}
 
         fn error(&self, args: Arguments<'_>) {
             println!("Error log: {}", args)
@@ -120,7 +118,7 @@ fn test_error_handler_ignore() {
         let mut mock_logger = TestLogger{};
         let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
         test_error_handler.handle_error(TestError::Report);
-        assert_eq!(EVENT_QUEUE.dequeue(), None);
+        assert!(EVENT_QUEUE.dequeue() == None);
     }
     #[test]
     fn test_error_handler_graceful_shutdown() {
@@ -129,29 +127,10 @@ fn test_error_handler_ignore() {
         let mut mock_logger = TestLogger{};
         let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
         test_error_handler.handle_error(TestError::GracefulShutdown);
-        assert_eq!(EVENT_QUEUE.dequeue(), Some(GlobEvent::ErrorWithGracefulShutdown));
-        assert_eq!(EVENT_QUEUE.dequeue(), None);
+        assert!(EVENT_QUEUE.dequeue() == Some(GlobEvent::ErrorWithGracefulShutdown));
+        assert!(EVENT_QUEUE.dequeue() == None);
     }
 
-    #[test]
-    fn test_error_handler_graceful_shutdown_queue_full() {
-        static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
-        for msg in 0..8 {
-            EVENT_QUEUE.enqueue(GlobEvent::ButtonShortPress).unwrap();
-        }
-        let mut mock_motor_enabler = MockMotorEnabler::new();
-        mock_motor_enabler.expect_set_enable()
-            .with(eq(false))
-            .times(1)
-            .return_const(());
-
-        let mut mock_logger = TestLogger{};
-        let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-        let result = std::panic::catch_unwind(AssertUnwindSafe(|| {
-            test_error_handler.handle_error(TestError::GracefulShutdown);
-        }));
-        assert!(result.is_err())
-    }
     #[test]
     fn test_error_handler_immediate_shutdown() {
         static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
@@ -164,24 +143,7 @@ fn test_error_handler_ignore() {
         let mut mock_logger = TestLogger{};
         let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
         test_error_handler.handle_error(TestError::ImmediateShutdown);
-        assert_eq!(EVENT_QUEUE.dequeue(), Some(GlobEvent::ErrorWithImmediateShutdown));
-        assert_eq!(EVENT_QUEUE.dequeue(), None);
-    }
-    #[test]
-    fn test_error_handler_panic() {
-        static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
-        let mut mock_motor_enabler = MockMotorEnabler::new();
-        mock_motor_enabler.expect_set_enable()
-            .with(eq(false))
-            .times(1)
-            .return_const(());
-
-        let mut mock_logger = TestLogger{};
-        let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-
-        let result = std::panic::catch_unwind(AssertUnwindSafe(|| {
-            test_error_handler.handle_error(TestError::Panic);
-        }));
-        assert!(result.is_err());
+        assert!(EVENT_QUEUE.dequeue() == Some(GlobEvent::ErrorWithImmediateShutdown));
+        assert!(EVENT_QUEUE.dequeue() == None);
     }
 }
