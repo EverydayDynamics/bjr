@@ -3,7 +3,7 @@ use core::fmt::Arguments;
 use bsp_traits::{Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, StepperDeviceError};
 use bsp_traits::StepperMotorController;
 use bsp_traits::TemperatureSensor;
-use crate::boards::{BjrBoardSupport, BoardCreationError};
+use crate::boards::{BjrBoardResources, BjrBoardSupport, BoardCreationError};
 use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
 use stm32f4xx_hal as hal;
@@ -22,7 +22,7 @@ use crate::utils::spidev::{Spidev, SpiDevError};
 
 // global logger
 pub struct MyBoard {
-    pub button: Option<GpioButton<Pin<'B', 5>>>,
+    pub button: GpioButton<Pin<'B', 5>>,
     pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
     pub stp_motor_drive_b: Dummy,
     pub stp_motor_drive_c: Dummy,
@@ -59,7 +59,7 @@ impl MyBoard {
         let stp_motor_drive_a = TMC5130StepperDev::new(driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
         let button = GpioButton::new(button_pin);
         Ok(MyBoard {
-            button: Some(button),
+            button: button,
             stp_motor_drive_a,
             log_device: Dummy{},
             stp_motor_drive_b: Dummy{},
@@ -91,6 +91,15 @@ impl BjrBoardSupport for MyBoard {
 
     fn get_log_device(&mut self) -> impl Logger {
         Dummy{}
+    }
+
+    fn get_resources(&mut self) -> BjrBoardResources {
+        BjrBoardResources{
+            stepper_devices: Some([&mut self.stp_motor_drive_a,&mut self.stp_motor_drive_b,&mut self.stp_motor_drive_c]),
+            button: Some(&mut self.button),
+            motor_enabler: Some(&mut self.motor_enabler),
+            log_device: Some(&mut self.log_device),
+        }
     }
 }
 
