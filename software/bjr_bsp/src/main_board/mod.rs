@@ -68,34 +68,12 @@ impl MyBoard {
         })
     }
 }
-impl BjrBoardSupport for MyBoard {
-    fn get_stepper_motor_controller_a(&mut self) -> impl StepperMotorController {
-        Dummy{}
-    }
-
-    fn get_stepper_motor_controller_b(&mut self) -> impl StepperMotorController {
-        Dummy{}
-    }
-
-    fn get_stepper_motor_controller_c(&mut self) -> impl StepperMotorController {
-        Dummy{}
-    }
-
-    fn get_button(& self) -> impl Button {
-        Dummy{}
-    }
-
-    fn get_motor_enabler(&mut self) -> impl MotorEnabler {
-        Dummy{}
-    }
-
-    fn get_log_device(&mut self) -> impl Logger {
-        Dummy{}
-    }
-
-    fn get_resources(&mut self) -> BjrBoardResources {
-        BjrBoardResources{
-            stepper_devices: Some([&mut self.stp_motor_drive_a,&mut self.stp_motor_drive_b,&mut self.stp_motor_drive_c]),
+impl<'a> BjrBoardSupport<'a> for MyBoard
+{
+    fn get_resources(&'a mut self) -> BjrBoardResources<'a> {
+        let d:[&mut dyn StepperMotorController;3] = [&mut self.stp_motor_drive_a, &mut self.stp_motor_drive_b, &mut self.stp_motor_drive_c];
+        BjrBoardResources {
+            stepper_devicees: Some(d),
             button: Some(&mut self.button),
             motor_enabler: Some(&mut self.motor_enabler),
             log_device: Some(&mut self.log_device),

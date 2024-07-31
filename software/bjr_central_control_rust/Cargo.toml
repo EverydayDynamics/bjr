@@ -19,10 +19,11 @@ defmt-rtt = "0.4.0"
 panic-probe = { version = "0.3.1", features = ["print-defmt"] }
 cortex-m-semihosting = "0.5.0"
 rtic = { version = "2.1.1", features = [ "thumbv7-backend"  ] }
-rtic-monotonics = { version = "1.5.0", features = [ "cortex-m-systick" ]}
+rtic-monotonics = { version = "1.5.0", features = [ "cortex-m-systick", "stm32_tim2","stm32f446re", ]}
 rtic-core = "1.0.0"
 bsp_traits = { path = "../bsp_traits", version = "0.1.0" }
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0" }
+embedded-time = "0.12.1"
 
 [dependencies.stm32f4xx-hal]
 version = "0.20.0"
