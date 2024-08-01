@@ -26,9 +26,10 @@ mod app {
     };
     use core::cell::RefCell;
     use core::default;
+    use core::fmt::{Display, Formatter};
     use bjr_bsp;
     use bjr_bsp::Board;
-    use bjr_bsp::boards::BjrBoardSupport;
+    use bjr_bsp::boards::{BjrBoardSupport, BoardCreationError};
     use bjr_bsp::main_board::MyBoard;
     use bjr_logic::app::button_handler::ButtonHandler;
     use bjr_logic::app::error_handler::ErrorHandler;
@@ -40,6 +41,7 @@ mod app {
     use bjr_logic::app::logic_runner;
     use bjr_logic::app::logic_runner::LogicRunner;
     use bjr_logic::app::motor_handler::MotorHandler;
+    use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
     use bjr_logic::app::state_manager::StateManager;
     use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
     use bsp_traits::{MotorInput, StepperMotorController};
@@ -53,7 +55,23 @@ mod app {
     use rtic_monotonics::stm32::fugit::Instant;
     use stm32f4xx_hal::pac::Peripherals;
     use stm32f4xx_hal::rcc::Clocks;
+    pub enum AppError {
+        SetupError(BoardCreationError)
+    }
+    impl Severity for AppError {fn get_severity(&self) -> ErrorSeverity {
+        match self{
+            AppError::SetupError(_) => { ErrorSeverity::Panic }
+        }
+    }
 
+    }
+    impl Display for AppError {fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self{
+            AppError::SetupError(bce) => { write!(f,"ApplicationError, Board initialization failed: {}", bce) }
+        }
+    }
+
+    }
     // Shared resources go here
     #[shared]
     struct Shared {
@@ -90,20 +108,26 @@ mod app {
     // TODO: Add tasks
     #[task(priority = 1)]
     async fn task1(cx: task1::Context) {
-        match Board::new() {
-            Ok(mut board) => {
-                let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
-                let timer_clock_hz = 75_000_000; // ??????????????????????????????
-                // Start the monotonic
-                Mono::start(timer_clock_hz, token);
-                let event_queue = get_event_queue();
-                let mut board_resources = board.get_resources();
-                let button_handler = ButtonHandler::new(board_resources.button.unwrap(),event_queue);
-                let motor_handler = MotorHandler::new(board_resources.stepper_devicees.unwrap(), MotorPosLimit::new(true), MotorVelLimit::new(true));
+        let mut board = Board::new();
+        let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
+        let timer_clock_hz = 75_000_000; // ??????????????????????????????
+        // Start the monotonic
+        Mono::start(timer_clock_hz, token);
+        let event_queue = get_event_queue();
+        let mut infall_resources = board.get_infallible_resources();
+        let mut error_handler = ErrorHandler::new(&mut infall_resources.motor_enabler, &mut infall_resources.log_device, event_queue);
+        match board.get_fallible_resources() {
+            Ok(mut fallible_resources) => {
+                let button_handler = ButtonHandler::new(&mut fallible_resources.button,event_queue);
+                let steppers: [&mut dyn StepperMotorController;3]= [
+                    &mut fallible_resources.stp_motor_drive_a,
+                    &mut fallible_resources.stp_motor_drive_b,
+                    &mut fallible_resources.stp_motor_drive_c,
+                ];
+                let motor_handler = MotorHandler::new(steppers, MotorPosLimit::new(true), MotorVelLimit::new(true));
                 let io_manager = DefaultIOManager::new(motor_handler);
                 let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
                 let event_handler = EventHandler::new();
-                let error_handler = ErrorHandler::new(board_resources.motor_enabler.take().unwrap(),board_resources.log_device.take().unwrap(), event_queue);
                 let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler);
                 loop {
                     let a = default::Default::default();
@@ -113,10 +137,9 @@ mod app {
                     Mono::delay_until(baba).await;
                 }
             }
-            Err(BoardInitError) => {
-                defmt::error!("Failed to initialize Board: {}", defmt::Display2Format(&BoardInitError));
-                defmt::info!("Shutting down...");
-                bjr::exit()
+            Err(error) => {
+                let error_binding = AppError::SetupError(error);
+                error_handler.handle_error(error_binding);
             }
         }
         {

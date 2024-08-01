@@ -1,7 +1,7 @@
 use embedded_hal::digital::InputPin;
 use bsp_traits::Button;
 pub struct GpioButton<PIN> {
-    pin: PIN,
+    pub(crate) pin: PIN,
 }
 
 impl<PIN> GpioButton<PIN>

@@ -29,7 +29,7 @@ impl ErrorHandler<'_>
     pub fn handle_error<ERR: Severity + core::fmt::Display>(&mut self, error:ERR) {
         match error.get_severity() {
             ErrorSeverity::Ignore => {}
-            _ => {self.log_device.error(format_args!("{}",error));}
+            _ => {self.log_device.error(&error);}
         }
         match error.get_severity() {
             ErrorSeverity::Panic => { self.panic(error) }

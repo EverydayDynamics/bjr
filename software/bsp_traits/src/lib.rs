@@ -54,11 +54,11 @@ pub trait Monotonic {
 
 
 pub trait Logger {
-    fn trace(&self, args: Arguments<'_>);
-    fn debug(&self, args: Arguments<'_>);
-    fn info(&self, args: Arguments<'_>);
-    fn warn(&self, args: Arguments<'_>);
-    fn error(&self, args: Arguments<'_>);
+    fn trace(&self, message: &dyn Display);
+    fn debug(&self, message: &dyn Display);
+    fn info(&self, message: &dyn Display);
+    fn warn(&self, message: &dyn Display);
+    fn error(&self, message: &dyn Display);
 }
 pub enum DeviceError {
     CommunicationError,
