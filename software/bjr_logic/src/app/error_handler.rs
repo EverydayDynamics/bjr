@@ -1,47 +1,51 @@
+use core::fmt::Display;
 use bsp_traits::{MotorEnabler, Logger};
 use heapless::mpmc::Q8;
 use crate::app::event::{EventError, GlobEvent};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
+use crate::str_to_display;
+use crate::utils::DisplayStr;
 
 // Define the ErrorHandler struct
-pub struct ErrorHandler<'a> {
-    motor_enabler: &'a mut dyn MotorEnabler,
-    log_device: &'a mut dyn Logger,
+pub struct ErrorHandler {
     event_queue: &'static Q8<GlobEvent>,
 }
 
-impl<'a> ErrorHandler<'a>{
-    pub fn new(motor_enabler: &'a mut dyn MotorEnabler, log_device: &'a mut dyn Logger, event_queue: &'static Q8<GlobEvent>) -> Self {
+impl ErrorHandler{
+    pub fn new( event_queue: &'static Q8<GlobEvent>) -> Self {
         ErrorHandler{
-            motor_enabler,
-            log_device,
             event_queue,
         }
     }
 }
-impl ErrorHandler<'_>
+impl ErrorHandler
 {
-    pub fn panic<T>(&mut self, error: T) {
-        self.motor_enabler.set_enable(false);
-        //Err::<(),T>(error).unwrap();
+    pub fn panic<T: Display>(&mut self, error: T, motor_enabler: & mut dyn MotorEnabler, log_device: & mut dyn Logger ) {
+        motor_enabler.set_enable(false);
+        log_device.error(&error);
         panic!();
     }
-    pub fn handle_error<ERR: Severity + core::fmt::Display>(&mut self, error:ERR) {
+    pub fn handle_error<ERR: Severity + Display>(&mut self, motor_enabler: & mut dyn MotorEnabler, log_device: & mut dyn Logger, error:ERR) {
         match error.get_severity() {
-            ErrorSeverity::Ignore => {}
-            _ => {self.log_device.error(&error);}
+            _ => {log_device.error(&error);}
         }
         match error.get_severity() {
-            ErrorSeverity::Panic => { self.panic(error) }
+            ErrorSeverity::Panic => { self.panic(error, motor_enabler, log_device) }
             ErrorSeverity::ImmediateShutdown => {
-                self.motor_enabler.set_enable(false);
-                if self.event_queue.enqueue(GlobEvent::ErrorWithImmediateShutdown).is_err() {
-                    self.panic(EventError::QueueFull);
+                motor_enabler.set_enable(false);
+                let event = GlobEvent::ErrorWithImmediateShutdown;
+                if self.event_queue.enqueue(event).is_err() {
+                    self.panic(EventError::QueueFull(event), motor_enabler, log_device);
                 }}
             ErrorSeverity::GracefulShutdown => {
-                if self.event_queue.enqueue(GlobEvent::ErrorWithGracefulShutdown).is_err() {
-                    self.panic(EventError::QueueFull);
+                let event = GlobEvent::ErrorWithGracefulShutdown;
+                if self.event_queue.enqueue(event).is_err() {
+                    self.panic(event, motor_enabler, log_device);
                 }
+            }
+
+            ErrorSeverity::Ignore => {
+                log_device.warn(&str_to_display!("Ignored error: {}", error));
             }
             _ => {}
         }
@@ -90,17 +94,15 @@ pub enum TestError {
     }
     pub struct TestLogger {}
     impl Logger for TestLogger {
-        fn trace(&self, args: Arguments<'_>) {}
+        fn trace(&self, message: &dyn Display) {}
 
-        fn debug(&self, args: Arguments<'_>) {}
+        fn debug(&self, message: &dyn Display) {}
 
-        fn info(&self, args: Arguments<'_>) {}
+        fn info(&self, message: &dyn Display) {}
 
-        fn warn(&self, args: Arguments<'_>) {}
+        fn warn(&self, message: &dyn Display) {}
 
-        fn error(&self, args: Arguments<'_>) {
-            println!("Error log: {}", args)
-        }
+        fn error(&self, message: &dyn Display) {}
     }
 
 #[test]
@@ -108,16 +110,16 @@ fn test_error_handler_ignore() {
     static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
     let mut mock_motor_enabler = MockMotorEnabler::new();
     let mut mock_logger = TestLogger{};
-    let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-    test_error_handler.handle_error(TestError::Ignore);
+    let mut test_error_handler = ErrorHandler::new(&EVENT_QUEUE);
+    test_error_handler.handle_error(&mut mock_motor_enabler, &mut mock_logger, TestError::Ignore);
 }
     #[test]
     fn test_error_handler_report() {
         static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
         let mut mock_motor_enabler = MockMotorEnabler::new();
         let mut mock_logger = TestLogger{};
-        let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-        test_error_handler.handle_error(TestError::Report);
+        let mut test_error_handler = ErrorHandler::new(&EVENT_QUEUE);
+        test_error_handler.handle_error(&mut mock_motor_enabler, &mut mock_logger, TestError::Report);
         assert!(EVENT_QUEUE.dequeue() == None);
     }
     #[test]
@@ -125,8 +127,8 @@ fn test_error_handler_ignore() {
         static EVENT_QUEUE: Q8<GlobEvent> = Q8::new();
         let mut mock_motor_enabler = MockMotorEnabler::new();
         let mut mock_logger = TestLogger{};
-        let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-        test_error_handler.handle_error(TestError::GracefulShutdown);
+        let mut test_error_handler = ErrorHandler::new(&EVENT_QUEUE);
+        test_error_handler.handle_error(&mut mock_motor_enabler, &mut mock_logger, TestError::GracefulShutdown);
         assert!(EVENT_QUEUE.dequeue() == Some(GlobEvent::ErrorWithGracefulShutdown));
         assert!(EVENT_QUEUE.dequeue() == None);
     }
@@ -141,8 +143,8 @@ fn test_error_handler_ignore() {
             .return_const(());
 
         let mut mock_logger = TestLogger{};
-        let mut test_error_handler = ErrorHandler::new(&mut mock_motor_enabler, &mut mock_logger, &EVENT_QUEUE);
-        test_error_handler.handle_error(TestError::ImmediateShutdown);
+        let mut test_error_handler = ErrorHandler::new(&EVENT_QUEUE);
+        test_error_handler.handle_error(&mut mock_motor_enabler, &mut mock_logger, TestError::ImmediateShutdown);
         assert!(EVENT_QUEUE.dequeue() == Some(GlobEvent::ErrorWithImmediateShutdown));
         assert!(EVENT_QUEUE.dequeue() == None);
     }

@@ -26,7 +26,7 @@ use crate::utils::spidev::{Spidev, SpiDevError};
 
 // global logger
 pub struct MyBoard {
-    button_pin: Option<Pin<'B', 5>>,
+    button_pin: Option<Pin<'C', 13>>,
     cs_1_pin: Option<Pin<'B', 6, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
@@ -36,7 +36,7 @@ pub struct InfallibleResources {
     pub log_device: DefmtLogger,
 }
 pub struct FallibleResources {
-    pub button: GpioButton<Pin<'B', 5>>,
+    pub button: GpioButton<Pin<'C', 13>>,
     pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
     pub stp_motor_drive_b: Dummy,
     pub stp_motor_drive_c: Dummy,
@@ -51,7 +51,8 @@ impl MyBoard {
         let clocks = rcc.cfgr.sysclk(150.MHz()).freeze();
         let gpioa = dp.GPIOA.split();
         let gpiob = dp.GPIOB.split();
-        let button_pin = Some(gpiob.pb5.into_pull_up_input());
+        let gpioc = dp.GPIOC.split();
+        let button_pin = Some(gpioc.pc13.into_pull_up_input());
         let cs_pin = gpiob.pb6.into_push_pull_output_in_state(PinState::High);
         let motor_enabler_pin = gpiob.pb7.into_push_pull_output_in_state(PinState::Low);
         let spi = dp.SPI1.spi(
@@ -81,8 +82,8 @@ impl MyBoard {
         let stp_motor_drive_a = TMC5130StepperDev::new(driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
         let button = GpioButton::new(self.button_pin.take().unwrap());
         Ok(FallibleResources {
-            button: button,
-            stp_motor_drive_a: stp_motor_drive_a,
+            button,
+            stp_motor_drive_a,
             stp_motor_drive_b: Dummy {},
             stp_motor_drive_c: Dummy {},
         })

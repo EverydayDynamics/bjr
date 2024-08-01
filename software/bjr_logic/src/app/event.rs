@@ -7,6 +7,7 @@ pub enum GlobEvent {
     ErrorWithGracefulShutdown,
     ErrorWithImmediateShutdown,
     HomingFinished,
+    InitFinished,
 }
 impl Display for GlobEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
@@ -16,10 +17,18 @@ impl Display for GlobEvent {
             GlobEvent::ErrorWithGracefulShutdown => {write!(f,"GlobEvent Error With Graceful Shutdown")}
             GlobEvent::ErrorWithImmediateShutdown => {write!(f,"GlobEvent Error With Immediate Shutdown")}
             GlobEvent::HomingFinished => {write!(f,"GlobEvent Homing Finished")}
+            GlobEvent::InitFinished => {write!(f,"GlobEvent Initialization Finished")}
         }
     }
 }
-#[derive(Debug)]
 pub enum EventError {
-    QueueFull,
+    QueueFull(GlobEvent),
+}
+impl Display for EventError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            EventError::QueueFull(msg) => {write!(f,"EventError, queue full. lost message: {}",msg)}
+        }
+    }
+
 }

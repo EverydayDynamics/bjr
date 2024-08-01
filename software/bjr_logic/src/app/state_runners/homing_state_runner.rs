@@ -1,3 +1,4 @@
+use bsp_traits::MotorEnabler;
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
@@ -33,7 +34,8 @@ impl HomingStateRunner {
     }
 }
 impl RunnableState for HomingStateRunner {
-    fn entry(&mut self, _call_time: Microseconds<u64>) {
+    fn entry(&mut self, _call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler) {
+        motor_enabler.set_enable(true);
         self.states = [HomingStateRunnerState::Default;MOTOR_NUM];
     }
 
@@ -208,6 +210,12 @@ mod tests {
     use crate::app::motor_handler::{ControlMode, MotorStatus};
 
     mock! {
+        pub TestMotorEnabler {}
+        impl<'a> MotorEnabler for TestMotorEnabler {
+            fn set_enable(&mut self, enable: bool);
+        }
+    }
+    mock! {
         pub TestIOManager {}
         impl<'a> IOManager for TestIOManager {
             fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
@@ -325,7 +333,12 @@ mod tests {
 
         let mut mock_iomanager = MockTestIOManager::new();
         let mut test_homing_state_runner = HomingStateRunner::new();
-        test_homing_state_runner.entry(Microseconds(0));
+        let mut mock_test_motor_enabler = MockTestMotorEnabler::new();
+        mock_test_motor_enabler.expect_set_enable()
+            .with(eq(true))
+            .times(1)
+            .returning(|_|{});
+        test_homing_state_runner.entry(Microseconds(0), &mut mock_test_motor_enabler);
         //update (1000us)
         //Check limit status -> not at limit
         // Start moving to limit fast

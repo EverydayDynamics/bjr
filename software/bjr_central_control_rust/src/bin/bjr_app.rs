@@ -34,7 +34,6 @@ mod app {
     use bjr_logic::app::button_handler::ButtonHandler;
     use bjr_logic::app::error_handler::ErrorHandler;
     use bjr_logic::app::event_handler::EventHandler;
-    use bjr_logic::app::event_handler::State::Default;
     use bjr_logic::app::event_queue::get_event_queue;
     use bjr_logic::app::io_manager::DefaultIOManager;
     use bjr_logic::app::limits::{MotorPosLimit, MotorVelLimit};
@@ -115,7 +114,7 @@ mod app {
         Mono::start(timer_clock_hz, token);
         let event_queue = get_event_queue();
         let mut infall_resources = board.get_infallible_resources();
-        let mut error_handler = ErrorHandler::new(&mut infall_resources.motor_enabler, &mut infall_resources.log_device, event_queue);
+        let mut error_handler = ErrorHandler::new(event_queue);
         match board.get_fallible_resources() {
             Ok(mut fallible_resources) => {
                 let button_handler = ButtonHandler::new(&mut fallible_resources.button,event_queue);
@@ -127,19 +126,18 @@ mod app {
                 let motor_handler = MotorHandler::new(steppers, MotorPosLimit::new(true), MotorVelLimit::new(true));
                 let io_manager = DefaultIOManager::new(motor_handler);
                 let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
-                let event_handler = EventHandler::new();
-                let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler);
+                let event_handler = EventHandler::new(event_queue);
+                let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler, &mut infall_resources.log_device, &mut infall_resources.motor_enabler, Microseconds(Mono::now().ticks()));
                 loop {
-                    let a = default::Default::default();
-                    let aa = Mono::now().ticks();
-                    let next_run = logic_runner.update(a);
-                    let baba: rtic_monotonics::systick::fugit::Instant<u64, 1, 1000000> = rtic_monotonics::systick::fugit::Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
+                    let now = Mono::now().ticks();
+                    let next_run = logic_runner.update(embedded_time::duration::Microseconds(now));
+                    let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
                     Mono::delay_until(baba).await;
                 }
             }
             Err(error) => {
                 let error_binding = AppError::SetupError(error);
-                error_handler.handle_error(error_binding);
+                error_handler.handle_error(&mut infall_resources.motor_enabler, &mut infall_resources.log_device, error_binding);
             }
         }
         {

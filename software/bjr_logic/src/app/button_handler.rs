@@ -4,6 +4,7 @@ use bsp_traits::Button;
 use crate::app::event::GlobEvent;
 use embedded_time::{duration::*};
 use heapless::mpmc::Q8;
+use crate::app::severity_trait::{ErrorSeverity, Severity};
 
 pub enum ButtonHandlerError {
     QueueFull(GlobEvent)
@@ -12,6 +13,13 @@ impl Display for ButtonHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ButtonHandlerError::QueueFull(ge) => {write!(f,"ButtonHandlerError Queue Full. Dropped msg: {}", ge)}
+        }
+    }
+}
+impl Severity for ButtonHandlerError {
+    fn get_severity(&self) -> ErrorSeverity {
+        match self {
+            ButtonHandlerError::QueueFull(_) => {ErrorSeverity::Panic}
         }
     }
 }

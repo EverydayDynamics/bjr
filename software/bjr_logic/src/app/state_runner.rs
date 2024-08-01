@@ -1,4 +1,5 @@
 use core::fmt::{Display, Formatter};
+use bsp_traits::MotorEnabler;
 use embedded_time::duration::Microseconds;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
@@ -35,7 +36,7 @@ impl Severity for StateRunnerError {
 }
 
 pub trait RunnableState {
-    fn entry(&mut self, call_time: Microseconds<u64>);
+    fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler);
     fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
     fn exit(&mut self, call_time: Microseconds<u64>);
 }
