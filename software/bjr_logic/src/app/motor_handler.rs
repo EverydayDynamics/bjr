@@ -1,6 +1,6 @@
 use core::fmt::Display;
 use core::fmt::{Formatter};
-use bsp_traits::{StepperMotorController, StepperDeviceError, MotorInput, MotorMode};
+use bsp_traits::{StepperMotorController, StepperDeviceError, MotorInput, MotorMode, MotorState};
 use crate::app::control_primitives::KinState;
 use crate::app::limits::{LimitError, MotorPosLimit, MotorVelLimit, Limit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
@@ -35,17 +35,53 @@ impl Display for MotorHandlerError {
         }
     }
 }
+pub enum GenericMotor<MA, MB, MC> where MA: StepperMotorController, MB: StepperMotorController, MC: StepperMotorController {
+    MotorA(MA),
+    MotorB(MB),
+    MotorC(MC),
+}
+impl<MA, MB, MC> StepperMotorController for GenericMotor<MA, MB, MC>
+where
+MA: StepperMotorController,
+MB: StepperMotorController,
+MC: StepperMotorController,
+{
+    fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
+        match self {
+            GenericMotor::MotorA(ma) => {ma.set_inputs(inputs)}
+            GenericMotor::MotorB(mb) => {mb.set_inputs(inputs)}
+            GenericMotor::MotorC(mc) => {mc.set_inputs(inputs)}
+        }
+    }
 
-pub struct MotorHandler<'a> {
-   motors: [&'a mut dyn StepperMotorController;MOTOR_NUM],
+    fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
+        match self {
+            GenericMotor::MotorA(ma) => {ma.get_state()}
+            GenericMotor::MotorB(mb) => {mb.get_state()}
+            GenericMotor::MotorC(mc) => {mc.get_state()}
+        }
+    }
+}
+pub struct MotorHandler<MA, MB, MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
+   motors: [GenericMotor<MA, MB, MC>;MOTOR_NUM],
     accel: [f32;MOTOR_NUM],
     poslim: MotorPosLimit,
     vellim: MotorVelLimit,
 }
-impl MotorHandler<'_> {
-    pub fn new(motors: [&mut dyn StepperMotorController;MOTOR_NUM], poslim: MotorPosLimit, vellim: MotorVelLimit) -> MotorHandler{
+impl<MA, MB, MC> MotorHandler<MA, MB, MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
+    pub fn new(motor_a: MA, motor_b: MB, motor_c: MC, poslim: MotorPosLimit, vellim: MotorVelLimit) -> MotorHandler<MA, MB, MC> {
         MotorHandler{
-            motors,
+            motors: [GenericMotor::MotorA(motor_a), GenericMotor::MotorB(motor_b), GenericMotor::MotorC(motor_c)],
             accel: [0.0f32;3],
             poslim,
             vellim,

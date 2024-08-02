@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler};
+use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController};
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 use crate::app::button_handler::ButtonHandler;
@@ -37,31 +37,39 @@ impl Severity for LogicRunnerError {
         }
     }
 }
-pub struct LogicRunner<'a, BTN, LOG, ME> {
+pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
     next_call_time: Microseconds<u64>,
     button_handler: ButtonHandler<BTN>,
     event_queue: &'static Q8<GlobEvent>,
     event_handler: EventHandler,
-    state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<'a>>,
+    state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC>>,
     error_handler: ErrorHandler,
     log_device: LOG,
     motor_enabler: ME,
 }
 
-impl<'a, BTN, LOG, ME> LogicRunner<'a,BTN, LOG, ME>
+impl<BTN, LOG, ME, MA, MB, MC> LogicRunner<BTN, LOG, ME, MA, MB, MC>
 where
 BTN: Button,
 LOG: Logger,
 ME: MotorEnabler,
+MA: StepperMotorController,
+MB: StepperMotorController,
+MC: StepperMotorController,
 {
     pub fn new(
         button_handler: ButtonHandler<BTN>,
         event_queue: &'static Q8<GlobEvent>,
-        state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<'a>>,
+        state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC>>,
         event_handler: EventHandler,
         error_handler: ErrorHandler,
-        log_device: &'a mut dyn Logger,
-        motor_enabler: &'a mut dyn MotorEnabler,
+        log_device: LOG,
+        motor_enabler: ME,
         call_time: Microseconds<u64>,
         ) -> Self {
         LogicRunner{
@@ -89,7 +97,7 @@ ME: MotorEnabler,
                     self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, error);
                 }
                 Ok(state) => {
-                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, self.motor_enabler);
+                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, &mut self.motor_enabler);
                     if let Err(state_runner_error) = state_runner_result {
                         self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, state_runner_error);
                     }

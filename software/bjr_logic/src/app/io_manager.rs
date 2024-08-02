@@ -1,4 +1,5 @@
 use core::fmt::{Display, Formatter};
+use bsp_traits::StepperMotorController;
 use embedded_time::duration::Microseconds;
 use crate::app::control_primitives::KinState;
 use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, MotorStatus};
@@ -25,8 +26,13 @@ impl Display for IOManagerError {
         }
     }
 }
-pub struct DefaultIOManager<'a> {
-    motor_handler: MotorHandler<'a>,
+pub struct DefaultIOManager<MA,MB,MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
+    motor_handler: MotorHandler<MA,MB,MC>,
     last_call_time: Microseconds<u64>
 }
 pub trait IOManager {
@@ -36,15 +42,25 @@ pub trait IOManager {
     fn reset_motor_pos(&mut self, motor_idx:usize) -> Result<(), IOManagerError>;
     fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
 }
-impl<'a> DefaultIOManager<'a> {
-    pub fn new(motor_handler: MotorHandler<'a>) -> DefaultIOManager<'a> {
+impl<MA,MB,MC> DefaultIOManager<MA,MB,MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
+    pub fn new(motor_handler: MotorHandler<MA,MB,MC>) -> DefaultIOManager<MA,MB,MC> {
         DefaultIOManager {
             motor_handler,
             last_call_time: Microseconds::<u64>::new(0),
         }
     }
 }
-impl<'a> IOManager for DefaultIOManager<'a> {
+impl<MA,MB,MC> IOManager for DefaultIOManager<MA,MB,MC>
+    where
+        MA: StepperMotorController,
+        MB: StepperMotorController,
+        MC: StepperMotorController,
+{
     fn read_all_inputs(&mut self, _call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.motor_handler.get_motor_state().map_err(|e| IOManagerError::MotorInput(e))?;
         Ok(Inputs{
