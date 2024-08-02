@@ -1,17 +1,23 @@
 use core::fmt::{Debug, Display, Formatter};
 use bsp_traits::{Button, Logger, MotorEnabler, StepperDeviceError, StepperMotorController, TemperatureSensor};
-pub struct BjrBoardResources<'a>
-{
-    pub stepper_devicees: Option<[&'a mut dyn StepperMotorController;3]>,
-    pub button: Option<&'a mut dyn Button>,
-    pub motor_enabler: Option<&'a mut dyn MotorEnabler>,
-    pub log_device: Option<&'a mut dyn Logger>,
-}
-pub trait BjrBoardSupport<'a>
-{
-    fn get_resources(&'a mut self) -> BjrBoardResources<'a>;
-}
-pub enum BoardCreationError{
+use core::result::Result;
+
+pub trait BoardResources {
+    // Infallible Resources
+    type MotorEnabler;
+    type LogDevice;
+
+    // Fallible Resources
+    type Button;
+    type StepperDriveA;
+    type StepperDriveB;
+    type StepperDriveC;
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice);
+
+    fn get_fallible_resources(&mut self) -> Result<
+    (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC),
+    BoardCreationError>;
+}pub enum BoardCreationError{
     StepperDriveInitError(StepperDeviceError, usize)
 }
 impl Display for BoardCreationError {

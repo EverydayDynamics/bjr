@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::{Logger, MotorEnabler};
+use bsp_traits::{Button, Logger, MotorEnabler};
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 use crate::app::button_handler::ButtonHandler;
@@ -37,21 +37,25 @@ impl Severity for LogicRunnerError {
         }
     }
 }
-pub struct LogicRunner<'a> {
+pub struct LogicRunner<'a, BTN, LOG, ME> {
     next_call_time: Microseconds<u64>,
-    button_handler: ButtonHandler<'a>,
+    button_handler: ButtonHandler<BTN>,
     event_queue: &'static Q8<GlobEvent>,
     event_handler: EventHandler,
     state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<'a>>,
     error_handler: ErrorHandler,
-    log_device: &'a mut dyn Logger,
-    motor_enabler: &'a mut dyn MotorEnabler,
+    log_device: LOG,
+    motor_enabler: ME,
 }
 
-impl<'a> LogicRunner<'a>
+impl<'a, BTN, LOG, ME> LogicRunner<'a,BTN, LOG, ME>
+where
+BTN: Button,
+LOG: Logger,
+ME: MotorEnabler,
 {
     pub fn new(
-        button_handler: ButtonHandler<'a>,
+        button_handler: ButtonHandler<BTN>,
         event_queue: &'static Q8<GlobEvent>,
         state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<'a>>,
         event_handler: EventHandler,
@@ -75,19 +79,19 @@ impl<'a> LogicRunner<'a>
         let period = parameter_manager().get::<LogicRunnerPeriodUs>() as u64;
         self.next_call_time = self.next_call_time + Microseconds::<u64>::new(period);
         if self.next_call_time < call_time {
-            self.error_handler.handle_error(self.motor_enabler, self.log_device, LogicRunnerError::TimeOverrun);
+            self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, LogicRunnerError::TimeOverrun);
         } else {
             if let Err(button_handler_error) = self.button_handler.update(call_time) {
-                self.error_handler.handle_error(self.motor_enabler, self.log_device, button_handler_error);
+                self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, button_handler_error);
             }
-            match self.event_handler.handle_events(self.log_device).map_err(|e|LogicRunnerError::EventHandlerError(e)) {
+            match self.event_handler.handle_events(&mut self.log_device).map_err(|e|LogicRunnerError::EventHandlerError(e)) {
                 Err(error) => {
-                    self.error_handler.handle_error(self.motor_enabler, self.log_device, error);
+                    self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, error);
                 }
                 Ok(state) => {
                     let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, self.motor_enabler);
                     if let Err(state_runner_error) = state_runner_result {
-                        self.error_handler.handle_error(self.motor_enabler, self.log_device, state_runner_error);
+                        self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, state_runner_error);
                     }
                 }
             }

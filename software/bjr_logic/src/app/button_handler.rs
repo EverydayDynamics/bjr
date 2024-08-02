@@ -24,15 +24,15 @@ impl Severity for ButtonHandlerError {
     }
 }
 
-pub struct ButtonHandler<'a> {
-    button: &'a mut dyn Button,
+pub struct ButtonHandler<BTN> {
+    button: BTN,
     event_handler: &'static Q8<GlobEvent>,
     last_state: bool,
     press_start: Microseconds<u64>,
 }
 
-impl<'a> ButtonHandler<'a> {
-    pub fn new(button: &'a mut dyn Button, event_handler: &'static Q8<GlobEvent>) -> Self {
+impl<BTN: Button> ButtonHandler<BTN> {
+    pub fn new(button: BTN, event_handler: &'static Q8<GlobEvent>) -> Self {
         ButtonHandler {
             button,
             event_handler,
@@ -89,7 +89,7 @@ static EVENT_QUEUE_3: Q8<GlobEvent> = Q8::new();
         mock_button.expect_is_pressed()
             .times(run_count.clone()as usize)
             .return_const(false);
-        let mut test_button_handler = ButtonHandler::new(&mut mock_button, &EVENT_QUEUE_1);
+        let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_1);
         for run_num in 1..(run_count+1) {
             let call_time = call_rate*run_num;
             test_button_handler.update(call_time);
@@ -111,7 +111,7 @@ static EVENT_QUEUE_3: Q8<GlobEvent> = Q8::new();
         mock_button.expect_is_pressed()
             .times(4)
             .return_const(false);
-        let mut test_button_handler = ButtonHandler::new(&mut mock_button, &EVENT_QUEUE_2);
+        let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_2);
         for run_num in 1..(run_count+1) {
             let call_time = call_rate*run_num;
             test_button_handler.update(call_time);
@@ -139,7 +139,7 @@ fn test_button_handler_longnshort_press() {
     mock_button.expect_is_pressed()
         .times(69)
        .return_const(false);
-    let mut test_button_handler = ButtonHandler::new(&mut mock_button, &EVENT_QUEUE_3);
+    let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_3);
     for run_num in 1..(run_count+1) {
         let call_time = call_rate*run_num;
         test_button_handler.update(call_time);

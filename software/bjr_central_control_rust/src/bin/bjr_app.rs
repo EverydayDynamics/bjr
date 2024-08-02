@@ -29,7 +29,7 @@ mod app {
     use core::fmt::{Display, Formatter};
     use bjr_bsp;
     use bjr_bsp::Board;
-    use bjr_bsp::boards::{BjrBoardSupport, BoardCreationError};
+    use bjr_bsp::boards::{BoardResources, BoardCreationError};
     use bjr_bsp::main_board::MyBoard;
     use bjr_logic::app::button_handler::ButtonHandler;
     use bjr_logic::app::error_handler::ErrorHandler;
@@ -113,21 +113,21 @@ mod app {
         // Start the monotonic
         Mono::start(timer_clock_hz, token);
         let event_queue = get_event_queue();
-        let mut infall_resources = board.get_infallible_resources();
+        let (mut motor_enabler, mut log_device) = board.get_infallible_resources();
         let mut error_handler = ErrorHandler::new(event_queue);
         match board.get_fallible_resources() {
-            Ok(mut fallible_resources) => {
-                let button_handler = ButtonHandler::new(&mut fallible_resources.button,event_queue);
+            Ok((mut button, mut stp_a, mut stp_b, mut stp_c)) => {
+                let button_handler = ButtonHandler::new(&mut button, get_event_queue());
                 let steppers: [&mut dyn StepperMotorController;3]= [
-                    &mut fallible_resources.stp_motor_drive_a,
-                    &mut fallible_resources.stp_motor_drive_b,
-                    &mut fallible_resources.stp_motor_drive_c,
+                    &mut stp_a,
+                    &mut stp_b,
+                    &mut stp_c,
                 ];
                 let motor_handler = MotorHandler::new(steppers, MotorPosLimit::new(true), MotorVelLimit::new(true));
                 let io_manager = DefaultIOManager::new(motor_handler);
                 let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
                 let event_handler = EventHandler::new(event_queue);
-                let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler, &mut infall_resources.log_device, &mut infall_resources.motor_enabler, Microseconds(Mono::now().ticks()));
+                let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler, &mut log_device, &mut motor_enabler, Microseconds(Mono::now().ticks()));
                 loop {
                     let now = Mono::now().ticks();
                     let next_run = logic_runner.update(embedded_time::duration::Microseconds(now));
@@ -137,7 +137,7 @@ mod app {
             }
             Err(error) => {
                 let error_binding = AppError::SetupError(error);
-                error_handler.handle_error(&mut infall_resources.motor_enabler, &mut infall_resources.log_device, error_binding);
+                error_handler.handle_error(&mut motor_enabler, &mut log_device, error_binding);
             }
         }
         {

@@ -1,4 +1,8 @@
+#[cfg(feature = "embedded")]
 pub mod gpio_button;
+#[cfg(feature = "embedded")]
 pub mod tmc5130_stepper_dev;
+#[cfg(feature = "embedded")]
 pub mod defmt_logger;
+#[cfg(feature = "embedded")]
 pub mod gpio_motor_enabler;

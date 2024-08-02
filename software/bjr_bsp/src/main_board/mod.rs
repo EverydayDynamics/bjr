@@ -1,23 +1,16 @@
 use core::cell::RefCell;
-use core::fmt::Arguments;
-use bsp_traits::{Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, StepperDeviceError};
+use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError};
 use bsp_traits::StepperMotorController;
-use bsp_traits::TemperatureSensor;
-use crate::boards::{BjrBoardResources, BjrBoardSupport, BoardCreationError};
-use cortex_m::{interrupt, Peripherals};
+use crate::boards::{BoardCreationError, BoardResources};
+use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
 use stm32f4xx_hal as hal;
-use stm32f4xx_hal::gpio::{Output, Pin, gpiob::PB6, PinState};
+use stm32f4xx_hal::gpio::{Output, Pin, PinState};
 use stm32f4xx_hal::prelude::*;
 use stm32f4xx_hal::spi::{Phase, Polarity, Spi};
 
-use panic_probe as _;
-use defmt_rtt as _;
 use embedded_hal::spi::{Error, ErrorKind};
-use stm32f4xx_hal::gpio;
 use stm32f4xx_hal::pac::SPI1;
-use stm32f4xx_hal::rcc::Clocks;
-use tmc5130::Tmc5130;
 use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::devices::defmt_logger::DefmtLogger;
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
@@ -57,7 +50,7 @@ impl MyBoard {
         let motor_enabler_pin = gpiob.pb7.into_push_pull_output_in_state(PinState::Low);
         let spi = dp.SPI1.spi(
             (gpioa.pa5, gpioa.pa6, gpioa.pa7),
-            hal::spi::Mode{ polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition },
+            hal::spi::Mode { polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition },
             1000.kHz(),
             &clocks,
         );
@@ -68,10 +61,21 @@ impl MyBoard {
             cs_1_pin: Some(cs_pin)
         }
     }
-    pub fn get_infallible_resources(&mut self) -> InfallibleResources {
-        InfallibleResources{ motor_enabler: GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), log_device: DefmtLogger {} }
+}
+impl BoardResources for MyBoard {
+
+    type MotorEnabler =  GPIOMotorEnabler<Pin<'B', 7, Output>>;
+    type LogDevice =  DefmtLogger;
+    type Button = GpioButton<Pin<'C', 13>>;
+    type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>;
+    type StepperDriveB = Dummy;
+    type StepperDriveC = Dummy;
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
+        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {})
     }
-    pub fn get_fallible_resources(&mut self) -> Result<FallibleResources, BoardCreationError> {
+    fn get_fallible_resources(&mut self) -> Result<
+        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC),
+        BoardCreationError> {
         //let a: Result<(), Error> = spi.read();
         let spi = self.spi1.take().unwrap();
         interrupt::free(|cs| {
@@ -81,12 +85,12 @@ impl MyBoard {
         let driver_spi_device = Spidev::new(&GUARDED_SPI, cs_pin);
         let stp_motor_drive_a = TMC5130StepperDev::new(driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
         let button = GpioButton::new(self.button_pin.take().unwrap());
-        Ok(FallibleResources {
+        Ok((
             button,
             stp_motor_drive_a,
-            stp_motor_drive_b: Dummy {},
-            stp_motor_drive_c: Dummy {},
-        })
+            Dummy{},
+            Dummy {},
+        ))
     }
 }
 
