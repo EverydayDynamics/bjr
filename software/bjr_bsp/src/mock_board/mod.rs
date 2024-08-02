@@ -1,13 +1,11 @@
 use core::fmt::Display;
 use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError, Logger};
 use bsp_traits::StepperMotorController;
-
-use crate::boards::{BoardCreationError};
-use crate::utils::error_wrapper::ErrorWrapper;
+use crate::boards::{BoardCreationError, BoardResources};
 use log;
 
 // global logger
-pub struct MyBoard {
+pub struct MockBoard {
 }
 pub struct InfallibleResources {
     pub motor_enabler: Dummy,
@@ -20,26 +18,26 @@ pub struct FallibleResources {
     pub stp_motor_drive_c: Dummy,
 }
 
-impl MyBoard {
+impl BoardResources for MockBoard{
+
+    type MotorEnabler = Dummy;
+    type LogDevice = NativeLogger;
+    type Button = Dummy;
+    type StepperDriveA = Dummy;
+    type StepperDriveB = Dummy;
+    type StepperDriveC = Dummy;
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
+        (Dummy{}, NativeLogger{})
+    }
+    fn get_fallible_resources(&mut self) -> Result<
+        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC),
+        BoardCreationError> {
+        Ok((Dummy{},Dummy{},Dummy{},Dummy{}))
+    }
+}
+impl MockBoard {
     pub fn new() -> Self {
-        MyBoard {}
-    }
-    pub fn get_infallible_resources(&mut self) -> InfallibleResources {
-
-        InfallibleResources{
-            motor_enabler: Dummy{},
-            log_device: NativeLogger{},
-
-        }
-    }
-    pub fn get_fallible_resources(&mut self) -> Result<FallibleResources, BoardCreationError> {
-        Ok(FallibleResources{
-            button: Dummy{},
-            stp_motor_drive_a: Dummy{},
-            stp_motor_drive_b: Dummy{},
-            stp_motor_drive_c: Dummy{},
-
-        })
+        MockBoard {}
     }
 }
 
@@ -60,7 +58,7 @@ impl StepperMotorController for Dummy {
 }
 impl Button for Dummy {
     fn is_pressed(&mut self) -> bool {
-        todo!()
+        false
     }
 }
 pub struct NativeLogger {}

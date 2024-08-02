@@ -62,7 +62,8 @@ impl<MA,MB,MC> IOManager for DefaultIOManager<MA,MB,MC>
         MC: StepperMotorController,
 {
     fn read_all_inputs(&mut self, _call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
-        let measured_motors_state =self.motor_handler.get_motor_state().map_err(|e| IOManagerError::MotorInput(e))?;
+        let measured_motors_state =self.read_motor_inputs()?;
+
         Ok(Inputs{
             measured_plate_angle: Default::default(),
             measured_ball_state: Default::default(),
@@ -71,15 +72,15 @@ impl<MA,MB,MC> IOManager for DefaultIOManager<MA,MB,MC>
     }
 
     fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError> {
-        todo!()
+        self.motor_handler.get_motor_state().map_err(|e| IOManagerError::MotorInput(e))
     }
 
-    fn write_motor_outputs(&mut self, _output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError> {
-        todo!()
+    fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError> {
+        self.motor_handler.set_motor_input(output).map_err(|e|IOManagerError::MotorOutput(e))
     }
 
-    fn reset_motor_pos(&mut self, _motor_idx: usize) -> Result<(), IOManagerError> {
-        todo!()
+    fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError> {
+        self.motor_handler.zero_motor_pos(motor_idx).map_err(|e|IOManagerError::MotorOutput(e))
     }
 
     fn write_all_outputs(&mut self, _outputs: Outputs) -> Result<(), IOManagerError>{

@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter};
+#![no_std]
 use bjr_logic::app::button_handler::ButtonHandler;
 use bjr_logic::app::error_handler::ErrorHandler;
 use bjr_logic::app::event_handler::EventHandler;
@@ -13,6 +13,7 @@ use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController};
 use embedded_time::duration::Microseconds;
 use bjr_bsp::boards::{BoardCreationError, BoardResources};
 use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
+use core::fmt::{Display, Formatter};
 
 pub enum AppError {
     SetupError(BoardCreationError)

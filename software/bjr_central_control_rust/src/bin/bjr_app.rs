@@ -2,9 +2,7 @@
 #![no_std]
 
 use bjr as _; // global logger + panicking-behavior + memory layout
-use bjr_logic::app::logic_runner::LogicRunner;
-use bjr_logic::app::button_handler::ButtonHandler;
-use bjr_bsp::main_board::MyBoard;
+
 // TODO(7) Configure the `rtic::app` macro
 
 #[rtic::app(
@@ -16,44 +14,24 @@ peripherals = false,
 dispatchers = [SPI1]
 )]
 mod app {
-
-    use rtic_monotonics::systick::*;
     use stm32f4xx_hal::{
-        gpio::{Output, PC13},
-        pac,
         prelude::*,
-        pac::TIM2,
     };
-    use core::cell::RefCell;
-    use core::default;
+    use rtic_monotonics::stm32::fugit::Instant;
     use core::fmt::{Display, Formatter};
     use bjr_bsp;
     use bjr_bsp::Board;
-    use bjr_bsp::boards::{BoardResources, BoardCreationError};
-    use bjr_bsp::main_board::MyBoard;
-    use bjr_logic::app::button_handler::ButtonHandler;
-    use bjr_logic::app::error_handler::ErrorHandler;
-    use bjr_logic::app::event_handler::EventHandler;
-    use bjr_logic::app::event_queue::get_event_queue;
-    use bjr_logic::app::io_manager::DefaultIOManager;
-    use bjr_logic::app::limits::{MotorPosLimit, MotorVelLimit};
-    use bjr_logic::app::logic_runner;
-    use bjr_logic::app::logic_runner::LogicRunner;
-    use bjr_logic::app::motor_handler::MotorHandler;
+    use bjr_bsp::boards::{BoardCreationError, BoardResources};
+    use bjr_builder::build_application;
     use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
-    use bjr_logic::app::state_manager::StateManager;
-    use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
-    use bsp_traits::{MotorInput, StepperMotorController};
-    use cortex_m::interrupt::{self, Mutex};
-    use defmt::error;
+    use bsp_traits::StepperMotorController;
     use rtic_monotonics;
     use rtic_monotonics::stm32::*;
-    use rtic_monotonics::stm32::Tim2 as Mono;
     use rtic_monotonics::Monotonic;
     use embedded_time::duration::*;
-    use rtic_monotonics::stm32::fugit::Instant;
-    use stm32f4xx_hal::pac::Peripherals;
-    use stm32f4xx_hal::rcc::Clocks;
+    use rtic_monotonics::stm32::Tim2 as Mono;
+
+
     pub enum AppError {
         SetupError(BoardCreationError)
     }
@@ -112,37 +90,13 @@ mod app {
         let timer_clock_hz = 75_000_000; // ??????????????????????????????
         // Start the monotonic
         Mono::start(timer_clock_hz, token);
-        let event_queue = get_event_queue();
-        let (mut motor_enabler, mut log_device) = board.get_infallible_resources();
-        let mut error_handler = ErrorHandler::new(event_queue);
-        match board.get_fallible_resources() {
-            Ok((mut button, mut stp_a, mut stp_b, mut stp_c)) => {
-                let button_handler = ButtonHandler::new(&mut button, get_event_queue());
-                let steppers: [&mut dyn StepperMotorController;3]= [
-                    &mut stp_a,
-                    &mut stp_b,
-                    &mut stp_c,
-                ];
-                let motor_handler = MotorHandler::new(steppers, MotorPosLimit::new(true), MotorVelLimit::new(true));
-                let io_manager = DefaultIOManager::new(motor_handler);
-                let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
-                let event_handler = EventHandler::new(event_queue);
-                let mut logic_runner = LogicRunner::new(button_handler, event_queue, state_manager, event_handler, error_handler, &mut log_device, &mut motor_enabler, Microseconds(Mono::now().ticks()));
-                loop {
-                    let now = Mono::now().ticks();
-                    let next_run = logic_runner.update(embedded_time::duration::Microseconds(now));
-                    let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
-                    Mono::delay_until(baba).await;
-                }
+        let now = Mono::now().ticks();
+        let mut logic_runner = build_application(now, &mut board);
+            loop {
+                let now = Mono::now().ticks();
+                let next_run = logic_runner.update(Microseconds(now));
+                let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
+                Mono::delay_until(baba).await;
             }
-            Err(error) => {
-                let error_binding = AppError::SetupError(error);
-                error_handler.handle_error(&mut motor_enabler, &mut log_device, error_binding);
-            }
-        }
-        {
-
-        }
-        task1::spawn().ok();
     }
 }

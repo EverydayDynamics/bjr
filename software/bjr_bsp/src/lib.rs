@@ -10,6 +10,6 @@ mod devices;
 pub mod boards;
 
 #[cfg(feature = "mock_board")]
-pub use mock_board::MyBoard as Board;
+pub use mock_board::MockBoard as Board;
 #[cfg(feature = "main_board")]
 pub use main_board::MyBoard as Board;

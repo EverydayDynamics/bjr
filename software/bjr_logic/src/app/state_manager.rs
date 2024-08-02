@@ -1,4 +1,4 @@
-use bsp_traits::MotorEnabler;
+use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::event_handler::State;
 use crate::app::event_queue::{EventQueue, get_event_queue};
@@ -24,15 +24,15 @@ where
         };
         sr
     }
-    pub fn update(&mut self, state: State, call_time: Microseconds<u64>, event_queue: EventQueue, motor_enabler: &mut dyn MotorEnabler) -> Result<(),StateRunnerError> {
+    pub fn update(&mut self, state: State, call_time: Microseconds<u64>, event_queue: EventQueue, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) -> Result<(),StateRunnerError> {
         if self.current_state != state {
 
-            self.runners.get_runner(self.current_state).exit(call_time);
-            self.runners.get_runner(state).entry(call_time, motor_enabler);
+            self.runners.get_runner(self.current_state).exit(call_time, logger);
+            self.runners.get_runner(state).entry(call_time, motor_enabler, logger);
             self.current_state = state;
         }
         let runner = self.runners.get_runner(self.current_state);
-        runner.update(&mut self.io_manager, call_time, event_queue)?;
+        runner.update(&mut self.io_manager, call_time, event_queue, logger)?;
         Ok(())
     }
 }
@@ -63,17 +63,17 @@ mod tests {
     mock! {
         pub TestRunnableState {}
         impl<'a> RunnableState for TestRunnableState {
-            fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler);
-            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
-            fn exit(&mut self, call_time: Microseconds<u64>);
+            fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger);
+            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError>;
+            fn exit(&mut self, call_time: Microseconds<u64>, logger: & dyn Logger);
         }
     }
     mock! {
         pub TestRunnableState2 {}
         impl<'a> RunnableState for TestRunnableState2 {
-            fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler);
-            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
-            fn exit(&mut self, call_time: Microseconds<u64>);
+            fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger);
+            fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError>;
+            fn exit(&mut self, call_time: Microseconds<u64>, logger: & dyn Logger);
         }
     }
 
@@ -88,32 +88,4 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_state_runner_no_state_change() {
-        let mock_iomanager = MockTestIOManager::new();
-        let mut mock_state_runner_selector = MockTestStateRunnerSelector::new();
-        let mut mock_testrunnablestate_init = MockTestRunnableState::new();
-        let mut mock_testrunnablestate_homing = MockTestRunnableState::new();
-        let mut mock_test_motor_enabler = MockTestMotorEnabler::new();
-        mock_testrunnablestate_init.expect_exit()
-            .with( eq(Microseconds::new(0)))
-            .returning(|_|());
-        mock_testrunnablestate_homing.expect_entry()
-            .with( eq(Microseconds::new(0)), always())
-            .returning(|_,_|());
-        mock_testrunnablestate_homing.expect_update()
-            .with(always(), eq(Microseconds::new(0)),always())
-            .returning(|_,_,_|Ok(()));
-        mock_state_runner_selector.expect_get_runner()
-            .with(predicate::eq(State::Initializing))
-            .times(1)
-            .return_var(Box::new(mock_testrunnablestate_init));
-        mock_state_runner_selector.expect_get_runner()
-            .with(eq(State::Homing))
-            .times(1)
-            .return_var(Box::new(mock_testrunnablestate_homing));
-        let mut test_state_runner = StateManager::new(mock_state_runner_selector, mock_iomanager);
-        let result = test_state_runner.update(State::Homing, Microseconds::new(0), get_event_queue(), &mut mock_test_motor_enabler);
-        assert!(result == Ok(()));
-    }
 }

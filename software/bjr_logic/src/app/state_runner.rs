@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::MotorEnabler;
+use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
@@ -31,12 +31,19 @@ impl Display for StateRunnerError {
 }
 impl Severity for StateRunnerError {
     fn get_severity(&self) -> ErrorSeverity {
-        todo!()
+        match self {
+            StateRunnerError::HomingIOError(_) => {ErrorSeverity::ImmediateShutdown}
+            StateRunnerError::HomingOverrun => {ErrorSeverity::ImmediateShutdown}
+            StateRunnerError::HomingLimistSWStuckAtSafePos => {ErrorSeverity::ImmediateShutdown}
+            StateRunnerError::HomingUnexpectedStopGoingToSafePos => {ErrorSeverity::ImmediateShutdown}
+            StateRunnerError::HomingInErrorState => {ErrorSeverity::ImmediateShutdown}
+            StateRunnerError::QueueFull(_) => {ErrorSeverity::Panic}
+        }
     }
 }
 
 pub trait RunnableState {
-    fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler);
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(),StateRunnerError>;
-    fn exit(&mut self, call_time: Microseconds<u64>);
+    fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger);
+    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError>;
+    fn exit(&mut self, call_time: Microseconds<u64>, logger: & dyn Logger);
 }

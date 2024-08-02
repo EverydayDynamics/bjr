@@ -1,11 +1,5 @@
 #![no_std]
-use core::fmt::{Arguments, Display, Formatter};
-pub trait BoardSupport {
-    fn get_temperature_sensor(&self) -> &dyn TemperatureSensor;
-    fn get_stepper_motor_controller(&mut self) -> &dyn StepperMotorController;
-    fn get_button(&mut self) -> & mut dyn Button;
-}
-
+use core::fmt::{Display, Formatter};
 pub trait TemperatureSensor {
     fn read_temperature(&self) -> Result<f32, DeviceError>;
 }
@@ -34,6 +28,7 @@ pub struct MotorInput {
 pub trait StepperMotorController {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError>;
+    fn set_position(&mut self, new_position:i32) -> Result<(), StepperDeviceError>;
 }
 
 pub struct Point {

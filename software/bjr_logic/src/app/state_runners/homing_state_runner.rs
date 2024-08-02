@@ -1,4 +1,5 @@
-use bsp_traits::MotorEnabler;
+use core::fmt::{Display, Formatter};
+use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
@@ -8,7 +9,8 @@ use crate::app::io_manager::IOManager;
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{HomingAccel, HomingHighVelocity, HomingLowVelocity, HomingMaxTravel, HomingSafePosition, parameter_manager};
 use crate::app::state_runner::{RunnableState, StateRunnerError};
-
+use crate::utils::DisplayStr;
+use crate::str_to_display;
 
 #[derive(Copy, Clone)]
 pub enum HomingStateRunnerState {
@@ -22,6 +24,21 @@ pub enum HomingStateRunnerState {
     Done,
     Error,
 }
+impl Display for HomingStateRunnerState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            HomingStateRunnerState::Default => {write!(f,"Default")}
+            HomingStateRunnerState::FastApproach => {write!(f,"FastApproach")}
+            HomingStateRunnerState::StoppingAfterFastApproach => {write!(f,"StoppingAfterFastApproach")}
+            HomingStateRunnerState::SlowApproach => {write!(f,"SlowApproach")}
+            HomingStateRunnerState::StoppingAfterSlowApproach => {write!(f,"StoppingAfterSlowApproach")}
+            HomingStateRunnerState::FirstGoingToSafeSpot => {write!(f,"FirstGoingToSafeSpot")}
+            HomingStateRunnerState::FinalGoingToSafeSpot => {write!(f,"FinalGoingToSafeSpot")}
+            HomingStateRunnerState::Done => {write!(f,"Done")}
+            HomingStateRunnerState::Error => {write!(f,"Error")}
+        }
+    }
+}
 pub struct HomingStateRunner {
     states: [HomingStateRunnerState;MOTOR_NUM]
 
@@ -34,12 +51,12 @@ impl HomingStateRunner {
     }
 }
 impl RunnableState for HomingStateRunner {
-    fn entry(&mut self, _call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler) {
+    fn entry(&mut self, _call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) {
         motor_enabler.set_enable(true);
         self.states = [HomingStateRunnerState::Default;MOTOR_NUM];
     }
 
-    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue) -> Result<(), StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(), StateRunnerError> {
 
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();
@@ -131,6 +148,7 @@ impl RunnableState for HomingStateRunner {
 
                 }
                 HomingStateRunnerState::FirstGoingToSafeSpot => {
+                    logger.debug(&str_to_display!("pos: ({}) target: ({})", input.0.pos, homing_safe_position));
                     if input.1.position_reached {
                         if input.1.limit_reached {
                             // Limit is stuck on at safe spot.
@@ -178,6 +196,7 @@ impl RunnableState for HomingStateRunner {
                 }
             }
             if let Some(next_state) = maybe_next_state {
+                logger.debug(&str_to_display!("changing homing state from ({}) to ({})", state, next_state));
                 *state = next_state;
 
             }
@@ -191,8 +210,7 @@ impl RunnableState for HomingStateRunner {
         retval
     }
 
-    fn exit(&mut self, _call_time: Microseconds<u64>) {
-        todo!()
+    fn exit(&mut self, _call_time: Microseconds<u64>, logger: & dyn Logger) {
     }
 }
 #[cfg(test)]
@@ -213,6 +231,17 @@ mod tests {
         pub TestMotorEnabler {}
         impl<'a> MotorEnabler for TestMotorEnabler {
             fn set_enable(&mut self, enable: bool);
+        }
+    }
+    mock! {
+        pub TestLogger {}
+        impl<'a> Logger for TestLogger {
+                fn trace(&self, msg: &dyn Display);
+                fn debug(&self, msg: &dyn Display);
+                fn info(&self, msg: &dyn Display);
+                fn warn(&self, msg: &dyn Display);
+                fn error(&self, msg: &dyn Display);
+
         }
     }
     mock! {

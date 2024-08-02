@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0", features = ["mock_board"]}
+bjr_builder = { path = "../bjr_builder", version = "0.1.0"}
+bjr_logic = {path = "../bjr_logic", version = "0.1.0"}
+embedded-time = "0.12.1"

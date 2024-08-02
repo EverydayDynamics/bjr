@@ -24,6 +24,7 @@ pub enum MotorHandlerError {
     MotorPositionLimitError(LimitError<f32>, usize),
     MotorVelocityLimitError(LimitError<f32>, usize),
     InputOverflow,
+    MotorIdxOutOfRange(usize),
 }
 impl Display for MotorHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
@@ -32,6 +33,7 @@ impl Display for MotorHandlerError {
             MotorHandlerError::MotorPositionLimitError(e, idx) => {write!(f, "MotorHandler Position limit error: {}, motor idx: {}", e, idx)}
             MotorHandlerError::MotorVelocityLimitError(e, idx) => {write!(f, "MotorHandler Velocity limit error: {}, motor idx: {}", e, idx)}
             MotorHandlerError::InputOverflow => {write!(f, "MotorHandler Input value overflow")}
+            MotorHandlerError::MotorIdxOutOfRange(idx) => {write!(f, "MotorHandler Motor index ({}) out of range", idx)}
         }
     }
 }
@@ -59,6 +61,14 @@ MC: StepperMotorController,
             GenericMotor::MotorA(ma) => {ma.get_state()}
             GenericMotor::MotorB(mb) => {mb.get_state()}
             GenericMotor::MotorC(mc) => {mc.get_state()}
+        }
+    }
+
+    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
+        match self {
+            GenericMotor::MotorA(ma) => {ma.set_position(new_position)}
+            GenericMotor::MotorB(mb) => {mb.set_position(new_position)}
+            GenericMotor::MotorC(mc) => {mc.set_position(new_position)}
         }
     }
 }
@@ -108,23 +118,32 @@ impl<MA, MB, MC> MotorHandler<MA, MB, MC>
         }
         Ok(state)
     }
-    pub fn set_motor_input(&mut self, inputs: [(KinState, ControlMode);MOTOR_NUM]) -> Result<(),MotorHandlerError> {
+    pub fn set_motor_input(&mut self, inputs: [Option<(KinState, ControlMode)>;MOTOR_NUM]) -> Result<(),MotorHandlerError> {
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
        for motor_idx in 0..MOTOR_NUM {
+           if let Some((state, mode)) = inputs[motor_idx] {
+               let motor_mode = match mode {
+                   ControlMode::Position => MotorMode::PositionCtrl,
+                   ControlMode::Velocity => MotorMode::VelocityCtrl,
+               };
+               let input = MotorInput{
+                   velocity: ((state.speed *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                   acceleration: ((state.accel *motm2us)as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                   position: ((state.pos *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                   mode: motor_mode,
+               };
+               self.motors[motor_idx].set_inputs(input).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))?;
 
-           let motor_mode = match inputs[motor_idx].1 {
-               ControlMode::Position => MotorMode::PositionCtrl,
-               ControlMode::Velocity => MotorMode::VelocityCtrl,
-           };
-           let input = MotorInput{
-               velocity: ((inputs[motor_idx].0.speed *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
-               acceleration: ((inputs[motor_idx].0.accel *motm2us)as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
-               position: ((inputs[motor_idx].0.pos *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
-               mode: motor_mode,
-           };
-            self.motors[motor_idx].set_inputs(input).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))?;
+           }
        }
         Ok(())
+    }
+    pub fn zero_motor_pos(&mut self, motor_idx: usize) -> Result<(),MotorHandlerError> {
+        if (motor_idx < MOTOR_NUM) {
+            self.motors[motor_idx].set_position(0).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))
+        }else {
+            Err(MotorHandlerError::MotorIdxOutOfRange(motor_idx))
+        }
     }
 
 }
@@ -142,6 +161,7 @@ use super::*;
         impl StepperMotorController for StepperMotorController {
             fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
             fn get_state(&mut self) -> Result<MotorState, StepperDeviceError>;
+            fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError>;
         }
     }
 

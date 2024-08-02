@@ -43,7 +43,7 @@ pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC>
         MB: StepperMotorController,
         MC: StepperMotorController,
 {
-    next_call_time: Microseconds<u64>,
+    next_call_time: Option<Microseconds<u64>>,
     button_handler: ButtonHandler<BTN>,
     event_queue: &'static Q8<GlobEvent>,
     event_handler: EventHandler,
@@ -73,7 +73,7 @@ MC: StepperMotorController,
         call_time: Microseconds<u64>,
         ) -> Self {
         LogicRunner{
-            next_call_time: call_time,
+            next_call_time: None,
             button_handler,
             event_queue,
             event_handler,
@@ -85,25 +85,30 @@ MC: StepperMotorController,
     }
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Microseconds<u64>{
         let period = parameter_manager().get::<LogicRunnerPeriodUs>() as u64;
-        self.next_call_time = self.next_call_time + Microseconds::<u64>::new(period);
-        if self.next_call_time < call_time {
+        let next_call_time =if let Some(mut last_call_time) = self.next_call_time {
+            last_call_time + Microseconds::<u64>::new(period)
+        } else {
+            call_time + Microseconds::<u64>::new(period)
+        };
+        if next_call_time < call_time {
             self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, LogicRunnerError::TimeOverrun);
         } else {
             if let Err(button_handler_error) = self.button_handler.update(call_time) {
-                self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, button_handler_error);
+                self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, button_handler_error);
             }
-            match self.event_handler.handle_events(&mut self.log_device).map_err(|e|LogicRunnerError::EventHandlerError(e)) {
+            match self.event_handler.handle_events(&mut self.log_device).map_err(|e| LogicRunnerError::EventHandlerError(e)) {
                 Err(error) => {
-                    self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, error);
+                    self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, error);
                 }
                 Ok(state) => {
-                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, &mut self.motor_enabler);
+                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, &mut self.motor_enabler, &mut self.log_device);
                     if let Err(state_runner_error) = state_runner_result {
-                        self.error_handler.handle_error(&mut self.motor_enabler,&mut  self.log_device, state_runner_error);
+                        self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, state_runner_error);
                     }
                 }
             }
         }
-        self.next_call_time
+        self.next_call_time = Some(next_call_time);
+        next_call_time
     }
 }

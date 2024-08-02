@@ -134,10 +134,21 @@ impl MotorEnabler for Dummy {
 }
 impl StepperMotorController for Dummy {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
-        todo!()
+        Ok(())
     }
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
+        Ok(MotorState{
+            velocity: 0,
+            position: 0,
+            limit_reached: false,
+            velocity_reached: false,
+            position_reached: false,
+            standstill: false,
+        })
+    }
+
+    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
         todo!()
     }
 }
