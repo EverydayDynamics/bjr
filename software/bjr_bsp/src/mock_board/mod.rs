@@ -55,6 +55,7 @@ impl StepperMotorController for Dummy {
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
         todo!()
     }
+    fn set_position(&mut self, new_position:i32) -> Result<(), StepperDeviceError> {todo!()}
 }
 impl Button for Dummy {
     fn is_pressed(&mut self) -> bool {

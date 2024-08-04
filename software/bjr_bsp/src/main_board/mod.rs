@@ -20,7 +20,9 @@ use crate::utils::spidev::{Spidev, SpiDevError};
 // global logger
 pub struct MyBoard {
     button_pin: Option<Pin<'C', 13>>,
-    cs_1_pin: Option<Pin<'B', 6, Output>>,
+    cs_mot_a_pin: Option<Pin<'B', 6, Output>>,
+    cs_mot_b_pin: Option<Pin<'C', 7, Output>>,
+    cs_mot_c_pin: Option<Pin<'A', 9, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
 }
@@ -31,8 +33,8 @@ pub struct InfallibleResources {
 pub struct FallibleResources {
     pub button: GpioButton<Pin<'C', 13>>,
     pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
-    pub stp_motor_drive_b: Dummy,
-    pub stp_motor_drive_c: Dummy,
+    pub stp_motor_drive_b: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>,
+    pub stp_motor_drive_c: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>,
 }
 
 static GUARDED_SPI: Mutex<RefCell<Option<Spi<SPI1>>>> =
@@ -46,7 +48,9 @@ impl MyBoard {
         let gpiob = dp.GPIOB.split();
         let gpioc = dp.GPIOC.split();
         let button_pin = Some(gpioc.pc13.into_pull_up_input());
-        let cs_pin = gpiob.pb6.into_push_pull_output_in_state(PinState::High);
+        let cs_mot_a_pin = gpiob.pb6.into_push_pull_output_in_state(PinState::High);
+        let cs_mot_b_pin = gpioc.pc7.into_push_pull_output_in_state(PinState::High);
+        let cs_mot_c_pin = gpioa.pa9.into_push_pull_output_in_state(PinState::High);
         let motor_enabler_pin = gpiob.pb7.into_push_pull_output_in_state(PinState::Low);
         let spi = dp.SPI1.spi(
             (gpioa.pa5, gpioa.pa6, gpioa.pa7),
@@ -58,7 +62,9 @@ impl MyBoard {
             button_pin,
             motor_enabler_pin: Some(motor_enabler_pin),
             spi1: Some(spi),
-            cs_1_pin: Some(cs_pin)
+            cs_mot_a_pin: Some(cs_mot_a_pin),
+            cs_mot_b_pin: Some(cs_mot_b_pin),
+            cs_mot_c_pin: Some(cs_mot_c_pin),
         }
     }
 }
@@ -68,8 +74,8 @@ impl BoardResources for MyBoard {
     type LogDevice =  DefmtLogger;
     type Button = GpioButton<Pin<'C', 13>>;
     type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>;
-    type StepperDriveB = Dummy;
-    type StepperDriveC = Dummy;
+    type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>;
+    type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>;
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
         (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {})
     }
@@ -81,15 +87,21 @@ impl BoardResources for MyBoard {
         interrupt::free(|cs| {
             GUARDED_SPI.borrow(cs).replace(Some(spi));
         });
-        let cs_pin = self.cs_1_pin.take().unwrap();
-        let driver_spi_device = Spidev::new(&GUARDED_SPI, cs_pin);
-        let stp_motor_drive_a = TMC5130StepperDev::new(driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
+        let cs_mot_a_pin = self.cs_mot_a_pin.take().unwrap();
+        let cs_mot_b_pin = self.cs_mot_b_pin.take().unwrap();
+        let cs_mot_c_pin = self.cs_mot_c_pin.take().unwrap();
+        let mot_a_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_a_pin);
+        let mot_b_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_b_pin);
+        let mot_c_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_c_pin);
+        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
+        let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
+        let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
         let button = GpioButton::new(self.button_pin.take().unwrap());
         Ok((
             button,
             stp_motor_drive_a,
-            Dummy{},
-            Dummy {},
+            stp_motor_drive_b,
+            stp_motor_drive_c,
         ))
     }
 }
