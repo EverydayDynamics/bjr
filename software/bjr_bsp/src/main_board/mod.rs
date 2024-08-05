@@ -14,6 +14,7 @@ use stm32f4xx_hal::pac::SPI1;
 use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::devices::defmt_logger::DefmtLogger;
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
+use crate::devices::tsc2046_touchscreen_dev::Tsc2046TouchDev;
 use crate::utils::error_wrapper::ErrorWrapper;
 use crate::utils::spidev::{Spidev, SpiDevError};
 
@@ -23,6 +24,7 @@ pub struct MyBoard {
     cs_mot_a_pin: Option<Pin<'B', 6, Output>>,
     cs_mot_b_pin: Option<Pin<'C', 7, Output>>,
     cs_mot_c_pin: Option<Pin<'A', 9, Output>>,
+    cs_touch_sense_pin: Option<Pin<'A', 8, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
 }
@@ -51,6 +53,7 @@ impl MyBoard {
         let cs_mot_a_pin = gpiob.pb6.into_push_pull_output_in_state(PinState::High);
         let cs_mot_b_pin = gpioc.pc7.into_push_pull_output_in_state(PinState::High);
         let cs_mot_c_pin = gpioa.pa9.into_push_pull_output_in_state(PinState::High);
+        let cs_touch_sense_pin = gpioa.pa8.into_push_pull_output_in_state(PinState::High);
         let motor_enabler_pin = gpiob.pb7.into_push_pull_output_in_state(PinState::Low);
         let spi = dp.SPI1.spi(
             (gpioa.pa5, gpioa.pa6, gpioa.pa7),
@@ -65,6 +68,7 @@ impl MyBoard {
             cs_mot_a_pin: Some(cs_mot_a_pin),
             cs_mot_b_pin: Some(cs_mot_b_pin),
             cs_mot_c_pin: Some(cs_mot_c_pin),
+            cs_touch_sense_pin: Some(cs_touch_sense_pin),
         }
     }
 }
@@ -76,11 +80,13 @@ impl BoardResources for MyBoard {
     type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>;
     type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>;
     type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>;
+    type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
+
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
         (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {})
     }
     fn get_fallible_resources(&mut self) -> Result<
-        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC),
+        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
         BoardCreationError> {
         //let a: Result<(), Error> = spi.read();
         let spi = self.spi1.take().unwrap();
@@ -90,18 +96,22 @@ impl BoardResources for MyBoard {
         let cs_mot_a_pin = self.cs_mot_a_pin.take().unwrap();
         let cs_mot_b_pin = self.cs_mot_b_pin.take().unwrap();
         let cs_mot_c_pin = self.cs_mot_c_pin.take().unwrap();
+        let cs_touch_sense_pin = self.cs_touch_sense_pin.take().unwrap();
         let mot_a_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_a_pin);
         let mot_b_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_b_pin);
         let mot_c_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_c_pin);
+        let touch_sense_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_touch_sense_pin);
         let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
         let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
         let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
+        let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device).map_err(|e|BoardCreationError::TouchSensorInitError(e))?;
         let button = GpioButton::new(self.button_pin.take().unwrap());
         Ok((
             button,
             stp_motor_drive_a,
             stp_motor_drive_b,
             stp_motor_drive_c,
+            touch_sense_dev,
         ))
     }
 }
@@ -130,6 +140,28 @@ where
             SpiDevError::NotImplemented => {CommsError::NotImplemented}
         };
         StepperDeviceError::CommunicationError(comms_err)
+    }
+}
+impl<SPI, PIN> From<ErrorWrapper<SpiDevError<SPI, PIN>>> for CommsError
+where
+    SPI: embedded_hal::spi::SpiBus,
+    PIN: embedded_hal::digital::OutputPin,
+{
+    fn from(value: ErrorWrapper<SpiDevError<SPI, PIN>>) -> Self {
+        match value.0 {
+            SpiDevError::SPIError(spie) => {
+                match spie.kind() {
+                    ErrorKind::Overrun => {CommsError::SPIOverrun}
+                    ErrorKind::ModeFault => {CommsError::SPIModeFault}
+                    ErrorKind::FrameFormat => {CommsError::SPIFrameFormat}
+                    ErrorKind::ChipSelectFault => {CommsError::SPICSPIn}
+                    ErrorKind::Other => {CommsError::Unknown}
+                    _ => {CommsError::Unknown}
+                }}
+            SpiDevError::CSPinError(_) => {CommsError::SPICSPIn}
+            SpiDevError::MutexError => {CommsError::SPIMutex}
+            SpiDevError::NotImplemented => {CommsError::NotImplemented}
+        }
     }
 }
 impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error>

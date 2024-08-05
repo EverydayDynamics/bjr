@@ -6,3 +6,5 @@ pub mod tmc5130_stepper_dev;
 pub mod defmt_logger;
 #[cfg(feature = "embedded")]
 pub mod gpio_motor_enabler;
+#[cfg(feature = "embedded")]
+pub mod tsc2046_touchscreen_dev;

@@ -32,11 +32,22 @@ pub trait StepperMotorController {
 }
 
 pub struct Point {
-    pub x: f32,
-    pub y: f32,
+    pub x: i32,
+    pub y: i32,
 }
 pub trait TouchSensor {
-    fn get_touch(&mut self) -> Result<Option<Point>, DeviceError>;
+    fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError>;
+}
+#[derive(PartialEq, Copy, Clone)]
+pub enum TouchSensorError {
+    CommunicationError(CommsError),
+}
+impl Display for TouchSensorError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            TouchSensorError::CommunicationError(e) => {write!(f,"TouchSensor Communication error: {}", e)}
+        }
+    }
 }
 
 pub trait Button{

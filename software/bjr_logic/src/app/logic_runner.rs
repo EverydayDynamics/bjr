@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController};
+use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController, TouchSensor};
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 use crate::app::button_handler::ButtonHandler;
@@ -37,23 +37,24 @@ impl Severity for LogicRunnerError {
         }
     }
 }
-pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC>
+pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC, TS>
     where
         MA: StepperMotorController,
         MB: StepperMotorController,
         MC: StepperMotorController,
+        TS: TouchSensor,
 {
     next_call_time: Option<Microseconds<u64>>,
     button_handler: ButtonHandler<BTN>,
     event_queue: &'static Q8<GlobEvent>,
     event_handler: EventHandler,
-    state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC>>,
+    state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC, TS>>,
     error_handler: ErrorHandler,
     log_device: LOG,
     motor_enabler: ME,
 }
 
-impl<BTN, LOG, ME, MA, MB, MC> LogicRunner<BTN, LOG, ME, MA, MB, MC>
+impl<BTN, LOG, ME, MA, MB, MC, TS> LogicRunner<BTN, LOG, ME, MA, MB, MC, TS>
 where
 BTN: Button,
 LOG: Logger,
@@ -61,16 +62,16 @@ ME: MotorEnabler,
 MA: StepperMotorController,
 MB: StepperMotorController,
 MC: StepperMotorController,
+TS: TouchSensor,
 {
     pub fn new(
         button_handler: ButtonHandler<BTN>,
         event_queue: &'static Q8<GlobEvent>,
-        state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC>>,
+        state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC, TS>>,
         event_handler: EventHandler,
         error_handler: ErrorHandler,
         log_device: LOG,
         motor_enabler: ME,
-        call_time: Microseconds<u64>,
         ) -> Self {
         LogicRunner{
             next_call_time: None,

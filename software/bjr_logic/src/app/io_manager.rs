@@ -1,8 +1,9 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::StepperMotorController;
+use bsp_traits::{StepperMotorController, TouchSensor};
 use embedded_time::duration::Microseconds;
 use crate::app::control_primitives::KinState;
 use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, MotorStatus};
+use crate::app::touch_handler::TouchHandler;
 
 pub struct Inputs {
     measured_plate_angle: [KinState;2],
@@ -26,13 +27,15 @@ impl Display for IOManagerError {
         }
     }
 }
-pub struct DefaultIOManager<MA,MB,MC>
+pub struct DefaultIOManager<MA,MB,MC, TS>
     where
         MA: StepperMotorController,
         MB: StepperMotorController,
         MC: StepperMotorController,
+        TS: TouchSensor,
 {
     motor_handler: MotorHandler<MA,MB,MC>,
+    touch_handler: TouchHandler<TS>,
     last_call_time: Microseconds<u64>
 }
 pub trait IOManager {
@@ -42,24 +45,27 @@ pub trait IOManager {
     fn reset_motor_pos(&mut self, motor_idx:usize) -> Result<(), IOManagerError>;
     fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
 }
-impl<MA,MB,MC> DefaultIOManager<MA,MB,MC>
+impl<MA,MB,MC,TS> DefaultIOManager<MA,MB,MC,TS>
     where
         MA: StepperMotorController,
         MB: StepperMotorController,
         MC: StepperMotorController,
+        TS: TouchSensor,
 {
-    pub fn new(motor_handler: MotorHandler<MA,MB,MC>) -> DefaultIOManager<MA,MB,MC> {
+    pub fn new(motor_handler: MotorHandler<MA,MB,MC>, touch_handler: TouchHandler<TS>) -> DefaultIOManager<MA,MB,MC,TS> {
         DefaultIOManager {
             motor_handler,
+            touch_handler,
             last_call_time: Microseconds::<u64>::new(0),
         }
     }
 }
-impl<MA,MB,MC> IOManager for DefaultIOManager<MA,MB,MC>
+impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
     where
         MA: StepperMotorController,
         MB: StepperMotorController,
         MC: StepperMotorController,
+        TS: TouchSensor,
 {
     fn read_all_inputs(&mut self, _call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.read_motor_inputs()?;
