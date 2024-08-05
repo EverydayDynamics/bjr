@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use bsp_traits::{StepperMotorController, TouchSensor};
+use bsp_traits::{StepperMotorController, TouchSensor, TouchSensorError};
 use embedded_time::duration::Microseconds;
 use crate::app::control_primitives::KinState;
 use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, MotorStatus};
@@ -18,12 +18,14 @@ pub struct Outputs {
 pub enum IOManagerError {
     MotorInput(MotorHandlerError),
     MotorOutput(MotorHandlerError),
+    BallSensor(TouchSensorError),
 }
 impl Display for IOManagerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             IOManagerError::MotorInput(e) => {write!(f, "IOMananger Motor input error: {}", e)}
             IOManagerError::MotorOutput(e) => {write!(f, "IOMananger Motor output error: {}", e)}
+            IOManagerError::BallSensor(e) => {write!(f, "IOMananger Ball sensor error: {}", e)}
         }
     }
 }
@@ -39,7 +41,7 @@ pub struct DefaultIOManager<MA,MB,MC, TS>
     last_call_time: Microseconds<u64>
 }
 pub trait IOManager {
-    fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
+    fn read_all_inputs(&mut self, call_time: u64) -> Result<Inputs, IOManagerError>;
     fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus);3], IOManagerError>;
     fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
     fn reset_motor_pos(&mut self, motor_idx:usize) -> Result<(), IOManagerError>;
@@ -67,8 +69,9 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
         MC: StepperMotorController,
         TS: TouchSensor,
 {
-    fn read_all_inputs(&mut self, _call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
+    fn read_all_inputs(&mut self, call_time: u64) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.read_motor_inputs()?;
+        let measured_touch = self.touch_handler.get_ball_state(call_time).map_err(|e|IOManagerError::BallSensor(e))?;
 
         Ok(Inputs{
             measured_plate_angle: Default::default(),

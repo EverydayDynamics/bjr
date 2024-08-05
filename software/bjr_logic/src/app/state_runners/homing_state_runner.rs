@@ -247,7 +247,7 @@ mod tests {
     mock! {
         pub TestIOManager {}
         impl<'a> IOManager for TestIOManager {
-            fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
+            fn read_all_inputs(&mut self, call_time: u64) -> Result<Inputs, IOManagerError>;
             fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
             fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
             fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
@@ -346,7 +346,7 @@ mod tests {
             Ok(expected_motor_input_none));
     }
     fn expect_motor_update(mock_iomanager: &mut MockTestIOManager, test_homing_state_runner: &mut HomingStateRunner,  call_time: u64, test_queue: EventQueue) {
-        let result = test_homing_state_runner.update(mock_iomanager, Microseconds::new(call_time), test_queue);
+        let result = test_homing_state_runner.update(mock_iomanager, Microseconds::new(call_time), test_queue, /* &dyn bsp_traits::Logger */);
         mock_iomanager.checkpoint();
         assert!(result == Ok(()));
     }

@@ -1,4 +1,4 @@
-use core::sync::atomic::{AtomicU32};
+use core::sync::atomic::{AtomicI32, AtomicU32};
 use atomic_float::AtomicF32;
 
 pub trait ParameterType {
@@ -64,6 +64,10 @@ generate_parameter_types!(
 
     (AtomicU32, u32, LogicRunnerPeriodUs, 10000),
     (AtomicF32, f32, HomingAccel, 2e3),
+    (AtomicI32, i32, TouchCenterOffsetX, -1024),
+    (AtomicI32, i32, TouchCenterOffsetY, -1024),
+    (AtomicF32, f32, TouchScaleY, 0.10361328e-3),
+    (AtomicF32, f32, TouchScaleX, 0.77734375e-4),
 );
 // Parameter manager
 

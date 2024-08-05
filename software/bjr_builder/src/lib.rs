@@ -10,7 +10,6 @@ use bjr_logic::app::motor_handler::MotorHandler;
 use bjr_logic::app::state_manager::StateManager;
 use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
 use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController, TouchSensor};
-use embedded_time::duration::Microseconds;
 use bjr_bsp::boards::{BoardCreationError, BoardResources};
 use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
 use core::fmt::{Display, Formatter};
