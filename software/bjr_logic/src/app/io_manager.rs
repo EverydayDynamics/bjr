@@ -41,7 +41,7 @@ pub struct DefaultIOManager<MA,MB,MC, TS>
     last_call_time: Microseconds<u64>
 }
 pub trait IOManager {
-    fn read_all_inputs(&mut self, call_time: u64) -> Result<Inputs, IOManagerError>;
+    fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
     fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus);3], IOManagerError>;
     fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
     fn reset_motor_pos(&mut self, motor_idx:usize) -> Result<(), IOManagerError>;
@@ -69,7 +69,7 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
         MC: StepperMotorController,
         TS: TouchSensor,
 {
-    fn read_all_inputs(&mut self, call_time: u64) -> Result<Inputs, IOManagerError>{
+    fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.read_motor_inputs()?;
         let measured_touch = self.touch_handler.get_ball_state(call_time).map_err(|e|IOManagerError::BallSensor(e))?;
 

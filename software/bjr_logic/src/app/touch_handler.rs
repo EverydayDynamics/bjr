@@ -1,11 +1,14 @@
 use bsp_traits::{TouchSensor, TouchSensorError};
+use embedded_time::duration::Microseconds;
+use embedded_time::fixed_point::FixedPoint;
 use crate::app::control_primitives::KinState;
 use crate::app::parameter_manager::{parameter_manager, TouchCenterOffsetX, TouchCenterOffsetY, TouchScaleX, TouchScaleY};
+use crate::utils::usec2sec;
 
 pub struct TouchHandler<TS> {
     touch_sensor: TS,
     last_state: Option<[KinState;2]>,
-    last_call_time: u64,
+    last_call_time: Microseconds<u64>,
 }
 impl<TS> TouchHandler<TS>
 where TS: TouchSensor
@@ -14,12 +17,12 @@ where TS: TouchSensor
         TouchHandler{
             touch_sensor,
             last_state: None,
-            last_call_time: 0,
+            last_call_time: Microseconds::new(0u64),
         }
 
     }
-    fn calc_kin(&mut self, pos: f32, call_time: u64, last_state: KinState) -> KinState {
-        let delta_t = (call_time - self.last_call_time)as f32;
+    fn calc_kin(&mut self, pos: f32, call_time: Microseconds<u64>, last_state: KinState) -> KinState {
+        let delta_t = usec2sec((call_time - self.last_call_time).integer());
         let speed = (pos - last_state.pos)/delta_t;
         let accel = (speed - last_state.speed)/delta_t;
         let state: KinState = KinState{
@@ -30,7 +33,7 @@ where TS: TouchSensor
 
        state
     }
-    pub fn get_ball_state(&mut self, call_time: u64) -> Result<Option<[KinState;2]>,TouchSensorError> {
+    pub fn get_ball_state(&mut self, call_time: Microseconds<u64>) -> Result<Option<[KinState;2]>,TouchSensorError> {
         let mut result = Ok(None);
         if let Some(touch_pos) = self.touch_sensor.get_touch()? {
             let x_offset = parameter_manager().get::<TouchCenterOffsetX>();
