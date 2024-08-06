@@ -7,7 +7,7 @@ use crate::app::touch_handler::TouchHandler;
 
 pub struct Inputs {
     measured_plate_angle: [KinState;2],
-    measured_ball_state: [KinState;2],
+    measured_ball_state: Option<[KinState;2]>,
     measured_motors_state: [(KinState, MotorStatus);3],
 }
 #[derive(Default)]
@@ -71,11 +71,11 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
 {
     fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.read_motor_inputs()?;
-        let measured_touch = self.touch_handler.get_ball_state(call_time).map_err(|e|IOManagerError::BallSensor(e))?;
+        let measured_ball_state = self.touch_handler.get_ball_state(call_time).map_err(|e|IOManagerError::BallSensor(e))?;
 
         Ok(Inputs{
             measured_plate_angle: Default::default(),
-            measured_ball_state: Default::default(),
+            measured_ball_state,
             measured_motors_state,
         })
     }
