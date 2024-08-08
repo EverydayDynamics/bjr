@@ -226,34 +226,8 @@ mod tests {
     use crate::app::event::GlobEvent;
     use crate::app::parameter_manager::{HomingAccel, HomingHighVelocity, HomingLowVelocity, HomingSafePosition, parameter_manager};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
+    use crate::utils::test_helper::bsp_mocks::{MockTestIOManager,MockTestLogger,MockTestMotorEnabler};
 
-    mock! {
-        pub TestMotorEnabler {}
-        impl<'a> MotorEnabler for TestMotorEnabler {
-            fn set_enable(&mut self, enable: bool);
-        }
-    }
-    mock! {
-        pub TestLogger {}
-        impl<'a> Logger for TestLogger {
-                fn trace(&self, msg: &dyn Display);
-                fn debug(&self, msg: &dyn Display);
-                fn info(&self, msg: &dyn Display);
-                fn warn(&self, msg: &dyn Display);
-                fn error(&self, msg: &dyn Display);
-
-        }
-    }
-    mock! {
-        pub TestIOManager {}
-        impl<'a> IOManager for TestIOManager {
-            fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
-            fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
-            fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
-            fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
-            fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError>;
-        }
-    }
 
     const TEST_HOMING_HIGH_VELOCITY:f32 = 1e-2;
     const TEST_HOMING_LOW_VELOCITY:f32 = 1e-3;

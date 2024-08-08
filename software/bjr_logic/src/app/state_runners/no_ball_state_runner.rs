@@ -61,11 +61,8 @@ impl RunnableState for NoBallStateRunner {
 
         let inputs = iomanager.read_all_inputs(call_time).map_err(|e|StateRunnerError::IOError(e))?;
         match self.state{
-            NoBallState::HasBall => {
-
-            }
+            NoBallState::HasBall => {}
             _ => {
-                let inputs = iomanager.read_all_inputs(call_time).map_err(|e|StateRunnerError::IOError(e))?;
                 if inputs.measured_ball_state != None {
                     event_queue.enqueue(GlobEvent::BallFound).map_err(|e|StateRunnerError::QueueFull(e))?;
                     maybe_next_state = Some(NoBallState::HasBall);
@@ -88,4 +85,54 @@ impl RunnableState for NoBallStateRunner {
         Ok(())
     }
     fn exit(&mut self, _call_time: Microseconds<u64>, logger: & dyn Logger) {}
+}
+#[cfg(test)]
+mod tests {
+    use heapless::mpmc::Q8;
+    use super::*;
+    use mockall::{mock, predicate};
+    use crate::app::io_manager::Inputs;
+    use crate::app::motor_handler::MotorStatus;
+    use crate::app::state_runner::RunnableState;
+    use crate::utils::test_helper::bsp_mocks::{MockTestIOManager,MockTestLogger,MockTestMotorEnabler};
+    static TEST_EVENT_QUEUE_1: Q8<GlobEvent> = Q8::new();
+    #[test]
+    fn test_regular_op() {
+
+        let mut test_no_ball_state_runner = NoBallStateRunner::default();
+        let mut mock_iomanager = MockTestIOManager::new();
+        let mut mock_motor_enabler = MockTestMotorEnabler::new();
+        let mut mock_logger = MockTestLogger::new();
+        test_no_ball_state_runner.entry(Microseconds::default(), &mut mock_motor_enabler, &mock_logger);
+        //first run, expect motion initialization
+        mock_logger.expect_debug().returning(|_|());
+        mock_iomanager.expect_write_motor_outputs().times(1).returning(|_|Ok(()));
+        mock_iomanager.expect_read_all_inputs().times(1).returning(|_|Ok(Inputs{
+            measured_plate_angle: [KinState::default();2],
+            measured_ball_state: None,
+            measured_motors_state: [(KinState::default(), MotorStatus{
+                limit_reached: false,
+                position_reached: false,
+                velocity_reached: false,
+                standstill: false,
+            });3],
+        }));
+        let result_1 = test_no_ball_state_runner.update( &mut mock_iomanager, Microseconds::default(), &TEST_EVENT_QUEUE_1, &mock_logger);
+        assert!(result_1 == Ok(()));
+        assert!(TEST_EVENT_QUEUE_1.dequeue() == None);
+        mock_iomanager.checkpoint();
+        mock_iomanager.expect_read_all_inputs().times(1).returning(|_|Ok(Inputs{
+            measured_plate_angle: [KinState::default();2],
+            measured_ball_state: Some([KinState::default();2]),
+            measured_motors_state: [(KinState::default(), MotorStatus{
+                limit_reached: false,
+                position_reached: false,
+                velocity_reached: false,
+                standstill: false,
+            });3],
+        }));
+        let result_2 = test_no_ball_state_runner.update( &mut mock_iomanager, Microseconds::default(), &TEST_EVENT_QUEUE_1, &mock_logger);
+        assert!(result_2 == Ok(()));
+        assert!(TEST_EVENT_QUEUE_1.dequeue() == Some(GlobEvent::BallFound));
+    }
 }
