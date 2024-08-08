@@ -10,7 +10,9 @@ use crate::app::state_runner::{RunnableState, StateRunnerError};
 pub struct InitializingStateRunner {
 }
 impl RunnableState for InitializingStateRunner {
-    fn entry(&mut self, _call_time: Microseconds<u64>, _motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) {}
+    fn entry(&mut self, _call_time: Microseconds<u64>, _motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) {
+
+    }
     fn update(&mut self, _iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError> {
         event_queue.enqueue(GlobEvent::InitFinished).map_err(|event|StateRunnerError::QueueFull(event))?;
         Ok(())

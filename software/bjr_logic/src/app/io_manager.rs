@@ -6,9 +6,9 @@ use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, Mo
 use crate::app::touch_handler::TouchHandler;
 
 pub struct Inputs {
-    measured_plate_angle: [KinState;2],
-    measured_ball_state: Option<[KinState;2]>,
-    measured_motors_state: [(KinState, MotorStatus);3],
+    pub measured_plate_angle: [KinState;2],
+    pub measured_ball_state: Option<[KinState;2]>,
+    pub measured_motors_state: [(KinState, MotorStatus);3],
 }
 #[derive(Default)]
 pub struct Outputs {

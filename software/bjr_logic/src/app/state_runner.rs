@@ -14,6 +14,7 @@ pub enum StateRunnerError {
     HomingUnexpectedStopGoingToSafePos,
     HomingInErrorState,
     QueueFull(GlobEvent),
+    IOError(IOManagerError),
 
 }
 impl Display for StateRunnerError {
@@ -25,6 +26,7 @@ impl Display for StateRunnerError {
             StateRunnerError::HomingUnexpectedStopGoingToSafePos => {write!(f, "Homing Unexpectedly stopped while going to safe position")}
             StateRunnerError::HomingInErrorState => {write!(f, "Homing is in error state")}
             StateRunnerError::QueueFull(e) => {write!(f, "Event Queue is full. Missed message: {}",e)}
+            StateRunnerError::IOError(e) => {write!(f, "IO error: {}",e)}
         }
 
     }
@@ -38,6 +40,7 @@ impl Severity for StateRunnerError {
             StateRunnerError::HomingUnexpectedStopGoingToSafePos => {ErrorSeverity::ImmediateShutdown}
             StateRunnerError::HomingInErrorState => {ErrorSeverity::ImmediateShutdown}
             StateRunnerError::QueueFull(_) => {ErrorSeverity::Panic}
+            StateRunnerError::IOError(_) => {ErrorSeverity::ImmediateShutdown}
         }
     }
 }
