@@ -62,16 +62,17 @@ generate_parameter_types!(
     (AtomicF32, f32, HomingSafePosition, 5e-3),
     (AtomicF32, f32, HomingMaxTravel, 20e-3),
     (AtomicF32, f32, HomingAccel, 5e-3),
-
+    //running period
     (AtomicU32, u32, LogicRunnerPeriodUs, 10000),
+    //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -1024),
     (AtomicI32, i32, TouchCenterOffsetY, -1024),
     (AtomicF32, f32, TouchScaleY, 0.10361328e-3),
     (AtomicF32, f32, TouchScaleX, 0.77734375e-4),
-
+    //No ball parameters
     (AtomicF32, f32, NoBallTargetPos, 10e-3),
-    (AtomicF32, f32, NoBallTargetVel, 2e-3),
-    (AtomicF32, f32, NoBallTargetAccel, 10e-3),
+    (AtomicF32, f32, NoBallTargetVel, 10e-3),
+    (AtomicF32, f32, NoBallTargetAccel, 20e-3),
 
 );
 // Parameter manager
