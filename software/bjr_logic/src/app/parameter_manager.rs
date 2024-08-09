@@ -50,28 +50,28 @@ macro_rules! generate_parameter_types {
     };
 }
 generate_parameter_types!(
-    (AtomicF32, f32, MotorM2Ustep, 440.0),
+    (AtomicF32, f32, MotorM2Ustep, 8e5),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
     (AtomicF32, f32, MotorUpperPosLimit, 1e6),
     (AtomicF32, f32, MotorLowerPosLimit, -1e6),
     (AtomicF32, f32, MotorUpperVelLimit, 1e6),
     (AtomicF32, f32, MotorLowerVelLimit, -1e6),
     //homing params
-    (AtomicF32, f32, HomingHighVelocity, 1e1),
-    (AtomicF32, f32, HomingLowVelocity, 1e0),
-    (AtomicF32, f32, HomingSafePosition, 1e2),
-    (AtomicF32, f32, HomingMaxTravel, 2e4),
+    (AtomicF32, f32, HomingHighVelocity, 1e-3),
+    (AtomicF32, f32, HomingLowVelocity, 1e-4),
+    (AtomicF32, f32, HomingSafePosition, 5e-3),
+    (AtomicF32, f32, HomingMaxTravel, 20e-3),
+    (AtomicF32, f32, HomingAccel, 5e-3),
 
     (AtomicU32, u32, LogicRunnerPeriodUs, 10000),
-    (AtomicF32, f32, HomingAccel, 2e3),
     (AtomicI32, i32, TouchCenterOffsetX, -1024),
     (AtomicI32, i32, TouchCenterOffsetY, -1024),
     (AtomicF32, f32, TouchScaleY, 0.10361328e-3),
     (AtomicF32, f32, TouchScaleX, 0.77734375e-4),
 
     (AtomicF32, f32, NoBallTargetPos, 10e-3),
-    (AtomicF32, f32, NoBallTargetVel, 5e-3),
-    (AtomicF32, f32, NoBallTargetAccel, 20e-3),
+    (AtomicF32, f32, NoBallTargetVel, 2e-3),
+    (AtomicF32, f32, NoBallTargetAccel, 10e-3),
 
 );
 // Parameter manager
