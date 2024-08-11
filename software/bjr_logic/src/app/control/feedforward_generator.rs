@@ -1,4 +1,4 @@
-use crate::app::control::control_primitives::PlateDelta;
+use crate::app::control_primitives::PlateDelta;
 use crate::app::event_handler::State;
 use embedded_time::duration::*;
 fn default(_time: Microseconds) -> PlateDelta {

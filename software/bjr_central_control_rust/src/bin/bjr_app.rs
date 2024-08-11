@@ -30,7 +30,7 @@ mod app {
     use rtic_monotonics::Monotonic;
     use embedded_time::duration::*;
     use rtic_monotonics::stm32::Tim2 as Mono;
-
+    use bjr_logic::app::menu_handler::MenuContext;
 
     pub enum AppError {
         SetupError(BoardCreationError)
@@ -93,7 +93,8 @@ mod app {
         let now = Mono::now().ticks();
         let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(1000000);
         Mono::delay_until(baba).await;
-        let mut logic_runner = build_application(now, &mut board);
+        let mut menu_context = MenuContext::default();
+        let mut logic_runner = build_application(&mut board, &mut menu_context);
             loop {
                 let now = Mono::now().ticks();
                 let next_run = logic_runner.update(Microseconds(now));

@@ -79,7 +79,6 @@ impl RunnableState for NoBallStateRunner {
             }
         }
         if let Some(next_state) = maybe_next_state {
-            //logger.debug(&str_to_display!("changing noball state from ({}) to ({})", self.state, next_state));
             self.state = next_state;
         }
         Ok(())

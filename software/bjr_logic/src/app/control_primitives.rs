@@ -1,3 +1,5 @@
+use embedded_time::duration::Microseconds;
+
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct KinState{
     pub pos: f32,
@@ -38,6 +40,6 @@ pub enum BallPattern{
 }
 pub trait Controller {
 
-    fn reset(&mut self);
-    fn update(&mut self, _inputs: ControlInputs) -> ControlOutputs;
+    fn reset(&mut self, call_time: Microseconds<u64>);
+    fn update(&mut self, call_time: Microseconds<u64>, _inputs: ControlInputs) -> ControlOutputs;
 }

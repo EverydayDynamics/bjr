@@ -353,6 +353,8 @@ mod tests {
             velocity_reached: false,
             standstill: true,
         });
+        mock_iomanager.expect_reset_motor_pos().with(always()).returning(|_|Ok(()));
+
         expect_motor_output_fast_approach(&mut mock_iomanager);
         expect_motor_update(&mut mock_iomanager, &mut test_homing_state_runner, 1000, &TEST_EVENT_QUEUE, &mut mock_test_logger);
 

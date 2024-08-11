@@ -47,6 +47,7 @@ where TS: TouchSensor
                 let xkinstate = self.calc_kin(x_pos, call_time, last_state[0]);
                 let ykinstate = self.calc_kin(y_pos, call_time, last_state[1]);
                 new_sate = Some([xkinstate, ykinstate]);
+                result = Ok(new_sate);
             } else {
                 let x_trivial_state = KinState {
                     pos: x_pos,

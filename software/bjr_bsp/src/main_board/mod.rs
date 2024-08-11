@@ -204,11 +204,11 @@ impl Button for Dummy {
 }
 impl Reader for Dummy {
     fn read(&mut self, buf: &mut [u8]) -> usize {
-        todo!()
+        0
     }
 }
 impl core::fmt::Write for Dummy{
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        todo!()
+        Ok(())
     }
 }

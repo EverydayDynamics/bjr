@@ -1,14 +1,11 @@
 use embedded_time::duration::Microseconds;
-use crate::app::control::control_primitives::{BallPattern, Controller};
+use crate::app::control_primitives::Controller;
 use crate::app::control::feedforward_generator::FeedForwardGen;
 use crate::app::control::setpoint_generator::SetPointGen;
-use crate::app::motor_handler::ControlMode;
-
 pub mod feedforward_generator;
 pub mod pid_controller;
-pub mod control_primitives;
 pub mod inverse_kinematics;
-mod setpoint_generator;
+pub mod setpoint_generator;
 
 pub struct ControlExecutor<CTRL,FFG,SPG> {
     controller: CTRL,
@@ -32,8 +29,12 @@ where CTRL: Controller,
     pub fn reset(&mut self, call_time: Microseconds<u64>){
         self.setpoint_gen.reset(call_time);
         self.feedforward_gen.reset(call_time);
+        self.controller.reset(call_time);
     }
     pub fn update(&mut self, call_time: Microseconds<u64>, ){
+        let setpoint = self.setpoint_gen.get_sp(call_time);
+        let feedforward = self.feedforward_gen.get_ff(call_time);
+
 
 
 

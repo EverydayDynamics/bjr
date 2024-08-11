@@ -17,4 +17,5 @@ pub mod state_runner_selector;
 pub mod state_runner;
 pub mod touch_handler;
 pub mod menu_handler;
-mod control;
+pub mod control;
+pub mod control_primitives;
