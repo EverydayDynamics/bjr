@@ -25,7 +25,6 @@ pub enum State {
     RunningCenterHold,
     RunningCircling,
     RunningTriangle,
-    RunningNoBall,
     Deinit,
     Error,
     Off,
@@ -38,7 +37,6 @@ impl Display for State {
             State::RunningCenterHold => {"RunningCenterHold"}
             State::RunningCircling => {"RunningCircling"}
             State::RunningTriangle => {"RunningTriangle"}
-            State::RunningNoBall => {"RunningNoBall"}
             State::Deinit => {"Deinit"}
             State::Off => {"Off"}
             State::Error => {"Error"}
@@ -75,8 +73,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::NewState(State::Homing)}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::Unexpected}
                     }
                 }
                 State::Homing => {
@@ -85,10 +81,8 @@ impl EventHandler {
                         GlobEvent::ButtonLongPress => {EventResponse::Ignore}
                         GlobEvent::ErrorWithGracefulShutdown => {EventResponse::NewState(State::Deinit)}
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
-                        GlobEvent::HomingFinished => {EventResponse::NewState(State::RunningNoBall)}
+                        GlobEvent::HomingFinished => {EventResponse::NewState(State::RunningCenterHold)}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::Unexpected}
                     }
                 }
                 State::RunningCenterHold => {
@@ -99,8 +93,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::NewState(State::RunningNoBall)}
                     }
                 }
                 State::RunningCircling => {
@@ -111,8 +103,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::NewState(State::RunningNoBall)}
                     }
 
                 }
@@ -124,20 +114,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::NewState(State::RunningNoBall)}
-                    }
-                }
-                State::RunningNoBall => {
-                    match event {
-                        GlobEvent::ButtonShortPress => {EventResponse::Ignore}
-                        GlobEvent::ButtonLongPress => {EventResponse::NewState(State::Deinit)}
-                        GlobEvent::ErrorWithGracefulShutdown => {EventResponse::NewState(State::Deinit)}
-                        GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
-                        GlobEvent::HomingFinished => {EventResponse::Unexpected}
-                        GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::NewState(State::RunningCenterHold)}
-                        GlobEvent::BallLost => {EventResponse::NewState(State::RunningCenterHold)}
                     }
                 }
                 State::Deinit => {
@@ -148,8 +124,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::Unexpected}
                     }
 
                 }
@@ -161,8 +135,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::Unexpected}
                     }
 
                 }
@@ -174,8 +146,6 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::Ignore}
                         GlobEvent::HomingFinished => {EventResponse::Ignore}
                         GlobEvent::InitFinished => {EventResponse::Ignore}
-                        GlobEvent::BallFound => {EventResponse::Unexpected}
-                        GlobEvent::BallLost => {EventResponse::Unexpected}
                     }
 
                 }

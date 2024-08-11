@@ -6,8 +6,9 @@ use crate::app::limits::{LimitError, MotorPosLimit, MotorVelLimit, Limit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use crate::app::consts::MOTOR_NUM;
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone, Default)]
 pub enum ControlMode {
+    #[default]
     Position,
     Velocity,
 }
@@ -118,7 +119,7 @@ impl<MA, MB, MC> MotorHandler<MA, MB, MC>
         }
         Ok(state)
     }
-    pub fn set_motor_input(&mut self, inputs: [Option<(KinState, ControlMode)>;MOTOR_NUM]) -> Result<(),MotorHandlerError> {
+    pub fn maybe_set_motor_input(&mut self, inputs: [Option<(KinState, ControlMode)>;MOTOR_NUM]) -> Result<(),MotorHandlerError> {
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
        for motor_idx in 0..MOTOR_NUM {
            if let Some((state, mode)) = inputs[motor_idx] {
@@ -136,6 +137,24 @@ impl<MA, MB, MC> MotorHandler<MA, MB, MC>
 
            }
        }
+        Ok(())
+    }
+    pub fn set_motor_input(&mut self, inputs: [(KinState, ControlMode);MOTOR_NUM]) -> Result<(),MotorHandlerError> {
+        let motm2us = parameter_manager().get::<MotorM2Ustep>();
+        for motor_idx in 0..MOTOR_NUM {
+            let (state, mode) = inputs[motor_idx];
+                let motor_mode = match mode {
+                    ControlMode::Position => MotorMode::PositionCtrl,
+                    ControlMode::Velocity => MotorMode::VelocityCtrl,
+                };
+                let input = MotorInput{
+                    velocity: ((state.speed *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                    acceleration: ((state.accel *motm2us)as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                    position: ((state.pos *motm2us) as i32).try_into().map_err(|_|MotorHandlerError::InputOverflow)?,
+                    mode: motor_mode,
+                };
+                self.motors[motor_idx].set_inputs(input).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))?;
+        }
         Ok(())
     }
     pub fn zero_motor_pos(&mut self, motor_idx: usize) -> Result<(),MotorHandlerError> {

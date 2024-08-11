@@ -70,9 +70,7 @@ generate_parameter_types!(
     (AtomicF32, f32, TouchScaleY, 0.5180664e-4),
     (AtomicF32, f32, TouchScaleX, 0.388671875e-4),
     //No ball parameters
-    (AtomicF32, f32, NoBallTargetPos, 10e-3),
-    (AtomicF32, f32, NoBallTargetVel, 10e-3),
-    (AtomicF32, f32, NoBallTargetAccel, 20e-3),
+    (AtomicF32, f32, NoBallTargetHeight, 100e-3),
 
 );
 // Parameter manager

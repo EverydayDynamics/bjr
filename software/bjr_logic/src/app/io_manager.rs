@@ -12,7 +12,7 @@ pub struct Inputs {
 }
 #[derive(Default)]
 pub struct Outputs {
-    piston_state: [KinState;3],
+    pub piston_state: [(KinState, ControlMode);3],
 }
 #[derive(PartialEq, Copy, Clone)]
 pub enum IOManagerError {
@@ -85,14 +85,15 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
     }
 
     fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError> {
-        self.motor_handler.set_motor_input(output).map_err(|e|IOManagerError::MotorOutput(e))
+        self.motor_handler.maybe_set_motor_input(output).map_err(|e|IOManagerError::MotorOutput(e))
     }
 
     fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError> {
         self.motor_handler.zero_motor_pos(motor_idx).map_err(|e|IOManagerError::MotorOutput(e))
     }
 
-    fn write_all_outputs(&mut self, _outputs: Outputs) -> Result<(), IOManagerError>{
-        todo!()
+    fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>{
+        self.motor_handler.set_motor_input(outputs.piston_state).map_err(|e|IOManagerError::MotorOutput(e))
+
     }
 }

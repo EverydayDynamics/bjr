@@ -8,8 +8,6 @@ pub enum GlobEvent {
     ErrorWithImmediateShutdown,
     HomingFinished,
     InitFinished,
-    BallFound,
-    BallLost,
 }
 impl Display for GlobEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
@@ -20,8 +18,6 @@ impl Display for GlobEvent {
             GlobEvent::ErrorWithImmediateShutdown => {write!(f,"GlobEvent Error With Immediate Shutdown")}
             GlobEvent::HomingFinished => {write!(f,"GlobEvent Homing Finished")}
             GlobEvent::InitFinished => {write!(f,"GlobEvent Initialization Finished")}
-            GlobEvent::BallFound => {write!(f,"GlobEvent Ball Found")}
-            GlobEvent::BallLost => {write!(f,"GlobEvent Ball Lost")}
         }
     }
 }
