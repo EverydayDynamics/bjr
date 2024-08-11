@@ -1,5 +1,5 @@
-use core::fmt::{Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler, StepperMotorController, TouchSensor};
+use core::fmt::{Display, Formatter, Write};
+use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperMotorController, TouchSensor};
 use heapless::mpmc::Q8;
 use crate::app::event::GlobEvent;
 use crate::app::button_handler::ButtonHandler;
@@ -7,6 +7,7 @@ use crate::app::event_handler::{EventHandler, EventHandlerError};
 use embedded_time::duration::*;
 use crate::app::error_handler::ErrorHandler;
 use crate::app::io_manager::{DefaultIOManager, IOManager};
+use crate::app::menu_handler::MenuHandler;
 use crate::app::parameter_manager::{LogicRunnerPeriodUs, parameter_manager};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
@@ -37,12 +38,13 @@ impl Severity for LogicRunnerError {
         }
     }
 }
-pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC, TS>
+pub struct LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO>
     where
         MA: StepperMotorController,
         MB: StepperMotorController,
         MC: StepperMotorController,
         TS: TouchSensor,
+        MIO: Reader+Write,
 {
     next_call_time: Option<Microseconds<u64>>,
     button_handler: ButtonHandler<BTN>,
@@ -52,9 +54,10 @@ pub struct LogicRunner<BTN, LOG, ME, MA, MB, MC, TS>
     error_handler: ErrorHandler,
     log_device: LOG,
     motor_enabler: ME,
+    menu_handler: MenuHandler<'a, MIO>
 }
 
-impl<BTN, LOG, ME, MA, MB, MC, TS> LogicRunner<BTN, LOG, ME, MA, MB, MC, TS>
+impl<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO> LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO>
 where
 BTN: Button,
 LOG: Logger,
@@ -63,6 +66,7 @@ MA: StepperMotorController,
 MB: StepperMotorController,
 MC: StepperMotorController,
 TS: TouchSensor,
+MIO: Reader+Write,
 {
     pub fn new(
         button_handler: ButtonHandler<BTN>,
@@ -72,6 +76,7 @@ TS: TouchSensor,
         error_handler: ErrorHandler,
         log_device: LOG,
         motor_enabler: ME,
+        menu_handler: MenuHandler<'a, MIO>
         ) -> Self {
         LogicRunner{
             next_call_time: None,
@@ -82,6 +87,7 @@ TS: TouchSensor,
             error_handler,
             log_device,
             motor_enabler,
+            menu_handler,
         }
     }
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Microseconds<u64>{
@@ -108,6 +114,7 @@ TS: TouchSensor,
                     }
                 }
             }
+            self.menu_handler.update();
         }
         self.next_call_time = Some(next_call_time);
         next_call_time

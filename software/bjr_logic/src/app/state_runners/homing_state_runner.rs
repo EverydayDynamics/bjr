@@ -66,6 +66,7 @@ impl RunnableState for HomingStateRunner {
 
         let mut retval = Ok(());
         let inputs = iomanager.read_motor_inputs().map_err(|e|StateRunnerError::HomingIOError(e))?;
+        logger.debug(&str_to_display!(" ({}) ({})({})", inputs[0].1.limit_reached, inputs[1].1.limit_reached, inputs[2].1.limit_reached));
         let mut outputs: [Option<(KinState, ControlMode)>; 3] = [None;MOTOR_NUM];
         let mut motor_idx = 0;
         let mut done_counter = 0;
@@ -73,8 +74,8 @@ impl RunnableState for HomingStateRunner {
             let mut maybe_next_state:Option<HomingStateRunnerState> = None;
             match state {
                 HomingStateRunnerState::Default => {
+                    iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                     if input.1.limit_reached {
-                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                         maybe_next_state.replace(HomingStateRunnerState::FirstGoingToSafeSpot);
                     } else {
                         maybe_next_state.replace(HomingStateRunnerState::FastApproach);
@@ -148,7 +149,6 @@ impl RunnableState for HomingStateRunner {
 
                 }
                 HomingStateRunnerState::FirstGoingToSafeSpot => {
-                    logger.debug(&str_to_display!("pos: ({}) target: ({})", input.0.pos, homing_safe_position));
                     if input.1.position_reached {
                         if input.1.limit_reached {
                             // Limit is stuck on at safe spot.
@@ -196,7 +196,7 @@ impl RunnableState for HomingStateRunner {
                 }
             }
             if let Some(next_state) = maybe_next_state {
-                logger.debug(&str_to_display!("changing homing state from ({}) to ({})", state, next_state));
+                logger.debug(&str_to_display!("changing homing state from ({}) to ({}) in motor ({})", state, next_state, motor_idx));
                 *state = next_state;
 
             }

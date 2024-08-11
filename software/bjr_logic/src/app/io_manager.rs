@@ -75,7 +75,7 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
 
         Ok(Inputs{
             measured_plate_angle: Default::default(),
-            measured_ball_state,
+            measured_ball_state: None,
             measured_motors_state,
         })
     }

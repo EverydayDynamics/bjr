@@ -1,5 +1,5 @@
 use core::fmt::{Debug, Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler, StepperDeviceError, StepperMotorController, TemperatureSensor, TouchSensor, TouchSensorError};
+use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TemperatureSensor, TouchSensor, TouchSensorError};
 use core::result::Result;
 
 pub trait BoardResources {
@@ -13,7 +13,8 @@ pub trait BoardResources {
     type StepperDriveB: StepperMotorController;
     type StepperDriveC: StepperMotorController;
     type TouchSensor: TouchSensor;
-    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice);
+    type MenuIO: core::fmt::Write + Reader;
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO);
 
     fn get_fallible_resources(&mut self) -> Result<
     (Self::Button,

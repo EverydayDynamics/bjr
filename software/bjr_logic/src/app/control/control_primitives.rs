@@ -14,16 +14,30 @@ pub struct PlateDelta {
     height: KinState,
     angle: [KinState;2],
 }
-pub struct ControlInputs{
+pub struct ControlExecInputs{
     pub measured_plate_angle: [KinState;2],
+    pub measured_ball_state: [KinState;2],
+
+}
+pub struct ControlInputs{
     pub feed_forward: PlateDelta,
     pub ball_setpoint: [KinState;2],
-    pub measured_ball_state: [KinState;2],
+    pub inputs: ControlExecInputs,
 }
 
 pub struct ControlOutputs{
-    motor_velocities: [f32;2],
+    motor_velocities: [f32;3],
 }
 pub struct TelemetryPacket{
 
+}
+pub enum BallPattern{
+    CenterHold,
+    Triangle,
+    Circling,
+}
+pub trait Controller {
+
+    fn reset(&mut self);
+    fn update(&mut self, _inputs: ControlInputs) -> ControlOutputs;
 }

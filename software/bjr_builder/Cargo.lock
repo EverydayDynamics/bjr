@@ -45,6 +45,7 @@ dependencies = [
  "bsp_traits",
  "embedded-time",
  "heapless",
+ "menu",
 ]
 
 [[package]]
@@ -119,6 +120,12 @@ dependencies = [
  "hash32",
  "stable_deref_trait",
 ]
+
+[[package]]
+name = "menu"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce98110899b3b97775dd181d9088ebee9abcb6804bb7ead4e9450c1f5419562d"
 
 [[package]]
 name = "num"

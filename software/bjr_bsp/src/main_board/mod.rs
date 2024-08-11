@@ -1,5 +1,5 @@
 use core::cell::RefCell;
-use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError};
+use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError};
 use bsp_traits::StepperMotorController;
 use crate::boards::{BoardCreationError, BoardResources};
 use cortex_m::interrupt;
@@ -81,9 +81,10 @@ impl BoardResources for MyBoard {
     type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>;
     type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>;
     type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
+    type MenuIO = Dummy;
 
-    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
-        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {})
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
+        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {}, Dummy{})
     }
     fn get_fallible_resources(&mut self) -> Result<
         (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
@@ -198,6 +199,16 @@ impl StepperMotorController for Dummy {
 }
 impl Button for Dummy {
     fn is_pressed(&mut self) -> bool {
+        todo!()
+    }
+}
+impl Reader for Dummy {
+    fn read(&mut self, buf: &mut [u8]) -> usize {
+        todo!()
+    }
+}
+impl core::fmt::Write for Dummy{
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
         todo!()
     }
 }

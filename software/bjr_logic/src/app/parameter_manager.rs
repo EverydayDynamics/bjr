@@ -57,9 +57,9 @@ generate_parameter_types!(
     (AtomicF32, f32, MotorUpperVelLimit, 1e6),
     (AtomicF32, f32, MotorLowerVelLimit, -1e6),
     //homing params
-    (AtomicF32, f32, HomingHighVelocity, 1e-3),
-    (AtomicF32, f32, HomingLowVelocity, 1e-4),
-    (AtomicF32, f32, HomingSafePosition, 5e-3),
+    (AtomicF32, f32, HomingHighVelocity, 20e-3),
+    (AtomicF32, f32, HomingLowVelocity, 10e-3),
+    (AtomicF32, f32, HomingSafePosition, 2e-3),
     (AtomicF32, f32, HomingMaxTravel, 20e-3),
     (AtomicF32, f32, HomingAccel, 5e-3),
     //running period

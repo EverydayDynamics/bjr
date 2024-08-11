@@ -55,7 +55,7 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         //set microstep resolution to 8 usteps
         self.map.chopconf_mut().set_mres(5);
         self.map.ihold_irun_mut().set_ihold(1);
-        self.map.ihold_irun_mut().set_irun(4);
+        self.map.ihold_irun_mut().set_irun(20);
         self.map.ihold_irun_mut().set_ihold_delay(6);
         self.map.pwmconf_mut().set_pwm_autoscale(true);
         self.map.pwmconf_mut().set_pwm_ampl(200);

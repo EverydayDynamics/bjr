@@ -91,6 +91,8 @@ mod app {
         // Start the monotonic
         Mono::start(timer_clock_hz, token);
         let now = Mono::now().ticks();
+        let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(1000000);
+        Mono::delay_until(baba).await;
         let mut logic_runner = build_application(now, &mut board);
             loop {
                 let now = Mono::now().ticks();

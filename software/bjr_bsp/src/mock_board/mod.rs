@@ -1,8 +1,14 @@
 use core::fmt::Display;
-use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError, Logger};
+use std::io;
+use std::io::{Read, Write};
+use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError, Logger, Reader, TouchSensor, Point, TouchSensorError};
 use bsp_traits::StepperMotorController;
 use crate::boards::{BoardCreationError, BoardResources};
 use log;
+use std::sync::mpsc;
+use std::sync::mpsc::Receiver;
+use std::sync::mpsc::TryRecvError;
+use std::{thread, time};
 
 // global logger
 pub struct MockBoard {
@@ -26,13 +32,16 @@ impl BoardResources for MockBoard{
     type StepperDriveA = Dummy;
     type StepperDriveB = Dummy;
     type StepperDriveC = Dummy;
-    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice){
-        (Dummy{}, NativeLogger{})
+    type TouchSensor = Dummy;
+    type MenuIO = NativeIO;
+
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
+        (Dummy{}, NativeLogger{}, NativeIO::new())
     }
     fn get_fallible_resources(&mut self) -> Result<
-        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC),
+        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
         BoardCreationError> {
-        Ok((Dummy{},Dummy{},Dummy{},Dummy{}))
+        Ok((Dummy{},Dummy{},Dummy{},Dummy{}, Dummy{}))
     }
 }
 impl MockBoard {
@@ -62,6 +71,11 @@ impl Button for Dummy {
         false
     }
 }
+impl TouchSensor for Dummy {
+    fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError> {
+        todo!()
+    }
+}
 pub struct NativeLogger {}
 impl Logger for NativeLogger {
 
@@ -85,3 +99,45 @@ impl Logger for NativeLogger {
         log::error!("{}", message);
     }
 }
+pub struct NativeIO {
+    stdin_channel: Receiver<u8>
+}
+impl NativeIO {
+    pub fn new() -> NativeIO {
+        let stdin_channel = spawn_stdin_channel();
+        NativeIO {
+            stdin_channel,
+        }
+    }
+}
+fn spawn_stdin_channel() -> Receiver<u8> {
+    let (tx, rx) = mpsc::channel::<u8>();
+    thread::spawn(move || loop {
+        let mut buffer = [0u8;1];
+        io::stdin().read_exact(&mut buffer).unwrap();
+        tx.send(buffer[0]).unwrap();
+    });
+    rx
+}
+
+impl Reader for NativeIO {
+    fn read(&mut self, buf: &mut [u8]) -> usize {
+        let mut received_chars= 0;
+        while  received_chars < buf.len(){
+            if let Ok(key) = self.stdin_channel.try_recv() {
+                buf[received_chars] = key;
+                received_chars+=1;
+            } else {
+                break;
+            }
+        }
+        received_chars
+    }
+}
+impl core::fmt::Write for NativeIO{
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        io::stdout().write(s.as_ref()).unwrap();
+        Ok(())
+    }
+}
+

@@ -1,5 +1,5 @@
-#![no_main]
-#![no_std]
+//#![no_main]
+//#[cfg(feature = "main_board")]
 
 #[cfg(feature = "mock_board")]
 pub mod mock_board;

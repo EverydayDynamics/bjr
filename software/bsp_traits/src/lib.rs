@@ -57,7 +57,9 @@ pub trait Button{
 pub trait Monotonic {
     fn current_time(&mut self) -> u64;
 }
-
+pub trait Reader {
+    fn read(&mut self, buf: &mut [u8]) -> usize;
+}
 
 pub trait Logger {
     fn trace(&self, message: &dyn Display);
