@@ -1,6 +1,19 @@
+use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
 use atomic_float::AtomicF32;
+use strum_macros::{Display, EnumIter, EnumString, EnumTable, VariantNames};
+use core::fmt::{Display, Write};
 
+struct ByteWriter<'a>(&'a mut [u8]);
+
+impl<'a> Write for ByteWriter<'a> {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        let bytes = s.as_bytes();
+        let len = bytes.len().min(self.0.len());
+        self.0[..len].copy_from_slice(&bytes[..len]);
+        Ok(())
+    }
+}
 pub trait ParameterType {
     type AtomicType;
     type ReturnType: PartialOrd;
@@ -9,9 +22,15 @@ pub trait ParameterType {
     fn atomic_store(value: <Self as ParameterType>::ReturnType, atomic: &Self::AtomicType);
     fn atomic_load(atomic: &Self::AtomicType) -> Self::ReturnType;
 }
+
+pub enum ParameterParseError {
+    InvalidToken,
+    WriteInterfaceError,
+}
 macro_rules! generate_parameter_types {
     ($(($atomic_type:ty, $return_type:ty, $member:ident, $default:expr)),* $(,)?) => {
         $(
+            #[derive(Default)]
             pub struct $member;
 
             impl ParameterType for $member {
@@ -30,7 +49,45 @@ macro_rules! generate_parameter_types {
                     atomic.load(core::sync::atomic::Ordering::Relaxed)
                 }
             }
+            impl FromStr for $member {
+                type Err= ParameterParseError;
+                fn from_str(s: &str) -> Result<Self, Self::Err> {
+                    if stringify!($member).to_ascii_lowercase() == s.to_ascii_lowercase() {
+                        Ok($member{})
+                    } else {
+                        Err(ParameterParseError::InvalidToken)
+                    }
+                }
+            }
         )*
+        #[derive(EnumString, EnumIter, Display)]
+        pub enum ParameterList{
+            $(
+                #[strum(ascii_case_insensitive)]
+                $member,
+            )*
+
+        }
+        impl ParameterList {
+            pub fn write_value<'a>(&self, writer: &mut dyn Write) -> Result<(),ParameterParseError>{
+                match self{
+                $(
+                    ParameterList::$member => {write!(writer,"{}", PARAMETER_MANAGER.get::<$member>()).map_err(|_| ParameterParseError::WriteInterfaceError)?;},
+                )*
+                }
+                Ok(())
+            }
+            pub fn set_value(&self, value_str: &str) -> Result<(),ParameterParseError>{
+                match self{
+                $(
+                    ParameterList::$member => {PARAMETER_MANAGER.set::<$member>(<$member as ParameterType>::ReturnType::from_str(value_str).map_err(|_| ParameterParseError::InvalidToken)?)},
+                )*
+                }
+                Ok(())
+            }
+
+
+        }
         pub struct ParameterStorage {
             $(
                 pub $member: $atomic_type,
