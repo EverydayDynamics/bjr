@@ -38,7 +38,6 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
         let (status,read_ioin) = self.dev_driver.read_register::<IOIN>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         get_error_from_spistatus(status)?;
         *self.map.ioin_mut() = read_ioin;
-        defmt::println!("Ioin version:{}", read_ioin.version());
         if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
             Err(StepperDeviceError::SelfTestVersionMismatch)
         }else {

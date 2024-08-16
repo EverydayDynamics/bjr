@@ -49,16 +49,6 @@ macro_rules! generate_parameter_types {
                     atomic.load(core::sync::atomic::Ordering::Relaxed)
                 }
             }
-            impl FromStr for $member {
-                type Err= ParameterParseError;
-                fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    if stringify!($member).to_ascii_lowercase() == s.to_ascii_lowercase() {
-                        Ok($member{})
-                    } else {
-                        Err(ParameterParseError::InvalidToken)
-                    }
-                }
-            }
         )*
         #[derive(EnumString, EnumIter, Display)]
         pub enum ParameterList{

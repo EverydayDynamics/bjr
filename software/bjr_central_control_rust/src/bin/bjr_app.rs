@@ -11,14 +11,14 @@ device = stm32f4xx_hal::pac,
 peripherals = false,
 // TODO: Replace the `FreeInterrupt1, ...` with free interrupt vectors if software tasks are used
 // You can usually find the names of the interrupt vectors in the some_hal::pac::interrupt enum.
-dispatchers = [SPI1]
+dispatchers = [SPI2]
 )]
 mod app {
     use stm32f4xx_hal::{
         prelude::*,
     };
     use rtic_monotonics::stm32::fugit::Instant;
-    use core::fmt::{Display, Formatter};
+    use core::fmt::{Display, Formatter, Write};
     use bjr_bsp;
     use bjr_bsp::Board;
     use bjr_bsp::boards::{BoardCreationError, BoardResources};
@@ -62,8 +62,6 @@ mod app {
     #[init]
     fn init(cx: init::Context) -> (Shared, Local) {
 
-        defmt::error!("Init start");
-        defmt::error!("Init finished");
         task1::spawn().unwrap();
         (
                     Shared {
@@ -90,10 +88,8 @@ mod app {
         let timer_clock_hz = 75_000_000; // ??????????????????????????????
         // Start the monotonic
         Mono::start(timer_clock_hz, token);
-        let now = Mono::now().ticks();
-        let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(1000000);
-        Mono::delay_until(baba).await;
         let mut menu_context = MenuContext::default();
+
         let mut logic_runner = build_application(&mut board, &mut menu_context);
             loop {
                 let now = Mono::now().ticks();

@@ -47,6 +47,6 @@ impl Severity for StateRunnerError {
 
 pub trait RunnableState {
     fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger);
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError>;
+    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(),StateRunnerError>;
     fn exit(&mut self, call_time: Microseconds<u64>, logger: & dyn Logger);
 }

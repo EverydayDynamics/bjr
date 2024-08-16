@@ -62,11 +62,11 @@ pub trait Reader {
 }
 
 pub trait Logger {
-    fn trace(&self, message: &dyn Display);
-    fn debug(&self, message: &dyn Display);
-    fn info(&self, message: &dyn Display);
-    fn warn(&self, message: &dyn Display);
-    fn error(&self, message: &dyn Display);
+    fn trace(&mut self, message: &dyn Display);
+    fn debug(&mut self, message: &dyn Display);
+    fn info(&mut self, message: &dyn Display);
+    fn warn(&mut self, message: &dyn Display);
+    fn error(&mut self, message: &dyn Display);
 }
 pub enum DeviceError {
     CommunicationError,

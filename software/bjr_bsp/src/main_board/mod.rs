@@ -10,10 +10,13 @@ use stm32f4xx_hal::prelude::*;
 use stm32f4xx_hal::spi::{Phase, Polarity, Spi};
 
 use embedded_hal::spi::{Error, ErrorKind};
+use rtt_target::{ChannelMode, rtt_init};
 use stm32f4xx_hal::pac::SPI1;
 use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::devices::defmt_logger::DefmtLogger;
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
+use crate::devices::rtt_logger::RttLogger;
+use crate::devices::rtt_rw_interface::RttRWInterface;
 use crate::devices::tsc2046_touchscreen_dev::Tsc2046TouchDev;
 use crate::utils::error_wrapper::ErrorWrapper;
 use crate::utils::spidev::{Spidev, SpiDevError};
@@ -75,20 +78,41 @@ impl MyBoard {
 impl BoardResources for MyBoard {
 
     type MotorEnabler =  GPIOMotorEnabler<Pin<'B', 7, Output>>;
-    type LogDevice =  DefmtLogger;
+    type LogDevice =  RttLogger;
     type Button = GpioButton<Pin<'C', 13>>;
     type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>;
     type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>;
     type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>;
     type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
-    type MenuIO = Dummy;
+    type MenuIO = RttRWInterface;
 
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
-        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), DefmtLogger {}, Dummy{})
+        let channels = rtt_init! {
+        up: {
+            0: {
+                size: 512,
+                mode: ChannelMode::BlockIfFull,
+                name: "Menu output"
+            }
+            1: {
+                size: 128,
+                name: "Log output"
+            }
+        }
+        down: {
+            0: {
+                size: 512,
+                mode: ChannelMode::BlockIfFull,
+                name: "Menu Input"
+            }
+        }
+    };
+        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), RttLogger::new(channels.up.1), RttRWInterface::new(channels.up.0, channels.down.0))
     }
     fn get_fallible_resources(&mut self) -> Result<
         (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
         BoardCreationError> {
+        let mut button = GpioButton::new(self.button_pin.take().unwrap());
         //let a: Result<(), Error> = spi.read();
         let spi = self.spi1.take().unwrap();
         interrupt::free(|cs| {
@@ -106,7 +130,6 @@ impl BoardResources for MyBoard {
         let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
         let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
         let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device).map_err(|e|BoardCreationError::TouchSensorInitError(e))?;
-        let button = GpioButton::new(self.button_pin.take().unwrap());
         Ok((
             button,
             stp_motor_drive_a,
@@ -174,7 +197,6 @@ impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error>
 pub struct Dummy {}
 impl MotorEnabler for Dummy {
     fn set_enable(&mut self, enable: bool) {
-        todo!()
     }
 }
 impl StepperMotorController for Dummy {
@@ -194,12 +216,12 @@ impl StepperMotorController for Dummy {
     }
 
     fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
-        todo!()
+        Ok(())
     }
 }
 impl Button for Dummy {
     fn is_pressed(&mut self) -> bool {
-        todo!()
+        false
     }
 }
 impl Reader for Dummy {

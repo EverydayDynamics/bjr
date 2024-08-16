@@ -8,3 +8,7 @@ pub mod defmt_logger;
 pub mod gpio_motor_enabler;
 #[cfg(feature = "embedded")]
 pub mod tsc2046_touchscreen_dev;
+#[cfg(feature = "embedded")]
+pub mod rtt_rw_interface;
+#[cfg(feature = "embedded")]
+pub mod rtt_logger;

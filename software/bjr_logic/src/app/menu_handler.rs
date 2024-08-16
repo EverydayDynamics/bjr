@@ -1,16 +1,13 @@
-use alloc::format;
 use core::fmt::{Display, Formatter, Write};
 use core::str::FromStr;
 use menu::{Item, ItemType, Menu, Parameter, Runner};
 use strum::{IntoEnumIterator, VariantNames};
-use strum_macros::EnumVariantNames;
 use bsp_traits::Reader;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::get_event_queue;
 use crate::app::menu_handler::MenuError::MenuInterfaceWriteError;
 use crate::app::parameter_manager::ParameterList;
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use crate::str_to_display;
 
 const READ_BUF_LEN:usize = 64;
 #[derive(Clone)]

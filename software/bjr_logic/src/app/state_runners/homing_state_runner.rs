@@ -56,7 +56,7 @@ impl RunnableState for HomingStateRunner {
         self.states = [HomingStateRunnerState::Default;MOTOR_NUM];
     }
 
-    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(), StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(), StateRunnerError> {
 
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();

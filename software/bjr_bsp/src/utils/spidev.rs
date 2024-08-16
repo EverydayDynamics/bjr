@@ -4,7 +4,6 @@ use embedded_hal::spi::{Error, ErrorKind, ErrorType, Operation, SpiBus, SpiDevic
 use core::cell::RefCell;
 use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
-use defmt::Format;
 
 pub struct Spidev<'a, SPI, CSPIN> {
     guarded_spi: &'a Mutex<RefCell<Option<SPI>>>,
@@ -41,51 +40,6 @@ pub enum SpiDevError<SPI, CSPIN>
     CSPinError(CSPIN::Error),
     MutexError,
     NotImplemented,
-}
-impl<SPIERR, CSPINERR> Format for SpiDevError<SPIERR, CSPINERR>
-    where
-        SPIERR: SpiBus,
-        CSPINERR: OutputPin
-{
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            SpiDevError::SPIError(spierr) => {
-                defmt::write!(f, "Failed to access SPI bus:");
-                match spierr.kind()  {
-                    ErrorKind::Overrun => defmt::write!(f, "The peripheral receive buffer was overrun"),
-                    ErrorKind::ModeFault => defmt::write!(
-                        f,
-                        "Multiple devices on the SPI bus are trying to drive the slave select pin"
-                    ),
-                    ErrorKind::FrameFormat => defmt::write!(
-                        f,
-                        "Received data does not conform to the peripheral configuration"
-                    ),
-                    ErrorKind::ChipSelectFault => defmt::write!(
-                        f,
-                        "An error occurred while asserting or deasserting the Chip Select pin"
-                    ),
-                    ErrorKind::Other => defmt::write!(
-                        f,
-                        "A different error occurred. The original error may contain more information"
-                    ),
-                    _ => defmt::write!(
-                        f,
-                        "An unknown error occured.")
-                };
-            }
-            SpiDevError::CSPinError(cserr) => {
-                defmt::write!(f, "Failed set CS pin:");
-
-            }
-            SpiDevError::MutexError => {
-                defmt::write!(f, "Failed to acquire mutex");
-            }
-            SpiDevError::NotImplemented => {
-                defmt::write!(f, "Requiested operation was not implemented.");
-            }
-        }
-    }
 }
 impl<SPI, CSPIN> Debug for SpiDevError<SPI, CSPIN>
     where

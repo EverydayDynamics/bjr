@@ -5,23 +5,18 @@ pub struct DefmtLogger {
 
 }
 impl Logger for DefmtLogger {
-    fn trace(&self, message: &dyn Display) {
-        defmt::trace!("{}", defmt::Display2Format(message));
+    fn trace(&mut self, message: &dyn Display) {
     }
 
-    fn debug(&self, message: &dyn Display) {
-        defmt::debug!("{}", defmt::Display2Format(message));
+    fn debug(&mut self, message: &dyn Display) {
     }
 
-    fn info(&self, message: &dyn Display) {
-        defmt::info!("{}", defmt::Display2Format(message));
+    fn info(&mut self, message: &dyn Display) {
     }
 
-    fn warn(&self, message: &dyn Display) {
-        defmt::warn!("{}", defmt::Display2Format(message));
+    fn warn(&mut self, message: &dyn Display) {
     }
 
-    fn error(&self, message: &dyn Display) {
-        defmt::error!("{}", defmt::Display2Format(message));
+    fn error(&mut self, message: &dyn Display) {
     }
 }

@@ -24,7 +24,7 @@ where
         };
         sr
     }
-    pub fn update(&mut self, state: State, call_time: Microseconds<u64>, event_queue: EventQueue, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) -> Result<(),StateRunnerError> {
+    pub fn update(&mut self, state: State, call_time: Microseconds<u64>, event_queue: EventQueue, motor_enabler: &mut dyn MotorEnabler, logger: &mut dyn Logger) -> Result<(),StateRunnerError> {
         if self.current_state != state {
 
             self.runners.get_runner(self.current_state).exit(call_time, logger);

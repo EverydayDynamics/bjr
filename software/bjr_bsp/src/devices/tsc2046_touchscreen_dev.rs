@@ -21,7 +21,6 @@ where SPI: SpiDevice,
     fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError> {
         let maybe_touch = self.driver.get_touch().map_err(|e|TouchSensorError::CommunicationError(ErrorWrapper(e).into()))?;
         if let Some(touch) = maybe_touch{
-            defmt::debug!("Touch: ({}), ({})", touch.x, touch.y);
             Ok(Some(Point{ x: touch.x as i32, y: touch.y as i32 }))
         } else {
             Ok(None)

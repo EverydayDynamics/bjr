@@ -14,7 +14,7 @@ impl RunnableState for InitializingStateRunner {
     fn entry(&mut self, _call_time: Microseconds<u64>, _motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger) {
 
     }
-    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(),StateRunnerError> {
         event_queue.enqueue(GlobEvent::InitFinished).map_err(|event|StateRunnerError::QueueFull(event))?;
         //let inputs = iomanager.read_motor_inputs().map_err(|e|StateRunnerError::HomingIOError(e))?;
         //logger.debug(&str_to_display!("0: ({}) 1: ({}) 2: ({})", inputs[0].1.limit_reached, inputs[1].1.limit_reached, inputs[2].1.limit_reached));

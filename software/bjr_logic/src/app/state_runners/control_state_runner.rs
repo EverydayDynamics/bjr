@@ -40,7 +40,7 @@ where CTRL: Controller,
         self.ff_generator.reset(call_time);
         self.sp_generator.reset(call_time);
     }
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, _event_queue: EventQueue, logger: & dyn Logger) -> Result<(),StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, _event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(),StateRunnerError> {
         let inputs = iomanager.read_all_inputs(call_time).map_err(|e|StateRunnerError::IOError(e))?;
         let feed_forward = self.ff_generator.get_ff(call_time);
         let target_plate_state = if let Some(ball_state) = inputs.measured_ball_state {
