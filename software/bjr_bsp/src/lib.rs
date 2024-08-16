@@ -1,5 +1,5 @@
 #![no_main]
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(feature = "mock_board")]
 pub mod mock_board;

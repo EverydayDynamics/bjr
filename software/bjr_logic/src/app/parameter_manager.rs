@@ -31,7 +31,6 @@ macro_rules! generate_parameter_types {
                 }
             }
         )*
-
         pub struct ParameterStorage {
             $(
                 pub $member: $atomic_type,

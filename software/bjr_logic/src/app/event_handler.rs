@@ -25,6 +25,7 @@ pub enum State {
     RunningCenterHold,
     RunningCircling,
     RunningTriangle,
+    FeedForward,
     Deinit,
     Error,
     Off,
@@ -37,6 +38,7 @@ impl Display for State {
             State::RunningCenterHold => {"RunningCenterHold"}
             State::RunningCircling => {"RunningCircling"}
             State::RunningTriangle => {"RunningTriangle"}
+            State::FeedForward => {"FeedForward"}
             State::Deinit => {"Deinit"}
             State::Off => {"Off"}
             State::Error => {"Error"}
@@ -73,6 +75,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::NewState(State::Homing)}
+                        GlobEvent::EnterFeedforward => {EventResponse::Ignore}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
                 }
                 State::Homing => {
@@ -83,6 +87,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::NewState(State::RunningCenterHold)}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::Ignore}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
                 }
                 State::RunningCenterHold => {
@@ -93,6 +99,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::NewState(State::FeedForward)}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
                 }
                 State::RunningCircling => {
@@ -103,6 +111,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::NewState(State::FeedForward)}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
 
                 }
@@ -114,6 +124,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::NewState(State::FeedForward)}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
                 }
                 State::Deinit => {
@@ -124,6 +136,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::Ignore}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
 
                 }
@@ -135,6 +149,8 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
                         GlobEvent::HomingFinished => {EventResponse::Unexpected}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::Ignore}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
 
                 }
@@ -146,8 +162,22 @@ impl EventHandler {
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::Ignore}
                         GlobEvent::HomingFinished => {EventResponse::Ignore}
                         GlobEvent::InitFinished => {EventResponse::Ignore}
+                        GlobEvent::EnterFeedforward => {EventResponse::Ignore}
+                        GlobEvent::ExitFeedforward => {EventResponse::Ignore}
                     }
 
+                }
+                State::FeedForward => {
+                    match event {
+                        GlobEvent::ButtonShortPress => {EventResponse::Ignore}
+                        GlobEvent::ButtonLongPress => {EventResponse::NewState(State::Deinit)}
+                        GlobEvent::ErrorWithGracefulShutdown => {EventResponse::NewState(State::Deinit)}
+                        GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
+                        GlobEvent::HomingFinished => {EventResponse::Unexpected}
+                        GlobEvent::InitFinished => {EventResponse::Unexpected}
+                        GlobEvent::EnterFeedforward => {EventResponse::NewState(State::FeedForward)}
+                        GlobEvent::ExitFeedforward => {EventResponse::NewState(State::RunningCenterHold)}
+                    }
                 }
             };
            match response{

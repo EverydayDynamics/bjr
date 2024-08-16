@@ -1,6 +1,7 @@
 use core::fmt::{Display, Formatter};
+use strum_macros::{EnumDiscriminants, EnumString, EnumTable, EnumVariantNames, VariantArray, VariantNames};
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(PartialEq, Copy, Clone, EnumString, VariantNames)]
 pub enum GlobEvent {
     ButtonShortPress,
     ButtonLongPress,
@@ -8,6 +9,8 @@ pub enum GlobEvent {
     ErrorWithImmediateShutdown,
     HomingFinished,
     InitFinished,
+    EnterFeedforward,
+    ExitFeedforward,
 }
 impl Display for GlobEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
@@ -18,9 +21,12 @@ impl Display for GlobEvent {
             GlobEvent::ErrorWithImmediateShutdown => {write!(f,"GlobEvent Error With Immediate Shutdown")}
             GlobEvent::HomingFinished => {write!(f,"GlobEvent Homing Finished")}
             GlobEvent::InitFinished => {write!(f,"GlobEvent Initialization Finished")}
+            GlobEvent::EnterFeedforward => {write!(f,"GlobEvent Feed forward mode entry event")}
+            GlobEvent::ExitFeedforward => {write!(f,"GlobEvent Feed forward mode exit event")}
         }
     }
 }
+
 pub enum EventError {
     QueueFull(GlobEvent),
 }

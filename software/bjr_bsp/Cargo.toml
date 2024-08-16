@@ -74,6 +74,7 @@ overflow-checks = false  # <-
 
 [features]
 default = []
+std = []
 embedded = ["dep:cortex-m", "dep:cortex-m-rt","dep:defmt","dep:defmt-rtt","dep:panic-probe", "dep:cortex-m-semihosting", "dep:embedded-hal"]
-mock_board = ["dep:log", "dep:env_logger"]
+mock_board = ["dep:log", "dep:env_logger", "std"]
 main_board = ["embedded","dep:stm32f4xx-hal", "dep:tmc5130", "dep:tsc2046", "dep:rtt-target"]

@@ -114,7 +114,9 @@ MIO: Reader+Write,
                     }
                 }
             }
-            self.menu_handler.update();
+            if let Err(error) = self.menu_handler.update() {
+                self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, error);
+            }
         }
         self.next_call_time = Some(next_call_time);
         next_call_time
