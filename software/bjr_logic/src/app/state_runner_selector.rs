@@ -19,6 +19,12 @@ pub struct DefaultStateRunnerSelector {
     center_hold_control_runner: ControlStateRunner<PIDController, FFGenCH, SetPointGenCH>,
     feedforward_state_runner: FeedforwardStateRunner,
 }
+impl Default for DefaultStateRunnerSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DefaultStateRunnerSelector {
     pub fn new() -> Self {
         DefaultStateRunnerSelector {

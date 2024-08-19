@@ -43,6 +43,12 @@ impl<T: defmt::Format> defmt::Format for LimitError<T> {
         }
     }
 }
+impl Default for LimitChecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LimitChecker {
    pub fn new() -> LimitChecker {
        LimitChecker{

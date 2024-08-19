@@ -15,7 +15,7 @@ impl RunnableState for FeedforwardStateRunner {
         match command {
             StateRunnerCommand::FeedForwardCommand(ff_plate_state) => {
                 let motor_outputs = inverse_kinematics(ff_plate_state);
-                iomanager.write_all_outputs(Outputs{ piston_state: motor_outputs.map(|o|(o, ControlMode::Position)) }).map_err(|e| StateRunnerError::IOError(e))?;
+                iomanager.write_all_outputs(Outputs{ piston_state: motor_outputs.map(|o|(o, ControlMode::Position)) }).map_err(StateRunnerError::IOError)?;
             }
             StateRunnerCommand::NoCommand => {}
         }

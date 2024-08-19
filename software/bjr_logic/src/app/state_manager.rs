@@ -1,7 +1,7 @@
 use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::event_handler::State;
-use crate::app::event_queue::{EventQueue, get_event_queue};
+use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
 use crate::app::state_runner_selector::StateRunnerSelector;
 use crate::app::state_runner::{StateRunnerCommand, StateRunnerError};
@@ -17,12 +17,12 @@ where
     IOMAN: IOManager,
 {
     pub fn new(runners: STRS, io_manager: IOMAN) -> Self{
-        let sr = StateManager {
+        
+        StateManager {
             runners,
             io_manager,
             current_state: State::Initializing,
-        };
-        sr
+        }
     }
     pub fn update(&mut self, state: State, call_time: Microseconds<u64>, event_queue: EventQueue, motor_enabler: &mut dyn MotorEnabler, logger: &mut dyn Logger, command: &StateRunnerCommand) -> Result<(),StateRunnerError> {
         if self.current_state != state {

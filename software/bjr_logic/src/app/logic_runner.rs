@@ -6,16 +6,13 @@ use crate::app::button_handler::ButtonHandler;
 use crate::app::event_handler::{EventHandler, EventHandlerError};
 use embedded_time::duration::*;
 use crate::app::error_handler::ErrorHandler;
-use crate::app::io_manager::{DefaultIOManager, IOManager};
+use crate::app::io_manager::DefaultIOManager;
 use crate::app::menu_handler::MenuHandler;
 use crate::app::parameter_manager::{LogicRunnerPeriodUs, parameter_manager};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
 use crate::app::state_runner::StateRunnerCommand;
-use crate::app::state_runner_selector::StateRunnerSelector;
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
-use crate::str_to_display;
-use crate::utils::DisplayStr;
 
 #[derive(Copy, Clone)]
 enum LogicRunnerError {
@@ -95,7 +92,7 @@ MIO: Reader+Write,
     }
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Microseconds<u64>{
         let period = parameter_manager().get::<LogicRunnerPeriodUs>() as u64;
-        let next_call_time =if let Some(mut last_call_time) = self.next_call_time {
+        let next_call_time =if let Some(last_call_time) = self.next_call_time {
             last_call_time + Microseconds::<u64>::new(period)
         } else {
             call_time + Microseconds::<u64>::new(period)
@@ -106,7 +103,7 @@ MIO: Reader+Write,
             if let Err(button_handler_error) = self.button_handler.update(call_time) {
                 self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, button_handler_error);
             }
-            match self.event_handler.handle_events(&mut self.log_device).map_err(|e| LogicRunnerError::EventHandlerError(e)) {
+            match self.event_handler.handle_events(&mut self.log_device).map_err(LogicRunnerError::EventHandlerError) {
                 Err(error) => {
                     self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, error);
                 }

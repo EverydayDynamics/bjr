@@ -3,7 +3,7 @@ use core::str::FromStr;
 use menu::{Item, ItemType, Menu, Parameter, Runner};
 use strum::{IntoEnumIterator, VariantNames};
 use bsp_traits::Reader;
-use crate::app::control_primitives::{KinState, PlateState};
+use crate::app::control_primitives::PlateState;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::get_event_queue;
 use crate::app::parameter_manager::{parameter_manager, ParameterList, FFDefaultLinSpeed, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultAngAccel};
@@ -112,7 +112,7 @@ where
                     } ) ,
                 },
             ],
-            entry: Some(enter_root),
+            entry: None,
             exit: None,
         };
         MenuHandler{
@@ -168,7 +168,7 @@ fn fallible_send_event<MIO: Reader+Write>(
 fn list_events<MIO: Reader+Write>(
     _menu: &Menu<MIO, Context>,
     _item: &Item<MIO, Context>,
-    args: &[&str],
+    _args: &[&str],
     interface: &mut MIO,
     context: &mut Context,
 ) {
@@ -241,7 +241,7 @@ fn list_parameters<MIO: Reader+Write>(
     context.error = fallible_list_parameters(args,interface);
 }
 fn fallible_list_parameters<MIO: Reader+Write>(
-    args: &[&str],
+    _args: &[&str],
     interface: &mut MIO,
 ) -> Result<(),MenuError> {
     for param in ParameterList::iter() {
@@ -250,13 +250,6 @@ fn fallible_list_parameters<MIO: Reader+Write>(
         interface.write_str("\n").map_err(|_|MenuError::MenuInterfaceWriteError)?;
     }
     Ok(())
-}
-fn enter_root<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("Enter root").unwrap();
 }
 fn enter_feedforward_mode<MIO: Reader+Write>(
     _menu: &Menu<MIO, Context>,
@@ -268,7 +261,7 @@ fn enter_feedforward_mode<MIO: Reader+Write>(
 }
 fn exit_feedforward_mode<MIO: Reader+Write>(
     _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
+    _interface: &mut MIO,
     context: &mut Context,
 ) {
     context.error = get_event_queue().enqueue(GlobEvent::ExitFeedforward).map_err(|_|MenuError::EventBufferOverflow);
@@ -287,11 +280,7 @@ fn fallible_set_plate_state<MIO: Reader+Write>(
     interface: &mut MIO,
     context: &mut Context,
 ) -> Result<(), MenuError>{
-    const DEG2RAD:f32 = 0.0174532925;
-    let default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
-    let default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();
-    let default_ang_speed = parameter_manager().get::<FFDefaultAngSpeed>();
-    let default_ang_accel = parameter_manager().get::<FFDefaultAngAccel>();
+    const DEG2RAD:f32 = 0.017_453_292;
     get_event_queue().enqueue(GlobEvent::EnterFeedforward).map_err(|_|MenuError::EventBufferOverflow)?;
     if let Ok(height) = f32::from_str(args[0]) {
        if let Ok(alpha)  = f32::from_str(args[1]) {
@@ -309,46 +298,4 @@ fn fallible_set_plate_state<MIO: Reader+Write>(
         interface.write_str("Couldn't parse Height parameter. Please enter a number.").map_err(|_|MenuError::MenuInterfaceWriteError)?;
     }
     Ok(())
-}
-fn root_entry<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("root entry").unwrap()
-}
-fn root_exit<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("root exit").unwrap()
-}
-fn sub1_entry<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("sub1 entry").unwrap()
-}
-fn sub1_exit<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("sub1 exit").unwrap()
-}
-fn sub2_entry<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("sub2 entry").unwrap()
-}
-fn sub2_exit<MIO: Reader+Write>(
-    _menu: &Menu<MIO, Context>,
-    interface: &mut MIO,
-    context: &mut Context,
-) {
-    interface.write_str("sub2 exit").unwrap()
 }

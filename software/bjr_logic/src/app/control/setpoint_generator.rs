@@ -1,5 +1,5 @@
 use embedded_time::duration::Microseconds;
-use crate::app::control_primitives::{KinState, PlateDelta};
+use crate::app::control_primitives::KinState;
 
 pub struct SetPointGenCH {
 

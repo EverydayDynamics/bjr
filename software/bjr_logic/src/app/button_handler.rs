@@ -57,7 +57,7 @@ impl<BTN: Button> ButtonHandler<BTN> {
                 } else {
                     GlobEvent::ButtonShortPress
                 };
-                self.event_handler.enqueue(event_to_send).map_err(|e|ButtonHandlerError::QueueFull(e))?;
+                self.event_handler.enqueue(event_to_send).map_err(ButtonHandlerError::QueueFull)?;
             }
         }
         self.last_state = currently_pressed;

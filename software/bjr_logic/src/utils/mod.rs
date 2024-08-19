@@ -2,7 +2,7 @@
 
 pub mod test_helper;
 
-use core::fmt::{self, Write};
+use core::fmt::{self};
 
 pub struct DisplayStr<'a> {
     content: fmt::Arguments<'a>,

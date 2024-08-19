@@ -82,7 +82,7 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
 {
     fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>{
         let measured_motors_state =self.read_motor_inputs()?;
-        let measured_ball_state = self.touch_handler.get_ball_state(call_time).map_err(|e|IOManagerError::BallSensor(e))?;
+        let measured_ball_state = self.touch_handler.get_ball_state(call_time).map_err(IOManagerError::BallSensor)?;
 
         Ok(Inputs{
             measured_plate_angle: Default::default(),
@@ -92,19 +92,19 @@ impl<MA,MB,MC,TS> IOManager for DefaultIOManager<MA,MB,MC,TS>
     }
 
     fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError> {
-        self.motor_handler.get_motor_state().map_err(|e| IOManagerError::MotorInput(e))
+        self.motor_handler.get_motor_state().map_err(IOManagerError::MotorInput)
     }
 
     fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError> {
-        self.motor_handler.maybe_set_motor_input(output).map_err(|e|IOManagerError::MotorOutput(e))
+        self.motor_handler.maybe_set_motor_input(output).map_err(IOManagerError::MotorOutput)
     }
 
     fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError> {
-        self.motor_handler.zero_motor_pos(motor_idx).map_err(|e|IOManagerError::MotorOutput(e))
+        self.motor_handler.zero_motor_pos(motor_idx).map_err(IOManagerError::MotorOutput)
     }
 
     fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>{
-        self.motor_handler.set_motor_input(outputs.piston_state).map_err(|e|IOManagerError::MotorOutput(e))
+        self.motor_handler.set_motor_input(outputs.piston_state).map_err(IOManagerError::MotorOutput)
 
     }
 }

@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter};
-use strum_macros::{EnumDiscriminants, EnumString, EnumTable, EnumVariantNames, VariantArray, VariantNames};
+use strum_macros::{EnumString, VariantNames};
 
 #[derive(PartialEq, Copy, Clone, EnumString, VariantNames)]
 pub enum GlobEvent {

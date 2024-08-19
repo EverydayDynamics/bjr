@@ -5,7 +5,7 @@ use fast_math;
 use libm::{sinf, cosf, sqrtf};
 use crate::app::parameter_manager::{KinHingeOffset, KinJointCircRad, parameter_manager};
 
-const SQ3:f32 = 1.732050807568877293527446341505872367_f32;
+const SQ3:f32 = 1.732_050_8_f32;
 fn aligned_state(angle_state: KinState, height_state: KinState, base_circle_radius:f32, hinge_offset:f32, joint_circle_radius:f32, min_height:f32, piston_body_len: f32) -> KinState{
     let px = base_circle_radius - joint_circle_radius *cosf(angle_state.pos);
     let py = height_state.pos + min_height + joint_circle_radius *sinf(angle_state.pos);

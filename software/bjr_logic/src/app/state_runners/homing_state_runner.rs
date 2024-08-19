@@ -43,6 +43,12 @@ pub struct HomingStateRunner {
     states: [HomingStateRunnerState;MOTOR_NUM]
 
 }
+impl Default for HomingStateRunner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HomingStateRunner {
     pub fn new() -> Self {
         HomingStateRunner{
@@ -65,7 +71,7 @@ impl RunnableState for HomingStateRunner {
         let homing_accel = parameter_manager().get::<HomingAccel>();
 
         let mut retval = Ok(());
-        let inputs = iomanager.read_motor_inputs().map_err(|e|StateRunnerError::HomingIOError(e))?;
+        let inputs = iomanager.read_motor_inputs().map_err(StateRunnerError::HomingIOError)?;
         logger.debug(&str_to_display!(" ({}) ({})({})", inputs[0].1.limit_reached, inputs[1].1.limit_reached, inputs[2].1.limit_reached));
         let mut outputs: [Option<(KinState, ControlMode)>; 3] = [None;MOTOR_NUM];
         let mut motor_idx = 0;
@@ -74,7 +80,7 @@ impl RunnableState for HomingStateRunner {
             let mut maybe_next_state:Option<HomingStateRunnerState> = None;
             match state {
                 HomingStateRunnerState::Default => {
-                    iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
+                    iomanager.reset_motor_pos(motor_idx).map_err(StateRunnerError::HomingIOError)?;
                     if input.1.limit_reached {
                         maybe_next_state.replace(HomingStateRunnerState::FirstGoingToSafeSpot);
                         output.replace((KinState{
@@ -93,7 +99,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::FastApproach => {
                     if input.1.limit_reached {
-                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
+                        iomanager.reset_motor_pos(motor_idx).map_err(StateRunnerError::HomingIOError)?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterFastApproach);
                         output.replace((KinState{
                             pos: 0.0,
@@ -124,7 +130,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::SlowApproach => {
                     if input.1.limit_reached {
-                        iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
+                        iomanager.reset_motor_pos(motor_idx).map_err(StateRunnerError::HomingIOError)?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterSlowApproach);
                         output.replace((KinState{
                             pos: 0.0,
@@ -207,10 +213,10 @@ impl RunnableState for HomingStateRunner {
             }
             motor_idx += 1;
         }
-        iomanager.write_motor_outputs(outputs).map_err(|e|StateRunnerError::HomingIOError(e))?;
+        iomanager.write_motor_outputs(outputs).map_err(StateRunnerError::HomingIOError)?;
         if done_counter == MOTOR_NUM {
             // All motors homed.
-            event_queue.enqueue(GlobEvent::HomingFinished).map_err(|e|StateRunnerError::QueueFull(e))?;
+            event_queue.enqueue(GlobEvent::HomingFinished).map_err(StateRunnerError::QueueFull)?;
         }
         retval
     }

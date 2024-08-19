@@ -3,6 +3,12 @@ use embedded_time::duration::*;
 pub struct BallpathGenerator {
 
 }
+impl Default for BallpathGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BallpathGenerator {
     pub fn new() -> Self {
         BallpathGenerator{}

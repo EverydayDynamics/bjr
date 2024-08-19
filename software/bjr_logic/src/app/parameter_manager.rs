@@ -2,8 +2,8 @@ use core::f32::consts::{FRAC_PI_2, PI};
 use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
 use atomic_float::AtomicF32;
-use strum_macros::{Display, EnumIter, EnumString, EnumTable, VariantNames};
-use core::fmt::{Display, Write};
+use strum_macros::{Display, EnumIter, EnumString};
+use core::fmt::Write;
 
 struct ByteWriter<'a>(&'a mut [u8]);
 
@@ -118,8 +118,8 @@ generate_parameter_types!(
     //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -2048),
     (AtomicI32, i32, TouchCenterOffsetY, -2048),
-    (AtomicF32, f32, TouchScaleY, 0.5180664e-4),
-    (AtomicF32, f32, TouchScaleX, 0.388671875e-4),
+    (AtomicF32, f32, TouchScaleY, 5.180_664e-5),
+    (AtomicF32, f32, TouchScaleX, 3.886_718_7e-5),
     //No ball parameters
     (AtomicF32, f32, NoBallTargetHeight, 10e-3),
     //Kinematics parameters
@@ -143,6 +143,12 @@ generate_parameter_types!(
 
 pub struct ParameterManager {
     storage: ParameterStorage,
+}
+
+impl Default for ParameterManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ParameterManager {
