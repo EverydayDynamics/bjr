@@ -27,6 +27,7 @@ pub enum MotorHandlerError {
     InputOverflow,
     MotorIdxOutOfRange(usize),
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for MotorHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -35,6 +36,18 @@ impl Display for MotorHandlerError {
             MotorHandlerError::MotorVelocityLimitError(e, idx) => {write!(f, "MotorHandler Velocity limit error: {}, motor idx: {}", e, idx)}
             MotorHandlerError::InputOverflow => {write!(f, "MotorHandler Input value overflow")}
             MotorHandlerError::MotorIdxOutOfRange(idx) => {write!(f, "MotorHandler Motor index ({}) out of range", idx)}
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for MotorHandlerError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            MotorHandlerError::MotorError(e, idx) => {defmt::write!(f, "Motor Handler Motor error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::MotorPositionLimitError(e, idx) => {defmt::write!(f, "MotorHandler Position limit error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::MotorVelocityLimitError(e, idx) => {defmt::write!(f, "MotorHandler Velocity limit error: {}, motor idx: {}", e, idx)}
+            MotorHandlerError::InputOverflow => {defmt::write!(f, "MotorHandler Input value overflow")}
+            MotorHandlerError::MotorIdxOutOfRange(idx) => {defmt::write!(f, "MotorHandler Motor index ({}) out of range", idx)}
         }
     }
 }
@@ -158,7 +171,7 @@ impl<MA, MB, MC> MotorHandler<MA, MB, MC>
         Ok(())
     }
     pub fn zero_motor_pos(&mut self, motor_idx: usize) -> Result<(),MotorHandlerError> {
-        if (motor_idx < MOTOR_NUM) {
+        if motor_idx < MOTOR_NUM {
             self.motors[motor_idx].set_position(0).map_err(|e|MotorHandlerError::MotorError(e, motor_idx))
         }else {
             Err(MotorHandlerError::MotorIdxOutOfRange(motor_idx))

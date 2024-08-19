@@ -36,6 +36,7 @@ impl BoardResources for MockBoard{
     type MenuIO = NativeIO;
 
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
+        env_logger::init();
         (Dummy{}, NativeLogger{}, NativeIO::new())
     }
     fn get_fallible_resources(&mut self) -> Result<
@@ -53,16 +54,22 @@ impl MockBoard {
 pub struct Dummy {}
 impl MotorEnabler for Dummy {
     fn set_enable(&mut self, enable: bool) {
-        todo!()
     }
 }
 impl StepperMotorController for Dummy {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
-        todo!()
+        Ok(())
     }
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
-        todo!()
+        Ok(MotorState{
+            velocity: 0,
+            position: 0,
+            limit_reached: false,
+            velocity_reached: false,
+            position_reached: false,
+            standstill: false,
+        })
     }
     fn set_position(&mut self, new_position:i32) -> Result<(), StepperDeviceError> {todo!()}
 }
@@ -73,29 +80,29 @@ impl Button for Dummy {
 }
 impl TouchSensor for Dummy {
     fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError> {
-        todo!()
+        Ok(None)
     }
 }
 pub struct NativeLogger {}
 impl Logger for NativeLogger {
 
-    fn trace(&self, message: &dyn Display) {
+    fn trace(&mut self, message: &dyn Display) {
         log::trace!("{}", message);
     }
 
-    fn debug(&self, message: &dyn Display) {
+    fn debug(&mut self, message: &dyn Display) {
         log::debug!("{}", message);
     }
 
-    fn info(&self, message: &dyn Display) {
+    fn info(&mut self, message: &dyn Display) {
         log::info!("{}", message);
     }
 
-    fn warn(&self, message: &dyn Display) {
+    fn warn(&mut self, message: &dyn Display) {
         log::warn!("{}", message);
     }
 
-    fn error(&self, message: &dyn Display) {
+    fn error(&mut self, message: &dyn Display) {
         log::error!("{}", message);
     }
 }

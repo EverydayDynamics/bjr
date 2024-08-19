@@ -12,6 +12,7 @@ pub enum GlobEvent {
     EnterFeedforward,
     ExitFeedforward,
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for GlobEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -23,6 +24,21 @@ impl Display for GlobEvent {
             GlobEvent::InitFinished => {write!(f,"GlobEvent Initialization Finished")}
             GlobEvent::EnterFeedforward => {write!(f,"GlobEvent Feed forward mode entry event")}
             GlobEvent::ExitFeedforward => {write!(f,"GlobEvent Feed forward mode exit event")}
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for GlobEvent {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            GlobEvent::ButtonShortPress => {defmt::write!(f,"GlobEvent Button Short Press")}
+            GlobEvent::ButtonLongPress => {defmt::write!(f,"GlobEvent Button Long Press")}
+            GlobEvent::ErrorWithGracefulShutdown => {defmt::write!(f,"GlobEvent Error With Graceful Shutdown")}
+            GlobEvent::ErrorWithImmediateShutdown => {defmt::write!(f,"GlobEvent Error With Immediate Shutdown")}
+            GlobEvent::HomingFinished => {defmt::write!(f,"GlobEvent Homing Finished")}
+            GlobEvent::InitFinished => {defmt::write!(f,"GlobEvent Initialization Finished")}
+            GlobEvent::EnterFeedforward => {defmt::write!(f,"GlobEvent Feed forward mode entry event")}
+            GlobEvent::ExitFeedforward => {defmt::write!(f,"GlobEvent Feed forward mode exit event")}
         }
     }
 }

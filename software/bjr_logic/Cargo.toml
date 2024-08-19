@@ -13,6 +13,9 @@ libm = "0.2.8"
 fast-math = "0.1.1"
 strum = { version = "0.26.3", default-features = false, features = ["derive"] }
 strum_macros = "0.26.4"
+defmt = { version = "0.3.8", optional = true }
 
 [dev-dependencies]
 mockall = "0.12.1"
+[features]
+defmt = ["dep:defmt", "bsp_traits/defmt"]

@@ -8,9 +8,16 @@ pub struct LimitReport<T>{
     limit: T,
     value: T,
 }
+#[cfg(not(feature = "defmt"))]
 impl<T: Display> Display for LimitReport<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f,"LimitReport limit:{}, value: {}", self.limit, self.value)
+    }
+}
+#[cfg(feature = "defmt")]
+impl<T: defmt::Format> defmt::Format for LimitReport<T> {
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f,"LimitReport limit:{}, value: {}", self.limit, self.value)
     }
 }
 #[derive(PartialEq, Copy, Clone)]
@@ -18,11 +25,21 @@ pub enum LimitError<T>{
     OverLimit(LimitReport<T>),
     UnderLimit(LimitReport<T>),
 }
+#[cfg(not(feature = "defmt"))]
 impl<T: Display> Display for LimitError<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             LimitError::OverLimit(lr) => {write!(f,"LimitError Over limit: {}", lr)}
             LimitError::UnderLimit(lr) => {write!(f,"LimitError Under limit: {}", lr)}
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl<T: defmt::Format> defmt::Format for LimitError<T> {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            LimitError::OverLimit(lr) => {defmt::write!(f,"LimitError Over limit: {}", lr)}
+            LimitError::UnderLimit(lr) => {defmt::write!(f,"LimitError Under limit: {}", lr)}
         }
     }
 }

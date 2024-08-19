@@ -27,6 +27,9 @@ pub struct MyBoard {
     cs_mot_a_pin: Option<Pin<'B', 6, Output>>,
     cs_mot_b_pin: Option<Pin<'C', 7, Output>>,
     cs_mot_c_pin: Option<Pin<'A', 9, Output>>,
+    mot_a_lim_pin: Option<Pin<'B', 4>>,
+    mot_b_lim_pin: Option<Pin<'B', 5>>,
+    mot_c_lim_pin: Option<Pin<'A', 10>>,
     cs_touch_sense_pin: Option<Pin<'A', 8, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
@@ -37,9 +40,9 @@ pub struct InfallibleResources {
 }
 pub struct FallibleResources {
     pub button: GpioButton<Pin<'C', 13>>,
-    pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>,
-    pub stp_motor_drive_b: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>,
-    pub stp_motor_drive_c: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>,
+    pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B',4>>,
+    pub stp_motor_drive_b: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B', 5>>,
+    pub stp_motor_drive_c: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A',10>>,
 }
 
 static GUARDED_SPI: Mutex<RefCell<Option<Spi<SPI1>>>> =
@@ -53,6 +56,9 @@ impl MyBoard {
         let gpiob = dp.GPIOB.split();
         let gpioc = dp.GPIOC.split();
         let button_pin = Some(gpioc.pc13.into_pull_up_input());
+        let mot_a_lim_pin = Some(gpiob.pb4.into_pull_up_input());
+        let mot_b_lim_pin = Some(gpiob.pb5.into_pull_up_input());
+        let mot_c_lim_pin = Some(gpioa.pa10.into_pull_up_input());
         let cs_mot_a_pin = gpiob.pb6.into_push_pull_output_in_state(PinState::High);
         let cs_mot_b_pin = gpioc.pc7.into_push_pull_output_in_state(PinState::High);
         let cs_mot_c_pin = gpioa.pa9.into_push_pull_output_in_state(PinState::High);
@@ -61,11 +67,14 @@ impl MyBoard {
         let spi = dp.SPI1.spi(
             (gpioa.pa5, gpioa.pa6, gpioa.pa7),
             hal::spi::Mode { polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition },
-            1000.kHz(),
+            2000.kHz(),
             &clocks,
         );
         MyBoard {
             button_pin,
+            mot_a_lim_pin,
+            mot_b_lim_pin,
+            mot_c_lim_pin,
             motor_enabler_pin: Some(motor_enabler_pin),
             spi1: Some(spi),
             cs_mot_a_pin: Some(cs_mot_a_pin),
@@ -80,9 +89,9 @@ impl BoardResources for MyBoard {
     type MotorEnabler =  GPIOMotorEnabler<Pin<'B', 7, Output>>;
     type LogDevice =  RttLogger;
     type Button = GpioButton<Pin<'C', 13>>;
-    type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>>;
-    type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>>;
-    type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>>;
+    type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B',4>>;
+    type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B',5>>;
+    type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A',10>>;
     type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
     type MenuIO = RttRWInterface;
 
@@ -95,7 +104,8 @@ impl BoardResources for MyBoard {
                 name: "Menu output"
             }
             1: {
-                size: 128,
+                size: 1024,
+                mode: ChannelMode::BlockIfFull,
                 name: "Log output"
             }
         }
@@ -118,17 +128,24 @@ impl BoardResources for MyBoard {
         interrupt::free(|cs| {
             GUARDED_SPI.borrow(cs).replace(Some(spi));
         });
-        let cs_mot_a_pin = self.cs_mot_a_pin.take().unwrap();
-        let cs_mot_b_pin = self.cs_mot_b_pin.take().unwrap();
-        let cs_mot_c_pin = self.cs_mot_c_pin.take().unwrap();
-        let cs_touch_sense_pin = self.cs_touch_sense_pin.take().unwrap();
+        let mot_a_lim_pin = self.mot_a_lim_pin.take().unwrap();
+        let mot_b_lim_pin = self.mot_b_lim_pin.take().unwrap();
+        let mot_c_lim_pin = self.mot_c_lim_pin.take().unwrap();
+        let mut cs_mot_a_pin = self.cs_mot_a_pin.take().unwrap();
+        let mut cs_mot_b_pin = self.cs_mot_b_pin.take().unwrap();
+        let mut cs_mot_c_pin = self.cs_mot_c_pin.take().unwrap();
+        let mut cs_touch_sense_pin = self.cs_touch_sense_pin.take().unwrap();
+        cs_mot_a_pin.set_high();
+        cs_mot_b_pin.set_high();
+        cs_mot_c_pin.set_high();
+        cs_touch_sense_pin.set_high();
         let mot_a_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_a_pin);
         let mot_b_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_b_pin);
         let mot_c_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_c_pin);
         let touch_sense_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_touch_sense_pin);
-        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
-        let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
-        let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
+        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device, mot_a_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
+        let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device, mot_b_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
+        let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device, mot_c_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
         let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device).map_err(|e|BoardCreationError::TouchSensorInitError(e))?;
         Ok((
             button,

@@ -20,12 +20,23 @@ pub enum IOManagerError {
     MotorOutput(MotorHandlerError),
     BallSensor(TouchSensorError),
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for IOManagerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             IOManagerError::MotorInput(e) => {write!(f, "IOMananger Motor input error: {}", e)}
             IOManagerError::MotorOutput(e) => {write!(f, "IOMananger Motor output error: {}", e)}
             IOManagerError::BallSensor(e) => {write!(f, "IOMananger Ball sensor error: {}", e)}
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for IOManagerError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            IOManagerError::MotorInput(e) => {defmt::write!(f, "IOMananger Motor input error: {}", e)}
+            IOManagerError::MotorOutput(e) => {defmt::write!(f, "IOMananger Motor output error: {}", e)}
+            IOManagerError::BallSensor(e) => {defmt::write!(f, "IOMananger Ball sensor error: {}", e)}
         }
     }
 }

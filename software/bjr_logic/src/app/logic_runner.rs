@@ -11,6 +11,7 @@ use crate::app::menu_handler::MenuHandler;
 use crate::app::parameter_manager::{LogicRunnerPeriodUs, parameter_manager};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
+use crate::app::state_runner::StateRunnerCommand;
 use crate::app::state_runner_selector::StateRunnerSelector;
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
 use crate::str_to_display;
@@ -54,7 +55,8 @@ pub struct LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO>
     error_handler: ErrorHandler,
     log_device: LOG,
     motor_enabler: ME,
-    menu_handler: MenuHandler<'a, MIO>
+    menu_handler: MenuHandler<'a, MIO>,
+    state_runner_command: StateRunnerCommand,
 }
 
 impl<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO> LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO>
@@ -88,6 +90,7 @@ MIO: Reader+Write,
             log_device,
             motor_enabler,
             menu_handler,
+            state_runner_command: StateRunnerCommand::NoCommand,
         }
     }
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Microseconds<u64>{
@@ -108,13 +111,13 @@ MIO: Reader+Write,
                     self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, error);
                 }
                 Ok(state) => {
-                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, &mut self.motor_enabler, &mut self.log_device);
+                    let state_runner_result = self.state_manager.update(state, call_time, self.event_queue, &mut self.motor_enabler, &mut self.log_device, &self.state_runner_command);
                     if let Err(state_runner_error) = state_runner_result {
                         self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, state_runner_error);
                     }
                 }
             }
-            if let Err(error) = self.menu_handler.update() {
+            if let Err(error) = self.menu_handler.update(&mut self.state_runner_command) {
                 self.error_handler.handle_error(&mut self.motor_enabler, &mut self.log_device, error);
             }
         }

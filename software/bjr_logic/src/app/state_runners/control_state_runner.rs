@@ -8,7 +8,7 @@ use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, IOManagerError, Outputs};
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{NoBallTargetHeight, parameter_manager};
-use crate::app::state_runner::{RunnableState, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
 use crate::str_to_display;
 use crate::utils::DisplayStr;
 
@@ -40,7 +40,7 @@ where CTRL: Controller,
         self.ff_generator.reset(call_time);
         self.sp_generator.reset(call_time);
     }
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, _event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(),StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, _event_queue: EventQueue, logger: &mut dyn Logger, _command: &StateRunnerCommand) -> Result<(),StateRunnerError> {
         let inputs = iomanager.read_all_inputs(call_time).map_err(|e|StateRunnerError::IOError(e))?;
         let feed_forward = self.ff_generator.get_ff(call_time);
         let target_plate_state = if let Some(ball_state) = inputs.measured_ball_state {
@@ -52,15 +52,11 @@ where CTRL: Controller,
                 measured_ball_state: ball_state,
             })
         } else {
-            //No ball found, send the plate to
+            //No ball found, send the plate to noball
             let target_height_pos = parameter_manager().get::<NoBallTargetHeight>();
-            PlateState{ height: KinState{
-                pos: target_height_pos,
-                speed: 0.0,
-                accel: 0.0,
-            }, angle: [KinState::default();2]}
+            PlateState::new_with_default_sa(target_height_pos, 0.0, 0.0)
         };
-         let motor_outputs = inverse_kinematics(target_plate_state+feed_forward);
+         let motor_outputs = inverse_kinematics(&(target_plate_state+feed_forward));
         iomanager.write_all_outputs(Outputs{ piston_state: motor_outputs.map(|o|(o, ControlMode::Position)) }).map_err(|e| StateRunnerError::IOError(e))?;
         Ok(())
     }

@@ -73,7 +73,7 @@ impl EventHandler {
                         GlobEvent::ButtonLongPress => {EventResponse::Ignore}
                         GlobEvent::ErrorWithGracefulShutdown => {EventResponse::NewState(State::Deinit)}
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
-                        GlobEvent::HomingFinished => {EventResponse::Unexpected}
+                        GlobEvent::HomingFinished => {EventResponse::NewState(State::RunningCenterHold)}
                         GlobEvent::InitFinished => {EventResponse::NewState(State::Homing)}
                         GlobEvent::EnterFeedforward => {EventResponse::Ignore}
                         GlobEvent::ExitFeedforward => {EventResponse::Ignore}
@@ -147,7 +147,7 @@ impl EventHandler {
                         GlobEvent::ButtonLongPress => {EventResponse::NewState(State::Initializing)}
                         GlobEvent::ErrorWithGracefulShutdown => {EventResponse::Ignore}
                         GlobEvent::ErrorWithImmediateShutdown => {EventResponse::NewState(State::Error)}
-                        GlobEvent::HomingFinished => {EventResponse::Unexpected}
+                        GlobEvent::HomingFinished => {EventResponse::NewState(State::RunningCenterHold)}
                         GlobEvent::InitFinished => {EventResponse::Unexpected}
                         GlobEvent::EnterFeedforward => {EventResponse::Ignore}
                         GlobEvent::ExitFeedforward => {EventResponse::Ignore}
@@ -182,13 +182,15 @@ impl EventHandler {
             };
            match response{
                EventResponse::Ignore => {
-                   logger_device.warn(&str_to_display!("Incoming Event ({}) ignored! current state: {}", event ,self.state))
+                   //TODO
+                   //logger_device.warn(&str_to_display!("Incoming Event ({}) ignored! current state: {}", event ,self.state))
                }
                EventResponse::Unexpected => {
                    return Err(EventHandlerError::UnexpectedEvent(event, self.state))
                }
                EventResponse::NewState(new_state) => {
-                   logger_device.info(&str_to_display!("state change occured: ({})->({}) Due to event: {}", self.state, new_state, event));
+                   //TODO
+                   //logger_device.info(&str_to_display!("state change occured: ({})->({}) Due to event: {}", self.state, new_state, event));
                    self.state = new_state;
                }
            }

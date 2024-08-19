@@ -1,5 +1,6 @@
 use embedded_time::duration::Microseconds;
 use core::ops::{Add, Sub, Mul, Div, Neg};
+use crate::app::parameter_manager::{FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed, parameter_manager};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct KinState{
@@ -68,9 +69,35 @@ impl Div<f32> for KinState {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct PlateState {
     pub height: KinState,
     pub angle: [KinState;2],
+}
+impl PlateState {
+    pub fn new_with_default_sa(height:f32, alpha:f32, beta:f32) -> PlateState{
+        let default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
+        let default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();
+        let default_ang_speed = parameter_manager().get::<FFDefaultAngSpeed>();
+        let default_ang_accel = parameter_manager().get::<FFDefaultAngAccel>();
+        PlateState{ height: KinState{
+            pos: height,
+            speed: default_lin_speed,
+            accel: default_lin_accel,
+        }, angle: [
+            KinState{
+                pos: alpha,
+                speed: default_ang_speed,
+                accel: default_ang_accel,
+            },
+            KinState{
+                pos: beta,
+                speed: default_ang_speed,
+                accel: default_ang_accel,
+            },
+
+        ] }
+    }
 }
 
 #[derive(Default)]

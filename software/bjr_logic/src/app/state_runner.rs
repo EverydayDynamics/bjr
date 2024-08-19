@@ -1,6 +1,7 @@
 use core::fmt::{Display, Formatter};
 use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
+use crate::app::control_primitives::PlateState;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, IOManagerError};
@@ -44,9 +45,13 @@ impl Severity for StateRunnerError {
         }
     }
 }
-
+#[derive(Copy, Clone)]
+pub enum StateRunnerCommand {
+    FeedForwardCommand(PlateState),
+    NoCommand,
+}
 pub trait RunnableState {
     fn entry(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: & dyn Logger);
-    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(),StateRunnerError>;
+    fn update(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger, command: &StateRunnerCommand) -> Result<(),StateRunnerError>;
     fn exit(&mut self, call_time: Microseconds<u64>, logger: & dyn Logger);
 }

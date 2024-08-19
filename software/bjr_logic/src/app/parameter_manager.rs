@@ -1,3 +1,4 @@
+use core::f32::consts::{FRAC_PI_2, PI};
 use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
 use atomic_float::AtomicF32;
@@ -95,6 +96,10 @@ macro_rules! generate_parameter_types {
         }
     };
 }
+
+const BASE_CIRCLE_RADIUS:f32 = 40.0;
+const HINGE_OFFSET:f32 = 6.5;
+const JOINT_CIRCLE_RADIUS:f32 = 17.5; //
 generate_parameter_types!(
     (AtomicF32, f32, MotorM2Ustep, 8e5),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
@@ -116,7 +121,22 @@ generate_parameter_types!(
     (AtomicF32, f32, TouchScaleY, 0.5180664e-4),
     (AtomicF32, f32, TouchScaleX, 0.388671875e-4),
     //No ball parameters
-    (AtomicF32, f32, NoBallTargetHeight, 100e-3),
+    (AtomicF32, f32, NoBallTargetHeight, 10e-3),
+    //Kinematics parameters
+    (AtomicF32, f32, KinBaseCircRad, 40.0e-3),
+    (AtomicF32, f32, KinHingeOffset, 6.5e-3),
+    (AtomicF32, f32, KinJointCircRad, 23.351e-3),
+    (AtomicF32, f32, KinMinHeight, 89.902e-3),
+    (AtomicF32, f32, KinSurface2JointCircDist, 27.96261e-3),
+
+    //piston parameters
+    (AtomicF32, f32, PistonBodyLen, 91.2e-3),
+    //feedforward mode parameters
+    (AtomicF32, f32, FFDefaultLinSpeed, 10e-3),
+    (AtomicF32, f32, FFDefaultLinAccel, 20e-3),
+    (AtomicF32, f32, FFDefaultAngSpeed, FRAC_PI_2),
+    (AtomicF32, f32, FFDefaultAngAccel, PI),
+
 
 );
 // Parameter manager

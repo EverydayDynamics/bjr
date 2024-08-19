@@ -6,6 +6,7 @@ use embedded_time::{duration::*};
 use heapless::mpmc::Q8;
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 
+#[derive(PartialEq)]
 pub enum ButtonHandlerError {
     QueueFull(GlobEvent)
 }
@@ -142,7 +143,8 @@ fn test_button_handler_longnshort_press() {
     let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_3);
     for run_num in 1..(run_count+1) {
         let call_time = call_rate*run_num;
-        test_button_handler.update(call_time);
+        let result = test_button_handler.update(call_time);
+        assert!(result == Ok(()));
     }
     assert!(EVENT_QUEUE_3.dequeue() == Some(GlobEvent::ButtonLongPress));
     assert!(EVENT_QUEUE_3.dequeue() == Some(GlobEvent::ButtonShortPress));

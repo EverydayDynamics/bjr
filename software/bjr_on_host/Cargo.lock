@@ -79,6 +79,8 @@ dependencies = [
  "bsp_traits",
  "env_logger",
  "log",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]
@@ -89,6 +91,8 @@ dependencies = [
  "bjr_logic",
  "bsp_traits",
  "embedded-time",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]
@@ -114,6 +118,8 @@ dependencies = [
  "bjr_builder",
  "bjr_logic",
  "embedded-time",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]

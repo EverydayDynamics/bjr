@@ -24,11 +24,11 @@ pub mod bsp_mocks {
     mock! {
         pub TestLogger {}
         impl<'a> Logger for TestLogger {
-                fn trace(&self, msg: &dyn Display);
-                fn debug(&self, msg: &dyn Display);
-                fn info(&self, msg: &dyn Display);
-                fn warn(&self, msg: &dyn Display);
-                fn error(&self, msg: &dyn Display);
+                fn trace(&mut self, msg: &dyn Display);
+                fn debug(&mut self, msg: &dyn Display);
+                fn info(&mut self, msg: &dyn Display);
+                fn warn(&mut self, msg: &dyn Display);
+                fn error(&mut self, msg: &dyn Display);
 
         }
     }

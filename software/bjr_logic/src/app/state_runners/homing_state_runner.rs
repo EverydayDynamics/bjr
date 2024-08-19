@@ -8,7 +8,7 @@ use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{HomingAccel, HomingHighVelocity, HomingLowVelocity, HomingMaxTravel, HomingSafePosition, parameter_manager};
-use crate::app::state_runner::{RunnableState, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
 use crate::utils::DisplayStr;
 use crate::str_to_display;
 
@@ -56,7 +56,7 @@ impl RunnableState for HomingStateRunner {
         self.states = [HomingStateRunnerState::Default;MOTOR_NUM];
     }
 
-    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger) -> Result<(), StateRunnerError> {
+    fn update(&mut self, iomanager: &mut dyn IOManager, _call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut dyn Logger, _command: &StateRunnerCommand) -> Result<(), StateRunnerError> {
 
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();
@@ -77,6 +77,11 @@ impl RunnableState for HomingStateRunner {
                     iomanager.reset_motor_pos(motor_idx).map_err(|e|StateRunnerError::HomingIOError(e))?;
                     if input.1.limit_reached {
                         maybe_next_state.replace(HomingStateRunnerState::FirstGoingToSafeSpot);
+                        output.replace((KinState{
+                            pos: homing_safe_position,
+                            speed: homing_high_velocity,
+                            accel: homing_accel,
+                        }, ControlMode::Position));
                     } else {
                         maybe_next_state.replace(HomingStateRunnerState::FastApproach);
                         output.replace((KinState{
@@ -320,7 +325,7 @@ mod tests {
             Ok(expected_motor_input_none));
     }
     fn expect_motor_update(mock_iomanager: &mut MockTestIOManager, test_homing_state_runner: &mut HomingStateRunner,  call_time: u64, test_queue: EventQueue, test_logger: &mut MockTestLogger) {
-        let result = test_homing_state_runner.update(mock_iomanager, Microseconds::new(call_time), test_queue, test_logger);
+        let result = test_homing_state_runner.update(mock_iomanager, Microseconds::new(call_time), test_queue, test_logger, &StateRunnerCommand::NoCommand);
         mock_iomanager.checkpoint();
         assert!(result == Ok(()));
     }
