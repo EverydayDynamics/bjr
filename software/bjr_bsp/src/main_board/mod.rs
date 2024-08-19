@@ -11,7 +11,6 @@ use stm32f4xx_hal::gpio::{Output, Pin, PinState};
 use stm32f4xx_hal::prelude::*;
 use stm32f4xx_hal::spi::{Phase, Polarity, Spi};
 
-use crate::devices::defmt_logger::DefmtLogger;
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
 use crate::devices::rtt_logger::RttLogger;
 use crate::devices::rtt_rw_interface::RttRWInterface;
@@ -38,7 +37,7 @@ pub struct MyBoard {
 }
 pub struct InfallibleResources {
     pub motor_enabler: GPIOMotorEnabler<Pin<'B', 7, Output>>,
-    pub log_device: DefmtLogger,
+    pub log_device: RttLogger,
 }
 pub struct FallibleResources {
     pub button: GpioButton<Pin<'C', 13>>,

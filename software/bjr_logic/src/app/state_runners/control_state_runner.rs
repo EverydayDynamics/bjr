@@ -39,22 +39,22 @@ where
     FFG: FeedForwardGen,
     SPG: SetPointGen,
 {
-    fn entry(
+    fn entry<LOG: Logger>(
         &mut self,
         call_time: Microseconds<u64>,
         _motor_enabler: &mut dyn MotorEnabler,
-        logger: &dyn Logger,
+        _logger: &mut LOG,
     ) {
         self.controller.reset(call_time);
         self.ff_generator.reset(call_time);
         self.sp_generator.reset(call_time);
     }
-    fn update(
+    fn update<LOG: Logger>(
         &mut self,
         iomanager: &mut dyn IOManager,
         call_time: Microseconds<u64>,
         _event_queue: EventQueue,
-        logger: &mut dyn Logger,
+        _logger: &mut LOG,
         _command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError> {
         let inputs = iomanager
@@ -88,5 +88,5 @@ where
             .map_err(StateRunnerError::IOError)?;
         Ok(())
     }
-    fn exit(&mut self, _call_time: Microseconds<u64>, logger: &dyn Logger) {}
+    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, _logger: &mut LOG) {}
 }

@@ -8,19 +8,19 @@ use embedded_time::duration::Microseconds;
 #[derive(Default)]
 pub struct InitializingStateRunner {}
 impl RunnableState for InitializingStateRunner {
-    fn entry(
+    fn entry<LOG: Logger>(
         &mut self,
         _call_time: Microseconds<u64>,
         _motor_enabler: &mut dyn MotorEnabler,
-        logger: &dyn Logger,
+        logger: &mut LOG,
     ) {
     }
-    fn update(
+    fn update<LOG: Logger>(
         &mut self,
         iomanager: &mut dyn IOManager,
         _call_time: Microseconds<u64>,
         event_queue: EventQueue,
-        logger: &mut dyn Logger,
+        logger: &mut LOG,
         _command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError> {
         event_queue
@@ -30,5 +30,5 @@ impl RunnableState for InitializingStateRunner {
         //logger.debug(&str_to_display!("0: ({}) 1: ({}) 2: ({})", inputs[0].1.limit_reached, inputs[1].1.limit_reached, inputs[2].1.limit_reached));
         Ok(())
     }
-    fn exit(&mut self, _call_time: Microseconds<u64>, logger: &dyn Logger) {}
+    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, logger: &mut LOG) {}
 }

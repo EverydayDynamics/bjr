@@ -2,6 +2,7 @@
 use core::fmt::{Display, Formatter};
 #[cfg(feature = "defmt")]
 use defmt;
+use ufmt::uDisplay;
 
 pub trait TemperatureSensor {
     fn read_temperature(&self) -> Result<f32, DeviceError>;
@@ -75,19 +76,18 @@ pub trait Monotonic {
 pub trait Reader {
     fn read(&mut self, buf: &mut [u8]) -> usize;
 }
-
 #[cfg(not(feature = "defmt"))]
 pub trait Logger {
-    fn trace(&mut self, message: &dyn Display);
-    fn debug(&mut self, message: &dyn Display);
-    fn info(&mut self, message: &dyn Display);
-    fn warn(&mut self, message: &dyn Display);
-    fn error(&mut self, message: &dyn Display);
+    fn trace<MSG: Display>(&mut self, message: MSG);
+    fn debug<MSG: Display>(&mut self, message: MSG);
+    fn info<MSG: Display>(&mut self, message: MSG);
+    fn warn<MSG: Display>(&mut self, message: MSG);
+    fn error<MSG: Display>(&mut self, message: MSG);
 }
 #[cfg(feature = "defmt")]
 pub trait Logger {
-    fn trace(&mut self, message: [&dyn defmt::Format; 1]);
-    fn debug<T: defmt::Format>(&mut self, message: [&dyn defmt::Format; 1]);
+    fn trace<T: defmt::Format>(&mut self, message: T);
+    fn debug<T: defmt::Format>(&mut self, message: T);
     fn info<T: defmt::Format>(&mut self, message: T);
     fn warn<T: defmt::Format>(&mut self, message: T);
     fn error<T: defmt::Format>(&mut self, message: T);

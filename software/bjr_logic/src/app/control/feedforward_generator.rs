@@ -7,9 +7,9 @@ pub trait FeedForwardGen {
 
 pub struct FFGenCH {}
 impl FeedForwardGen for FFGenCH {
-    fn reset(&mut self, time: Microseconds<u64>) {}
+    fn reset(&mut self, _time: Microseconds<u64>) {}
 
-    fn get_ff(&mut self, time: Microseconds<u64>) -> PlateDelta {
+    fn get_ff(&mut self, _time: Microseconds<u64>) -> PlateDelta {
         PlateDelta {
             height: Default::default(),
             angle: [KinState::default(); 2],

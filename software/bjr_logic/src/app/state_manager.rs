@@ -1,7 +1,7 @@
 use crate::app::event_handler::State;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
-use crate::app::state_runner::{StateRunnerCommand, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
 use crate::app::state_runner_selector::StateRunnerSelector;
 use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
@@ -23,13 +23,13 @@ where
             current_state: State::Initializing,
         }
     }
-    pub fn update(
+    pub fn update<LOG: Logger>(
         &mut self,
         state: State,
         call_time: Microseconds<u64>,
         event_queue: EventQueue,
         motor_enabler: &mut dyn MotorEnabler,
-        logger: &mut dyn Logger,
+        logger: &mut LOG,
         command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError> {
         if self.current_state != state {

@@ -9,19 +9,19 @@ use embedded_time::duration::Microseconds;
 #[derive(Default)]
 pub struct FeedforwardStateRunner {}
 impl RunnableState for FeedforwardStateRunner {
-    fn entry(
+    fn entry<LOG: Logger>(
         &mut self,
         _call_time: Microseconds<u64>,
         _motor_enabler: &mut dyn MotorEnabler,
-        logger: &dyn Logger,
+        _logger: &mut LOG,
     ) {
     }
-    fn update(
+    fn update<LOG: Logger>(
         &mut self,
         iomanager: &mut dyn IOManager,
         _call_time: Microseconds<u64>,
         _event_queue: EventQueue,
-        logger: &mut dyn Logger,
+        _logger: &mut LOG,
         command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError> {
         match command {
@@ -37,5 +37,5 @@ impl RunnableState for FeedforwardStateRunner {
         }
         Ok(())
     }
-    fn exit(&mut self, _call_time: Microseconds<u64>, logger: &dyn Logger) {}
+    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, _logger: &mut LOG) {}
 }

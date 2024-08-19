@@ -96,23 +96,23 @@ impl TouchSensor for Dummy {
 }
 pub struct NativeLogger {}
 impl Logger for NativeLogger {
-    fn trace(&mut self, message: &dyn Display) {
+    fn trace<MSG: Display>(&mut self, message: MSG) {
         log::trace!("{}", message);
     }
 
-    fn debug(&mut self, message: &dyn Display) {
+    fn debug<MSG: Display>(&mut self, message: MSG) {
         log::debug!("{}", message);
     }
 
-    fn info(&mut self, message: &dyn Display) {
+    fn info<MSG: Display>(&mut self, message: MSG) {
         log::info!("{}", message);
     }
 
-    fn warn(&mut self, message: &dyn Display) {
+    fn warn<MSG: Display>(&mut self, message: MSG) {
         log::warn!("{}", message);
     }
 
-    fn error(&mut self, message: &dyn Display) {
+    fn error<MSG: Display>(&mut self, message: MSG) {
         log::error!("{}", message);
     }
 }

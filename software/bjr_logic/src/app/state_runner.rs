@@ -68,19 +68,19 @@ pub enum StateRunnerCommand {
     NoCommand,
 }
 pub trait RunnableState {
-    fn entry(
+    fn entry<LOG: Logger>(
         &mut self,
         call_time: Microseconds<u64>,
         motor_enabler: &mut dyn MotorEnabler,
-        logger: &dyn Logger,
+        logger: &mut LOG,
     );
-    fn update(
+    fn update<LOG: Logger>(
         &mut self,
         iomanager: &mut dyn IOManager,
         call_time: Microseconds<u64>,
         event_queue: EventQueue,
-        logger: &mut dyn Logger,
+        logger: &mut LOG,
         command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError>;
-    fn exit(&mut self, call_time: Microseconds<u64>, logger: &dyn Logger);
+    fn exit<LOG: Logger>(&mut self, call_time: Microseconds<u64>, logger: &mut LOG);
 }

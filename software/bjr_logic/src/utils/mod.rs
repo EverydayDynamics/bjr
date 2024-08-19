@@ -1,5 +1,3 @@
-#![no_std]
-
 pub mod test_helper;
 
 use core::fmt::{self};

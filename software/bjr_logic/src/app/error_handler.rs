@@ -17,20 +17,20 @@ impl ErrorHandler {
     }
 }
 impl ErrorHandler {
-    pub fn panic<T: Display>(
+    pub fn panic<T: Display, LOG: Logger>(
         &mut self,
         error: T,
         motor_enabler: &mut dyn MotorEnabler,
-        log_device: &mut dyn Logger,
+        log_device: &mut LOG,
     ) {
         motor_enabler.set_enable(false);
         log_device.error(&error);
         panic!();
     }
-    pub fn handle_error<ERR: Severity + Display>(
+    pub fn handle_error<ERR: Severity + Display, LOG: Logger>(
         &mut self,
         motor_enabler: &mut dyn MotorEnabler,
-        log_device: &mut dyn Logger,
+        log_device: &mut LOG,
         error: ERR,
     ) {
         match error.get_severity() {

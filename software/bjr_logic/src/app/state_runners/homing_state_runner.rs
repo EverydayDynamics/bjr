@@ -77,22 +77,22 @@ impl HomingStateRunner {
     }
 }
 impl RunnableState for HomingStateRunner {
-    fn entry(
+    fn entry<LOG: Logger>(
         &mut self,
         _call_time: Microseconds<u64>,
         motor_enabler: &mut dyn MotorEnabler,
-        logger: &dyn Logger,
+        _logger: &mut LOG,
     ) {
         motor_enabler.set_enable(true);
         self.states = [HomingStateRunnerState::Default; MOTOR_NUM];
     }
 
-    fn update(
+    fn update<LOG: Logger>(
         &mut self,
         iomanager: &mut dyn IOManager,
         _call_time: Microseconds<u64>,
         event_queue: EventQueue,
-        logger: &mut dyn Logger,
+        logger: &mut LOG,
         _command: &StateRunnerCommand,
     ) -> Result<(), StateRunnerError> {
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
@@ -283,7 +283,7 @@ impl RunnableState for HomingStateRunner {
         retval
     }
 
-    fn exit(&mut self, _call_time: Microseconds<u64>, logger: &dyn Logger) {}
+    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, logger: &mut LOG) {}
 }
 #[cfg(test)]
 mod tests {

@@ -67,9 +67,9 @@ impl EventHandler {
             state: State::Off,
         }
     }
-    pub fn handle_events(
+    pub fn handle_events<LOG: Logger>(
         &mut self,
-        logger_device: &mut dyn Logger,
+        logger_device: &mut LOG,
     ) -> Result<State, EventHandlerError> {
         while let Some(event) = self.event_queue.dequeue() {
             logger_device.info(&str_to_display!("Event received: {}", event));

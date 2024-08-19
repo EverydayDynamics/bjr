@@ -1,4 +1,4 @@
-#[cfg(feature = "embedded")]
+#[cfg(all(feature = "embedded", feature = "defmt"))]
 pub mod defmt_logger;
 #[cfg(feature = "embedded")]
 pub mod gpio_button;

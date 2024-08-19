@@ -79,6 +79,7 @@ macro_rules! generate_parameter_types {
 
 
         }
+       #[allow(non_snake_case)]
         pub struct ParameterStorage {
             $(
                 pub $member: $atomic_type,

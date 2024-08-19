@@ -2,7 +2,6 @@ use crate::app::control_primitives::PlateState;
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::get_event_queue;
 use crate::app::parameter_manager::{
-    parameter_manager, FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed,
     ParameterList,
 };
 use crate::app::severity_trait::{ErrorSeverity, Severity};

@@ -1,15 +1,26 @@
 use bsp_traits::Logger;
 use core::fmt::Display;
+use defmt::Format;
 
 pub struct DefmtLogger {}
 impl Logger for DefmtLogger {
-    fn trace(&mut self, message: &dyn Display) {}
+    fn trace<T: Format>(&mut self, message: T) {
+        todo!()
+    }
 
-    fn debug(&mut self, message: &dyn Display) {}
+    fn debug<T: Format>(&mut self, message: T) {
+        todo!()
+    }
 
-    fn info(&mut self, message: &dyn Display) {}
+    fn info<T: Format>(&mut self, message: T) {
+        todo!()
+    }
 
-    fn warn(&mut self, message: &dyn Display) {}
+    fn warn<T: Format>(&mut self, message: T) {
+        todo!()
+    }
 
-    fn error(&mut self, message: &dyn Display) {}
+    fn error<T: Format>(&mut self, message: T) {
+        todo!()
+    }
 }
