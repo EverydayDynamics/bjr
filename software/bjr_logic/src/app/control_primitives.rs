@@ -1,9 +1,11 @@
+use crate::app::parameter_manager::{
+    parameter_manager, FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed,
+};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 use embedded_time::duration::Microseconds;
-use core::ops::{Add, Sub, Mul, Div, Neg};
-use crate::app::parameter_manager::{FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed, parameter_manager};
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
-pub struct KinState{
+pub struct KinState {
     pub pos: f32,
     pub speed: f32,
     pub accel: f32,
@@ -41,7 +43,6 @@ impl Neg for KinState {
             speed: -self.speed,
             accel: -self.accel,
         }
-
     }
 }
 
@@ -72,38 +73,40 @@ impl Div<f32> for KinState {
 #[derive(Copy, Clone)]
 pub struct PlateState {
     pub height: KinState,
-    pub angle: [KinState;2],
+    pub angle: [KinState; 2],
 }
 impl PlateState {
-    pub fn new_with_default_sa(height:f32, alpha:f32, beta:f32) -> PlateState{
+    pub fn new_with_default_sa(height: f32, alpha: f32, beta: f32) -> PlateState {
         let default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
         let default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();
         let default_ang_speed = parameter_manager().get::<FFDefaultAngSpeed>();
         let default_ang_accel = parameter_manager().get::<FFDefaultAngAccel>();
-        PlateState{ height: KinState{
-            pos: height,
-            speed: default_lin_speed,
-            accel: default_lin_accel,
-        }, angle: [
-            KinState{
-                pos: alpha,
-                speed: default_ang_speed,
-                accel: default_ang_accel,
+        PlateState {
+            height: KinState {
+                pos: height,
+                speed: default_lin_speed,
+                accel: default_lin_accel,
             },
-            KinState{
-                pos: beta,
-                speed: default_ang_speed,
-                accel: default_ang_accel,
-            },
-
-        ] }
+            angle: [
+                KinState {
+                    pos: alpha,
+                    speed: default_ang_speed,
+                    accel: default_ang_accel,
+                },
+                KinState {
+                    pos: beta,
+                    speed: default_ang_speed,
+                    accel: default_ang_accel,
+                },
+            ],
+        }
     }
 }
 
 #[derive(Default)]
 pub struct PlateDelta {
     pub height: KinState,
-    pub angle: [KinState;2],
+    pub angle: [KinState; 2],
 }
 impl Add<PlateDelta> for PlateState {
     type Output = PlateState;
@@ -111,30 +114,24 @@ impl Add<PlateDelta> for PlateState {
     fn add(self, rhs: PlateDelta) -> Self::Output {
         Self {
             height: self.height + rhs.height,
-            angle: [self.angle[0]+rhs.angle[0],self.angle[1]+rhs.angle[1]],
+            angle: [self.angle[0] + rhs.angle[0], self.angle[1] + rhs.angle[1]],
         }
-
     }
 }
-pub struct ControlExecInputs{
-
-}
-pub struct ControlInputs{
-    pub ball_setpoint: [KinState;2],
+pub struct ControlExecInputs {}
+pub struct ControlInputs {
+    pub ball_setpoint: [KinState; 2],
     pub measured_plate_state: PlateState,
-    pub measured_ball_state: [KinState;2],
+    pub measured_ball_state: [KinState; 2],
 }
 
-pub struct TelemetryPacket{
-
-}
-pub enum BallPattern{
+pub struct TelemetryPacket {}
+pub enum BallPattern {
     CenterHold,
     Triangle,
     Circling,
 }
 pub trait Controller {
-
     fn reset(&mut self, call_time: Microseconds<u64>);
     fn update(&mut self, call_time: Microseconds<u64>, _inputs: ControlInputs) -> PlateState;
 }

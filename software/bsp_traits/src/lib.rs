@@ -31,7 +31,7 @@ pub struct MotorInput {
 pub trait StepperMotorController {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError>;
-    fn set_position(&mut self, new_position:i32) -> Result<(), StepperDeviceError>;
+    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError>;
 }
 
 pub struct Point {
@@ -49,21 +49,23 @@ pub enum TouchSensorError {
 
 #[cfg(not(feature = "defmt"))]
 impl core::fmt::Display for TouchSensorError {
-fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    match self {
-        TouchSensorError::CommunicationError(e) => write!(f, "Communication error: {}", e)
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            TouchSensorError::CommunicationError(e) => write!(f, "Communication error: {}", e),
+        }
     }
-}
 }
 #[cfg(feature = "defmt")]
 impl defmt::Format for TouchSensorError {
-fn format(&self, f: defmt::Formatter) {
-    match self {
-        TouchSensorError::CommunicationError(e) => defmt::write!(f, "Communication error: {}", e)
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            TouchSensorError::CommunicationError(e) => {
+                defmt::write!(f, "Communication error: {}", e)
+            }
+        }
     }
 }
-}
-pub trait Button{
+pub trait Button {
     fn is_pressed(&mut self) -> bool;
 }
 
@@ -83,10 +85,9 @@ pub trait Logger {
     fn error(&mut self, message: &dyn Display);
 }
 #[cfg(feature = "defmt")]
-pub trait Logger
-{
-    fn trace(&mut self, message: [&dyn defmt::Format;1]);
-    fn debug<T: defmt::Format>(&mut self, message: [&dyn defmt::Format;1]);
+pub trait Logger {
+    fn trace(&mut self, message: [&dyn defmt::Format; 1]);
+    fn debug<T: defmt::Format>(&mut self, message: [&dyn defmt::Format; 1]);
     fn info<T: defmt::Format>(&mut self, message: T);
     fn warn<T: defmt::Format>(&mut self, message: T);
     fn error<T: defmt::Format>(&mut self, message: T);
@@ -105,8 +106,12 @@ pub enum StepperMotorPhase {
 impl Display for StepperMotorPhase {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            StepperMotorPhase::A => {write!(f, "A")}
-            StepperMotorPhase::B => {write!(f, "B")}
+            StepperMotorPhase::A => {
+                write!(f, "A")
+            }
+            StepperMotorPhase::B => {
+                write!(f, "B")
+            }
         }
     }
 }
@@ -114,8 +119,12 @@ impl Display for StepperMotorPhase {
 impl defmt::Format for StepperMotorPhase {
     fn format(&self, f: defmt::Formatter) {
         match self {
-            StepperMotorPhase::A => {defmt::write!(f, "A")}
-            StepperMotorPhase::B => {defmt::write!(f, "B")}
+            StepperMotorPhase::A => {
+                defmt::write!(f, "A")
+            }
+            StepperMotorPhase::B => {
+                defmt::write!(f, "B")
+            }
         }
     }
 }
@@ -134,14 +143,30 @@ pub enum StepperDeviceError {
 impl Display for StepperDeviceError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            StepperDeviceError::CommunicationError(e) => {write!(f,"Communication error: {}", e)}
-            StepperDeviceError::SelfTestVersionMismatch => {write!(f,"Self Test version mismatch")}
-            StepperDeviceError::DriverError => {write!(f,"driver error")}
-            StepperDeviceError::UnexpectedReset => {write!(f,"Unexpected Reset")}
-            StepperDeviceError::InvalidParameter => {write!(f,"Invalid Parameter")}
-            StepperDeviceError::HardwareFailure => {write!(f,"Hardware Failure")}
-            StepperDeviceError::ShortToGround(ph) => {write!(f,"Phase {} shorted to ground", ph)}
-            StepperDeviceError::OverTemperatureShutdown => {write!(f,"Over temperature shutdown")}
+            StepperDeviceError::CommunicationError(e) => {
+                write!(f, "Communication error: {}", e)
+            }
+            StepperDeviceError::SelfTestVersionMismatch => {
+                write!(f, "Self Test version mismatch")
+            }
+            StepperDeviceError::DriverError => {
+                write!(f, "driver error")
+            }
+            StepperDeviceError::UnexpectedReset => {
+                write!(f, "Unexpected Reset")
+            }
+            StepperDeviceError::InvalidParameter => {
+                write!(f, "Invalid Parameter")
+            }
+            StepperDeviceError::HardwareFailure => {
+                write!(f, "Hardware Failure")
+            }
+            StepperDeviceError::ShortToGround(ph) => {
+                write!(f, "Phase {} shorted to ground", ph)
+            }
+            StepperDeviceError::OverTemperatureShutdown => {
+                write!(f, "Over temperature shutdown")
+            }
         }
     }
 }
@@ -149,14 +174,30 @@ impl Display for StepperDeviceError {
 impl defmt::Format for StepperDeviceError {
     fn format(&self, f: defmt::Formatter) {
         match self {
-            StepperDeviceError::CommunicationError(e) => {defmt::write!(f,"Communication error: {}", e)}
-            StepperDeviceError::SelfTestVersionMismatch => {defmt::write!(f,"Self Test version mismatch")}
-            StepperDeviceError::DriverError => {defmt::write!(f,"driver error")}
-            StepperDeviceError::UnexpectedReset => {defmt::write!(f,"Unexpected Reset")}
-            StepperDeviceError::InvalidParameter => {defmt::write!(f,"Invalid Parameter")}
-            StepperDeviceError::HardwareFailure => {defmt::write!(f,"Hardware Failure")}
-            StepperDeviceError::ShortToGround(ph) => {defmt::write!(f,"Phase {} shorted to ground", ph)}
-            StepperDeviceError::OverTemperatureShutdown => {defmt::write!(f,"Over temperature shutdown")}
+            StepperDeviceError::CommunicationError(e) => {
+                defmt::write!(f, "Communication error: {}", e)
+            }
+            StepperDeviceError::SelfTestVersionMismatch => {
+                defmt::write!(f, "Self Test version mismatch")
+            }
+            StepperDeviceError::DriverError => {
+                defmt::write!(f, "driver error")
+            }
+            StepperDeviceError::UnexpectedReset => {
+                defmt::write!(f, "Unexpected Reset")
+            }
+            StepperDeviceError::InvalidParameter => {
+                defmt::write!(f, "Invalid Parameter")
+            }
+            StepperDeviceError::HardwareFailure => {
+                defmt::write!(f, "Hardware Failure")
+            }
+            StepperDeviceError::ShortToGround(ph) => {
+                defmt::write!(f, "Phase {} shorted to ground", ph)
+            }
+            StepperDeviceError::OverTemperatureShutdown => {
+                defmt::write!(f, "Over temperature shutdown")
+            }
         }
     }
 }
@@ -175,30 +216,61 @@ pub enum CommsError {
 impl Display for CommsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            CommsError::SPIMutex => {write!(f,"CommsError SPIMutex")}
-            CommsError::SPICSPIn => {write!(f,"CommsError SPICSPIn")}
-            CommsError::SPIOverrun => {write!(f,"CommsError SPIOverrun")}
-            CommsError::SPICRIC => {write!(f,"CommsError SPICRIC")}
-            CommsError::SPIModeFault => {write!(f,"CommsError SPIModeFault")}
-            CommsError::SPIFrameFormat => {write!(f,"CommsError SPIFrameFormat")}
-            CommsError::NotImplemented => {write!(f,"CommsError NotImplemented")}
-            CommsError::Unknown => {write!(f,"CommsError Unknown")}
+            CommsError::SPIMutex => {
+                write!(f, "CommsError SPIMutex")
+            }
+            CommsError::SPICSPIn => {
+                write!(f, "CommsError SPICSPIn")
+            }
+            CommsError::SPIOverrun => {
+                write!(f, "CommsError SPIOverrun")
+            }
+            CommsError::SPICRIC => {
+                write!(f, "CommsError SPICRIC")
+            }
+            CommsError::SPIModeFault => {
+                write!(f, "CommsError SPIModeFault")
+            }
+            CommsError::SPIFrameFormat => {
+                write!(f, "CommsError SPIFrameFormat")
+            }
+            CommsError::NotImplemented => {
+                write!(f, "CommsError NotImplemented")
+            }
+            CommsError::Unknown => {
+                write!(f, "CommsError Unknown")
+            }
         }
     }
 }
 #[cfg(feature = "defmt")]
 impl defmt::Format for CommsError {
     fn format(&self, f: defmt::Formatter) {
-            match self {
-                CommsError::SPIMutex => {defmt::write!(f,"CommsError SPIMutex")}
-                CommsError::SPICSPIn => {defmt::write!(f,"CommsError SPICSPIn")}
-                CommsError::SPIOverrun => {defmt::write!(f,"CommsError SPIOverrun")}
-                CommsError::SPICRIC => {defmt::write!(f,"CommsError SPICRIC")}
-                CommsError::SPIModeFault => {defmt::write!(f,"CommsError SPIModeFault")}
-                CommsError::SPIFrameFormat => {defmt::write!(f,"CommsError SPIFrameFormat")}
-                CommsError::NotImplemented => {defmt::write!(f,"CommsError NotImplemented")}
-                CommsError::Unknown => {defmt::write!(f,"CommsError Unknown")}
+        match self {
+            CommsError::SPIMutex => {
+                defmt::write!(f, "CommsError SPIMutex")
             }
+            CommsError::SPICSPIn => {
+                defmt::write!(f, "CommsError SPICSPIn")
+            }
+            CommsError::SPIOverrun => {
+                defmt::write!(f, "CommsError SPIOverrun")
+            }
+            CommsError::SPICRIC => {
+                defmt::write!(f, "CommsError SPICRIC")
+            }
+            CommsError::SPIModeFault => {
+                defmt::write!(f, "CommsError SPIModeFault")
+            }
+            CommsError::SPIFrameFormat => {
+                defmt::write!(f, "CommsError SPIFrameFormat")
+            }
+            CommsError::NotImplemented => {
+                defmt::write!(f, "CommsError NotImplemented")
+            }
+            CommsError::Unknown => {
+                defmt::write!(f, "CommsError Unknown")
+            }
+        }
     }
 }
-

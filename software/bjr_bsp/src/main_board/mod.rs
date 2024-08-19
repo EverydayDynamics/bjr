@@ -1,7 +1,9 @@
-use core::cell::RefCell;
-use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError};
-use bsp_traits::StepperMotorController;
 use crate::boards::{BoardCreationError, BoardResources};
+use bsp_traits::StepperMotorController;
+use bsp_traits::{
+    Button, CommsError, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError,
+};
+use core::cell::RefCell;
 use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
 use stm32f4xx_hal as hal;
@@ -9,17 +11,17 @@ use stm32f4xx_hal::gpio::{Output, Pin, PinState};
 use stm32f4xx_hal::prelude::*;
 use stm32f4xx_hal::spi::{Phase, Polarity, Spi};
 
-use embedded_hal::spi::{Error, ErrorKind};
-use rtt_target::{ChannelMode, rtt_init};
-use stm32f4xx_hal::pac::SPI1;
-use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::devices::defmt_logger::DefmtLogger;
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
 use crate::devices::rtt_logger::RttLogger;
 use crate::devices::rtt_rw_interface::RttRWInterface;
 use crate::devices::tsc2046_touchscreen_dev::Tsc2046TouchDev;
+use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::utils::error_wrapper::ErrorWrapper;
-use crate::utils::spidev::{Spidev, SpiDevError};
+use crate::utils::spidev::{SpiDevError, Spidev};
+use embedded_hal::spi::{Error, ErrorKind};
+use rtt_target::{rtt_init, ChannelMode};
+use stm32f4xx_hal::pac::SPI1;
 
 // global logger
 pub struct MyBoard {
@@ -40,13 +42,15 @@ pub struct InfallibleResources {
 }
 pub struct FallibleResources {
     pub button: GpioButton<Pin<'C', 13>>,
-    pub stp_motor_drive_a: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B',4>>,
-    pub stp_motor_drive_b: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B', 5>>,
-    pub stp_motor_drive_c: TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A',10>>,
+    pub stp_motor_drive_a:
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B', 4>>,
+    pub stp_motor_drive_b:
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B', 5>>,
+    pub stp_motor_drive_c:
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A', 10>>,
 }
 
-static GUARDED_SPI: Mutex<RefCell<Option<Spi<SPI1>>>> =
-    Mutex::new(RefCell::new(None));
+static GUARDED_SPI: Mutex<RefCell<Option<Spi<SPI1>>>> = Mutex::new(RefCell::new(None));
 impl MyBoard {
     pub fn new() -> Self {
         let dp = hal::pac::Peripherals::take().expect("cannot take peripherals");
@@ -66,7 +70,10 @@ impl MyBoard {
         let motor_enabler_pin = gpiob.pb7.into_push_pull_output_in_state(PinState::Low);
         let spi = dp.SPI1.spi(
             (gpioa.pa5, gpioa.pa6, gpioa.pa7),
-            hal::spi::Mode { polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition },
+            hal::spi::Mode {
+                polarity: Polarity::IdleLow,
+                phase: Phase::CaptureOnFirstTransition,
+            },
             2000.kHz(),
             &clocks,
         );
@@ -85,43 +92,58 @@ impl MyBoard {
     }
 }
 impl BoardResources for MyBoard {
-
-    type MotorEnabler =  GPIOMotorEnabler<Pin<'B', 7, Output>>;
-    type LogDevice =  RttLogger;
+    type MotorEnabler = GPIOMotorEnabler<Pin<'B', 7, Output>>;
+    type LogDevice = RttLogger;
     type Button = GpioButton<Pin<'C', 13>>;
-    type StepperDriveA = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B',4>>;
-    type StepperDriveB = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B',5>>;
-    type StepperDriveC = TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A',10>>;
+    type StepperDriveA =
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'B', 6, Output>>, Pin<'B', 4>>;
+    type StepperDriveB =
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'C', 7, Output>>, Pin<'B', 5>>;
+    type StepperDriveC =
+        TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A', 10>>;
     type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
     type MenuIO = RttRWInterface;
 
-    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO) {
         let channels = rtt_init! {
-        up: {
-            0: {
-                size: 512,
-                mode: ChannelMode::BlockIfFull,
-                name: "Menu output"
+            up: {
+                0: {
+                    size: 512,
+                    mode: ChannelMode::BlockIfFull,
+                    name: "Menu output"
+                }
+                1: {
+                    size: 1024,
+                    mode: ChannelMode::BlockIfFull,
+                    name: "Log output"
+                }
             }
-            1: {
-                size: 1024,
-                mode: ChannelMode::BlockIfFull,
-                name: "Log output"
+            down: {
+                0: {
+                    size: 512,
+                    mode: ChannelMode::BlockIfFull,
+                    name: "Menu Input"
+                }
             }
-        }
-        down: {
-            0: {
-                size: 512,
-                mode: ChannelMode::BlockIfFull,
-                name: "Menu Input"
-            }
-        }
-    };
-        (GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()), RttLogger::new(channels.up.1), RttRWInterface::new(channels.up.0, channels.down.0))
+        };
+        (
+            GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()),
+            RttLogger::new(channels.up.1),
+            RttRWInterface::new(channels.up.0, channels.down.0),
+        )
     }
-    fn get_fallible_resources(&mut self) -> Result<
-        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
-        BoardCreationError> {
+    fn get_fallible_resources(
+        &mut self,
+    ) -> Result<
+        (
+            Self::Button,
+            Self::StepperDriveA,
+            Self::StepperDriveB,
+            Self::StepperDriveC,
+            Self::TouchSensor,
+        ),
+        BoardCreationError,
+    > {
         let mut button = GpioButton::new(self.button_pin.take().unwrap());
         //let a: Result<(), Error> = spi.read();
         let spi = self.spi1.take().unwrap();
@@ -143,10 +165,14 @@ impl BoardResources for MyBoard {
         let mot_b_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_b_pin);
         let mot_c_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_c_pin);
         let touch_sense_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_touch_sense_pin);
-        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device, mot_a_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 0))?;
-        let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device, mot_b_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 1))?;
-        let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device, mot_c_lim_pin).map_err(|e|BoardCreationError::StepperDriveInitError(e, 2))?;
-        let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device).map_err(|e|BoardCreationError::TouchSensorInitError(e))?;
+        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device, mot_a_lim_pin)
+            .map_err(|e| BoardCreationError::StepperDriveInitError(e, 0))?;
+        let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device, mot_b_lim_pin)
+            .map_err(|e| BoardCreationError::StepperDriveInitError(e, 1))?;
+        let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device, mot_c_lim_pin)
+            .map_err(|e| BoardCreationError::StepperDriveInitError(e, 2))?;
+        let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device)
+            .map_err(|e| BoardCreationError::TouchSensorInitError(e))?;
         Ok((
             button,
             stp_motor_drive_a,
@@ -157,9 +183,6 @@ impl BoardResources for MyBoard {
     }
 }
 
-
-
-
 impl<SPI, PIN> From<ErrorWrapper<SpiDevError<SPI, PIN>>> for StepperDeviceError
 where
     SPI: embedded_hal::spi::SpiBus,
@@ -167,18 +190,17 @@ where
 {
     fn from(wrapper: ErrorWrapper<SpiDevError<SPI, PIN>>) -> StepperDeviceError {
         let comms_err = match wrapper.0 {
-            SpiDevError::SPIError(spie) => {
-                match spie.kind() {
-                    ErrorKind::Overrun => {CommsError::SPIOverrun}
-                    ErrorKind::ModeFault => {CommsError::SPIModeFault}
-                    ErrorKind::FrameFormat => {CommsError::SPIFrameFormat}
-                    ErrorKind::ChipSelectFault => {CommsError::SPICSPIn}
-                    ErrorKind::Other => {CommsError::Unknown}
-                    _ => {CommsError::Unknown}
-                }}
-            SpiDevError::CSPinError(_) => {CommsError::SPICSPIn}
-            SpiDevError::MutexError => {CommsError::SPIMutex}
-            SpiDevError::NotImplemented => {CommsError::NotImplemented}
+            SpiDevError::SPIError(spie) => match spie.kind() {
+                ErrorKind::Overrun => CommsError::SPIOverrun,
+                ErrorKind::ModeFault => CommsError::SPIModeFault,
+                ErrorKind::FrameFormat => CommsError::SPIFrameFormat,
+                ErrorKind::ChipSelectFault => CommsError::SPICSPIn,
+                ErrorKind::Other => CommsError::Unknown,
+                _ => CommsError::Unknown,
+            },
+            SpiDevError::CSPinError(_) => CommsError::SPICSPIn,
+            SpiDevError::MutexError => CommsError::SPIMutex,
+            SpiDevError::NotImplemented => CommsError::NotImplemented,
         };
         StepperDeviceError::CommunicationError(comms_err)
     }
@@ -190,31 +212,28 @@ where
 {
     fn from(value: ErrorWrapper<SpiDevError<SPI, PIN>>) -> Self {
         match value.0 {
-            SpiDevError::SPIError(spie) => {
-                match spie.kind() {
-                    ErrorKind::Overrun => {CommsError::SPIOverrun}
-                    ErrorKind::ModeFault => {CommsError::SPIModeFault}
-                    ErrorKind::FrameFormat => {CommsError::SPIFrameFormat}
-                    ErrorKind::ChipSelectFault => {CommsError::SPICSPIn}
-                    ErrorKind::Other => {CommsError::Unknown}
-                    _ => {CommsError::Unknown}
-                }}
-            SpiDevError::CSPinError(_) => {CommsError::SPICSPIn}
-            SpiDevError::MutexError => {CommsError::SPIMutex}
-            SpiDevError::NotImplemented => {CommsError::NotImplemented}
+            SpiDevError::SPIError(spie) => match spie.kind() {
+                ErrorKind::Overrun => CommsError::SPIOverrun,
+                ErrorKind::ModeFault => CommsError::SPIModeFault,
+                ErrorKind::FrameFormat => CommsError::SPIFrameFormat,
+                ErrorKind::ChipSelectFault => CommsError::SPICSPIn,
+                ErrorKind::Other => CommsError::Unknown,
+                _ => CommsError::Unknown,
+            },
+            SpiDevError::CSPinError(_) => CommsError::SPICSPIn,
+            SpiDevError::MutexError => CommsError::SPIMutex,
+            SpiDevError::NotImplemented => CommsError::NotImplemented,
         }
     }
 }
-impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error>
-{
+impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error> {
     fn into(self) -> CommsError {
         CommsError::NotImplemented
     }
 }
 pub struct Dummy {}
 impl MotorEnabler for Dummy {
-    fn set_enable(&mut self, enable: bool) {
-    }
+    fn set_enable(&mut self, enable: bool) {}
 }
 impl StepperMotorController for Dummy {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
@@ -222,7 +241,7 @@ impl StepperMotorController for Dummy {
     }
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
-        Ok(MotorState{
+        Ok(MotorState {
             velocity: 0,
             position: 0,
             limit_reached: false,
@@ -246,7 +265,7 @@ impl Reader for Dummy {
         0
     }
 }
-impl core::fmt::Write for Dummy{
+impl core::fmt::Write for Dummy {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         Ok(())
     }

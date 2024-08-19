@@ -1,1 +1,1 @@
-pub const MOTOR_NUM:usize = 3;
+pub const MOTOR_NUM: usize = 3;

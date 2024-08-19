@@ -1,8 +1,6 @@
 use crate::app::control_primitives::KinState;
 use embedded_time::duration::*;
-pub struct BallpathGenerator {
-
-}
+pub struct BallpathGenerator {}
 impl Default for BallpathGenerator {
     fn default() -> Self {
         Self::new()
@@ -11,12 +9,9 @@ impl Default for BallpathGenerator {
 
 impl BallpathGenerator {
     pub fn new() -> Self {
-        BallpathGenerator{}
+        BallpathGenerator {}
     }
-    pub fn get_setpoint(&mut self, _time: Microseconds) -> [KinState;2]{
+    pub fn get_setpoint(&mut self, _time: Microseconds) -> [KinState; 2] {
         todo!()
     }
 }
-
-
-

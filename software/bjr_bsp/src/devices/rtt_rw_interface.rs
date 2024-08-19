@@ -1,5 +1,5 @@
-use core::fmt::Write;
 use bsp_traits::Reader;
+use core::fmt::Write;
 use rtt_target;
 use rtt_target::{DownChannel, UpChannel};
 
@@ -9,7 +9,10 @@ pub struct RttRWInterface {
 }
 impl RttRWInterface {
     pub fn new(up_channel: UpChannel, down_channel: DownChannel) -> RttRWInterface {
-        RttRWInterface{ up_channel, down_channel }
+        RttRWInterface {
+            up_channel,
+            down_channel,
+        }
     }
 }
 impl Write for RttRWInterface {

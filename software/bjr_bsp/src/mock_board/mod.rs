@@ -1,18 +1,20 @@
+use crate::boards::{BoardCreationError, BoardResources};
+use bsp_traits::StepperMotorController;
+use bsp_traits::{
+    Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, Point, Reader,
+    StepperDeviceError, TouchSensor, TouchSensorError,
+};
 use core::fmt::Display;
+use log;
 use std::io;
 use std::io::{Read, Write};
-use bsp_traits::{Button, CommsError, MotorEnabler, MotorInput, MotorState, StepperDeviceError, Logger, Reader, TouchSensor, Point, TouchSensorError};
-use bsp_traits::StepperMotorController;
-use crate::boards::{BoardCreationError, BoardResources};
-use log;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::TryRecvError;
 use std::{thread, time};
 
 // global logger
-pub struct MockBoard {
-}
+pub struct MockBoard {}
 pub struct InfallibleResources {
     pub motor_enabler: Dummy,
     pub log_device: NativeLogger,
@@ -24,8 +26,7 @@ pub struct FallibleResources {
     pub stp_motor_drive_c: Dummy,
 }
 
-impl BoardResources for MockBoard{
-
+impl BoardResources for MockBoard {
     type MotorEnabler = Dummy;
     type LogDevice = NativeLogger;
     type Button = Dummy;
@@ -35,14 +36,23 @@ impl BoardResources for MockBoard{
     type TouchSensor = Dummy;
     type MenuIO = NativeIO;
 
-    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO){
+    fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO) {
         env_logger::init();
-        (Dummy{}, NativeLogger{}, NativeIO::new())
+        (Dummy {}, NativeLogger {}, NativeIO::new())
     }
-    fn get_fallible_resources(&mut self) -> Result<
-        (Self::Button, Self::StepperDriveA, Self::StepperDriveB, Self::StepperDriveC, Self::TouchSensor),
-        BoardCreationError> {
-        Ok((Dummy{},Dummy{},Dummy{},Dummy{}, Dummy{}))
+    fn get_fallible_resources(
+        &mut self,
+    ) -> Result<
+        (
+            Self::Button,
+            Self::StepperDriveA,
+            Self::StepperDriveB,
+            Self::StepperDriveC,
+            Self::TouchSensor,
+        ),
+        BoardCreationError,
+    > {
+        Ok((Dummy {}, Dummy {}, Dummy {}, Dummy {}, Dummy {}))
     }
 }
 impl MockBoard {
@@ -53,8 +63,7 @@ impl MockBoard {
 
 pub struct Dummy {}
 impl MotorEnabler for Dummy {
-    fn set_enable(&mut self, enable: bool) {
-    }
+    fn set_enable(&mut self, enable: bool) {}
 }
 impl StepperMotorController for Dummy {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
@@ -62,7 +71,7 @@ impl StepperMotorController for Dummy {
     }
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
-        Ok(MotorState{
+        Ok(MotorState {
             velocity: 0,
             position: 0,
             limit_reached: false,
@@ -71,7 +80,9 @@ impl StepperMotorController for Dummy {
             standstill: false,
         })
     }
-    fn set_position(&mut self, new_position:i32) -> Result<(), StepperDeviceError> {todo!()}
+    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
+        todo!()
+    }
 }
 impl Button for Dummy {
     fn is_pressed(&mut self) -> bool {
@@ -85,7 +96,6 @@ impl TouchSensor for Dummy {
 }
 pub struct NativeLogger {}
 impl Logger for NativeLogger {
-
     fn trace(&mut self, message: &dyn Display) {
         log::trace!("{}", message);
     }
@@ -107,20 +117,18 @@ impl Logger for NativeLogger {
     }
 }
 pub struct NativeIO {
-    stdin_channel: Receiver<u8>
+    stdin_channel: Receiver<u8>,
 }
 impl NativeIO {
     pub fn new() -> NativeIO {
         let stdin_channel = spawn_stdin_channel();
-        NativeIO {
-            stdin_channel,
-        }
+        NativeIO { stdin_channel }
     }
 }
 fn spawn_stdin_channel() -> Receiver<u8> {
     let (tx, rx) = mpsc::channel::<u8>();
     thread::spawn(move || loop {
-        let mut buffer = [0u8;1];
+        let mut buffer = [0u8; 1];
         io::stdin().read_exact(&mut buffer).unwrap();
         tx.send(buffer[0]).unwrap();
     });
@@ -129,11 +137,11 @@ fn spawn_stdin_channel() -> Receiver<u8> {
 
 impl Reader for NativeIO {
     fn read(&mut self, buf: &mut [u8]) -> usize {
-        let mut received_chars= 0;
-        while  received_chars < buf.len(){
+        let mut received_chars = 0;
+        while received_chars < buf.len() {
             if let Ok(key) = self.stdin_channel.try_recv() {
                 buf[received_chars] = key;
-                received_chars+=1;
+                received_chars += 1;
             } else {
                 break;
             }
@@ -141,10 +149,9 @@ impl Reader for NativeIO {
         received_chars
     }
 }
-impl core::fmt::Write for NativeIO{
+impl core::fmt::Write for NativeIO {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         io::stdout().write(s.as_ref()).unwrap();
         Ok(())
     }
 }
-

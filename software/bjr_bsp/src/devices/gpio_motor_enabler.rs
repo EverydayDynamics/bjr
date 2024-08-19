@@ -1,9 +1,9 @@
+use crate::devices::gpio_button::GpioButton;
 use bsp_traits::MotorEnabler;
 use embedded_hal::digital::OutputPin;
-use crate::devices::gpio_button::GpioButton;
 
 pub struct GPIOMotorEnabler<PIN> {
-    pin: PIN
+    pin: PIN,
 }
 impl<PIN> GPIOMotorEnabler<PIN>
 where
@@ -21,10 +21,8 @@ where
     fn set_enable(&mut self, enable: bool) {
         if enable {
             self.pin.set_high().unwrap();
-
         } else {
             self.pin.set_low().unwrap();
-
         }
     }
 }

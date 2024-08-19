@@ -1,5 +1,8 @@
+use bsp_traits::{
+    Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TouchSensor,
+    TouchSensorError,
+};
 use core::fmt::{Debug, Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TouchSensor, TouchSensorError};
 use core::result::Result;
 
 pub trait BoardResources {
@@ -16,15 +19,20 @@ pub trait BoardResources {
     type MenuIO: core::fmt::Write + Reader;
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO);
 
-    fn get_fallible_resources(&mut self) -> Result<
-    (Self::Button,
-     Self::StepperDriveA,
-     Self::StepperDriveB,
-     Self::StepperDriveC,
-     Self::TouchSensor,
-    ),
-    BoardCreationError>;
-}pub enum BoardCreationError{
+    fn get_fallible_resources(
+        &mut self,
+    ) -> Result<
+        (
+            Self::Button,
+            Self::StepperDriveA,
+            Self::StepperDriveB,
+            Self::StepperDriveC,
+            Self::TouchSensor,
+        ),
+        BoardCreationError,
+    >;
+}
+pub enum BoardCreationError {
     StepperDriveInitError(StepperDeviceError, usize),
     TouchSensorInitError(TouchSensorError),
 }
@@ -32,10 +40,18 @@ impl Display for BoardCreationError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             BoardCreationError::StepperDriveInitError(err, idx) => {
-                write!(f,"BoardCreationError Stepper drive initialization error: {}, idx: {}", err, idx)
+                write!(
+                    f,
+                    "BoardCreationError Stepper drive initialization error: {}, idx: {}",
+                    err, idx
+                )
             }
             BoardCreationError::TouchSensorInitError(err) => {
-                write!(f,"BoardCreationError Touch sensor initialization error: {}", err)
+                write!(
+                    f,
+                    "BoardCreationError Touch sensor initialization error: {}",
+                    err
+                )
             }
         }
     }

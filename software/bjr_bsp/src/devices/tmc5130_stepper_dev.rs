@@ -1,8 +1,11 @@
-use bsp_traits::{MotorState, StepperMotorController, StepperDeviceError, MotorInput, MotorMode, StepperMotorPhase};
-use tmc5130::{reg, Tmc5130};
-use tmc5130::reg::{DRV_STATUS, IOIN};
-use tmc5130::reg::XACTUAL;
 use crate::utils::error_wrapper::ErrorWrapper;
+use bsp_traits::{
+    MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController,
+    StepperMotorPhase,
+};
+use tmc5130::reg::XACTUAL;
+use tmc5130::reg::{DRV_STATUS, IOIN};
+use tmc5130::{reg, Tmc5130};
 
 pub struct TMC5130StepperDev<SPI, PIN> {
     dev_driver: Tmc5130<SPI>,
@@ -10,22 +13,28 @@ pub struct TMC5130StepperDev<SPI, PIN> {
     map: reg::Map,
 }
 
-
 impl<SPI, PIN> TMC5130StepperDev<SPI, PIN>
-where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
-      SPI: embedded_hal::spi::SpiDevice,
+where
+    StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
+    SPI: embedded_hal::spi::SpiDevice,
     PIN: embedded_hal::digital::InputPin,
 {
-    fn get_error_from_spistatus(&mut self, status: reg::SPISTATUS) -> Result<(),StepperDeviceError>{
+    fn get_error_from_spistatus(
+        &mut self,
+        status: reg::SPISTATUS,
+    ) -> Result<(), StepperDeviceError> {
         if status.driver_error() {
-            let (status,read_drv_status) = self.dev_driver.read_register::<DRV_STATUS>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+            let (status, read_drv_status) = self
+                .dev_driver
+                .read_register::<DRV_STATUS>()
+                .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
             if read_drv_status.s2ga() {
                 Err(StepperDeviceError::ShortToGround(StepperMotorPhase::A))
             } else if read_drv_status.s2gb() {
                 Err(StepperDeviceError::ShortToGround(StepperMotorPhase::B))
             } else if read_drv_status.ot() {
                 Err(StepperDeviceError::OverTemperatureShutdown)
-            }else{
+            } else {
                 Ok(())
             }
         } else if status.reset_flag() {
@@ -34,25 +43,33 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
             Ok(())
         }
     }
-    fn clear_status_flags(&mut self)-> Result<(),StepperDeviceError>{
-        let (_,gstat) = self.dev_driver.read_register::<reg::GSTAT>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
-        let (_,gstat) = self.dev_driver.read_register::<reg::GSTAT>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+    fn clear_status_flags(&mut self) -> Result<(), StepperDeviceError> {
+        let (_, gstat) = self
+            .dev_driver
+            .read_register::<reg::GSTAT>()
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        let (_, gstat) = self
+            .dev_driver
+            .read_register::<reg::GSTAT>()
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         Ok(())
     }
-    fn self_test(&mut self)-> Result<(),StepperDeviceError>{
+    fn self_test(&mut self) -> Result<(), StepperDeviceError> {
         const EXPECTED_IOIN_VERSION: u16 = 17;
 
-        let (status,read_ioin) = self.dev_driver.read_register::<IOIN>().map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        let (status, read_ioin) = self
+            .dev_driver
+            .read_register::<IOIN>()
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         self.get_error_from_spistatus(status)?;
         *self.map.ioin_mut() = read_ioin;
         if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
             Err(StepperDeviceError::SelfTestVersionMismatch)
-        }else {
+        } else {
             Ok(())
         }
-
     }
-    fn initial_register_set(&mut self)-> Result<(),StepperDeviceError> {
+    fn initial_register_set(&mut self) -> Result<(), StepperDeviceError> {
         self.map.chopconf_mut().set_toff(3);
         self.map.chopconf_mut().set_hstrt(4);
         self.map.chopconf_mut().set_hend(1);
@@ -99,13 +116,15 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
             tmc5130::Action::write(self.map.state(reg::Address::XACTUAL)),
         ];
 
-        let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        let status = self
+            .dev_driver
+            .bulk_register_action(&mut actions)
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         Ok(())
-
     }
-    pub fn new(spi:SPI, limit_pin: PIN)->Result<Self, StepperDeviceError> {
-        let dev_driver= Tmc5130::new(spi);
-        let mut stepper_device = TMC5130StepperDev{
+    pub fn new(spi: SPI, limit_pin: PIN) -> Result<Self, StepperDeviceError> {
+        let dev_driver = Tmc5130::new(spi);
+        let mut stepper_device = TMC5130StepperDev {
             dev_driver,
             limit_pin,
             map: reg::Map::default(),
@@ -122,9 +141,10 @@ const RAMPMODE_VEL_MODE_NEG: u8 = 2;
 const RAMPMODE_HOLD: u8 = 3;
 
 impl<SPI, PIN> StepperMotorController for TMC5130StepperDev<SPI, PIN>
-where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
-      SPI: embedded_hal::spi::SpiDevice,
-      PIN: embedded_hal::digital::InputPin,
+where
+    StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType>::Error>>,
+    SPI: embedded_hal::spi::SpiDevice,
+    PIN: embedded_hal::digital::InputPin,
 {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
         let vel_abs = inputs.velocity.abs() as u32;
@@ -141,7 +161,7 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
                 self.map.rampmode_mut().set(RAMPMODE_POS_MODE);
             }
             MotorMode::VelocityCtrl => {
-                if inputs.velocity <0 {
+                if inputs.velocity < 0 {
                     self.map.rampmode_mut().set(RAMPMODE_VEL_MODE_NEG);
                 } else {
                     self.map.rampmode_mut().set(RAMPMODE_VEL_MODE_POS);
@@ -161,26 +181,31 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
             tmc5130::Action::write(self.map.state(reg::Address::A1)),
             tmc5130::Action::write(self.map.state(reg::Address::XTARGET)),
         ];
-        let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        let status = self
+            .dev_driver
+            .bulk_register_action(&mut actions)
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         self.get_error_from_spistatus(status)?;
         self.map.drv_status_mut().0 = drv_status_binding.into();
         Ok(())
     }
 
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError> {
-
         let mut vactual_binding = reg::State::VACTUAL(Default::default());
         let mut xactual_binding = reg::State::XACTUAL(Default::default());
         let mut actions = [
             tmc5130::Action::read(&mut xactual_binding),
             tmc5130::Action::read(&mut vactual_binding),
         ];
-        let status = self.dev_driver.bulk_register_action(&mut actions).map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        let status = self
+            .dev_driver
+            .bulk_register_action(&mut actions)
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
 
         self.get_error_from_spistatus(status)?;
         *self.map.vactual_mut() = *vactual_binding.reg().unwrap();
         *self.map.xactual_mut() = *xactual_binding.reg().unwrap();
-        Ok(MotorState{
+        Ok(MotorState {
             velocity: self.map.vactual().get(),
             position: self.map.xactual().get(),
             limit_reached: self.limit_pin.is_low().unwrap(),
@@ -192,7 +217,10 @@ where StepperDeviceError: From<ErrorWrapper<<SPI as embedded_hal::spi::ErrorType
 
     fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
         self.map.xactual_mut().set(new_position);
-        let status = self.dev_driver.write_register(*self.map.xactual()).map_err(|e|StepperDeviceError::from(ErrorWrapper(e)))?;
+        let status = self
+            .dev_driver
+            .write_register(*self.map.xactual())
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         self.get_error_from_spistatus(status)?;
         Ok(())
     }

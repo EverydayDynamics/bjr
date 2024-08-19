@@ -26,4 +26,3 @@ unsafe fn HardFault(_frame: &cortex_m_rt::ExceptionFrame) -> ! {
         debug::exit(debug::EXIT_FAILURE);
     }
 }
-

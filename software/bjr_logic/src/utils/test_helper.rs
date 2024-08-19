@@ -1,12 +1,12 @@
 #[cfg(test)]
 pub mod bsp_mocks {
-    use bsp_traits::{TouchSensor, Point, TouchSensorError, MotorEnabler, Logger};
-    use mockall::mock;
-    use core::fmt::Display;
-    use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
-    use embedded_time::duration::*;
-    use crate::app::motor_handler::{ControlMode, MotorStatus};
     use crate::app::control_primitives::KinState;
+    use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
+    use crate::app::motor_handler::{ControlMode, MotorStatus};
+    use bsp_traits::{Logger, MotorEnabler, Point, TouchSensor, TouchSensorError};
+    use core::fmt::Display;
+    use embedded_time::duration::*;
+    use mockall::mock;
 
     mock! {
         pub TouchSensor {}

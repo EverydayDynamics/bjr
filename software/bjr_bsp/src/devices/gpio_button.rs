@@ -1,12 +1,12 @@
-use embedded_hal::digital::InputPin;
 use bsp_traits::Button;
+use embedded_hal::digital::InputPin;
 pub struct GpioButton<PIN> {
     pub(crate) pin: PIN,
 }
 
 impl<PIN> GpioButton<PIN>
-    where
-        PIN: InputPin,
+where
+    PIN: InputPin,
 {
     pub fn new(pin: PIN) -> Self {
         GpioButton { pin }
@@ -14,8 +14,8 @@ impl<PIN> GpioButton<PIN>
 }
 
 impl<PIN> Button for GpioButton<PIN>
-    where
-        PIN: InputPin,
+where
+    PIN: InputPin,
 {
     fn is_pressed(&mut self) -> bool {
         // Assuming the button is connected in a pull-up configuration

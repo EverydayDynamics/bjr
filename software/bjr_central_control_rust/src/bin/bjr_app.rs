@@ -14,40 +14,40 @@ peripherals = false,
 dispatchers = [SPI2]
 )]
 mod app {
-    use stm32f4xx_hal::{
-        prelude::*,
-    };
-    use rtic_monotonics::stm32::fugit::Instant;
-    use core::fmt::{Display, Formatter, Write};
     use bjr_bsp;
-    use bjr_bsp::Board;
     use bjr_bsp::boards::{BoardCreationError, BoardResources};
+    use bjr_bsp::Board;
     use bjr_builder::build_application;
+    use bjr_logic::app::menu_handler::MenuContext;
     use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
     use bsp_traits::StepperMotorController;
+    use core::fmt::{Display, Formatter, Write};
+    use embedded_time::duration::*;
     use rtic_monotonics;
+    use rtic_monotonics::stm32::fugit::Instant;
+    use rtic_monotonics::stm32::Tim2 as Mono;
     use rtic_monotonics::stm32::*;
     use rtic_monotonics::Monotonic;
-    use embedded_time::duration::*;
-    use rtic_monotonics::stm32::Tim2 as Mono;
-    use bjr_logic::app::menu_handler::MenuContext;
+    use stm32f4xx_hal::prelude::*;
 
     pub enum AppError {
-        SetupError(BoardCreationError)
+        SetupError(BoardCreationError),
     }
-    impl Severity for AppError {fn get_severity(&self) -> ErrorSeverity {
-        match self{
-            AppError::SetupError(_) => { ErrorSeverity::Panic }
+    impl Severity for AppError {
+        fn get_severity(&self) -> ErrorSeverity {
+            match self {
+                AppError::SetupError(_) => ErrorSeverity::Panic,
+            }
         }
     }
-
-    }
-    impl Display for AppError {fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        match self{
-            AppError::SetupError(bce) => { write!(f,"ApplicationError, Board initialization failed: {}", bce) }
+    impl Display for AppError {
+        fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+            match self {
+                AppError::SetupError(bce) => {
+                    write!(f, "ApplicationError, Board initialization failed: {}", bce)
+                }
+            }
         }
-    }
-
     }
     // Shared resources go here
     #[shared]
@@ -57,19 +57,16 @@ mod app {
 
     // Local resources go here
     #[local]
-    struct Local {
-    }
+    struct Local {}
     #[init]
     fn init(cx: init::Context) -> (Shared, Local) {
-
         task1::spawn().unwrap();
         (
-                    Shared {
+            Shared {
                         // Initialization of shared resources go here
                     },
-                    Local {
-                    },
-                )
+            Local {},
+        )
     }
 
     // Optional idle, can be removed if not needed.
@@ -86,16 +83,17 @@ mod app {
         let mut board = Board::new();
         let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
         let timer_clock_hz = 75_000_000; // ??????????????????????????????
-        // Start the monotonic
+                                         // Start the monotonic
         Mono::start(timer_clock_hz, token);
         let mut menu_context = MenuContext::default();
 
         let mut logic_runner = build_application(&mut board, &mut menu_context);
-            loop {
-                let now = Mono::now().ticks();
-                let next_run = logic_runner.update(Microseconds(now));
-                let baba: Instant<u64, 1, 1000000> = Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
-                Mono::delay_until(baba).await;
-            }
+        loop {
+            let now = Mono::now().ticks();
+            let next_run = logic_runner.update(Microseconds(now));
+            let baba: Instant<u64, 1, 1000000> =
+                Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
+            Mono::delay_until(baba).await;
+        }
     }
 }

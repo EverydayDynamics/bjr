@@ -1,27 +1,29 @@
+use crate::app::parameter_manager::{
+    parameter_manager, MotorLowerPosLimit, MotorLowerVelLimit, MotorUpperPosLimit,
+    MotorUpperVelLimit, ParameterType,
+};
 use core::fmt::{Display, Formatter};
-use crate::app::parameter_manager::{MotorLowerPosLimit, MotorLowerVelLimit, MotorUpperPosLimit, MotorUpperVelLimit, parameter_manager, ParameterType};
 
-pub struct LimitChecker {
-}
+pub struct LimitChecker {}
 #[derive(PartialEq, Copy, Clone)]
-pub struct LimitReport<T>{
+pub struct LimitReport<T> {
     limit: T,
     value: T,
 }
 #[cfg(not(feature = "defmt"))]
 impl<T: Display> Display for LimitReport<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f,"LimitReport limit:{}, value: {}", self.limit, self.value)
+        write!(f, "LimitReport limit:{}, value: {}", self.limit, self.value)
     }
 }
 #[cfg(feature = "defmt")]
 impl<T: defmt::Format> defmt::Format for LimitReport<T> {
     fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f,"LimitReport limit:{}, value: {}", self.limit, self.value)
+        defmt::write!(f, "LimitReport limit:{}, value: {}", self.limit, self.value)
     }
 }
 #[derive(PartialEq, Copy, Clone)]
-pub enum LimitError<T>{
+pub enum LimitError<T> {
     OverLimit(LimitReport<T>),
     UnderLimit(LimitReport<T>),
 }
@@ -29,8 +31,12 @@ pub enum LimitError<T>{
 impl<T: Display> Display for LimitError<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            LimitError::OverLimit(lr) => {write!(f,"LimitError Over limit: {}", lr)}
-            LimitError::UnderLimit(lr) => {write!(f,"LimitError Under limit: {}", lr)}
+            LimitError::OverLimit(lr) => {
+                write!(f, "LimitError Over limit: {}", lr)
+            }
+            LimitError::UnderLimit(lr) => {
+                write!(f, "LimitError Under limit: {}", lr)
+            }
         }
     }
 }
@@ -38,8 +44,12 @@ impl<T: Display> Display for LimitError<T> {
 impl<T: defmt::Format> defmt::Format for LimitError<T> {
     fn format(&self, f: defmt::Formatter) {
         match self {
-            LimitError::OverLimit(lr) => {defmt::write!(f,"LimitError Over limit: {}", lr)}
-            LimitError::UnderLimit(lr) => {defmt::write!(f,"LimitError Under limit: {}", lr)}
+            LimitError::OverLimit(lr) => {
+                defmt::write!(f, "LimitError Over limit: {}", lr)
+            }
+            LimitError::UnderLimit(lr) => {
+                defmt::write!(f, "LimitError Under limit: {}", lr)
+            }
         }
     }
 }
@@ -50,41 +60,44 @@ impl Default for LimitChecker {
 }
 
 impl LimitChecker {
-   pub fn new() -> LimitChecker {
-       LimitChecker{
-
-       }
-   }
+    pub fn new() -> LimitChecker {
+        LimitChecker {}
+    }
 }
 pub trait Limit<T>
 where
-    T: PartialOrd + Display
+    T: PartialOrd + Display,
 {
-    type UpperParam: ParameterType<ReturnType=T>;
-    type LowerParam: ParameterType<ReturnType=T>;
+    type UpperParam: ParameterType<ReturnType = T>;
+    type LowerParam: ParameterType<ReturnType = T>;
     fn enabled(&self) -> bool;
-    fn enable(&mut self, enable:bool);
-    fn check(&self,  value: T)-> Result<(),LimitError<T>> {
+    fn enable(&mut self, enable: bool);
+    fn check(&self, value: T) -> Result<(), LimitError<T>> {
         let upper_limit = parameter_manager().get::<Self::UpperParam>();
         let lower_limit = parameter_manager().get::<Self::LowerParam>();
         if self.enabled() {
             if value > upper_limit {
-                return Err(LimitError::OverLimit(LimitReport{limit: upper_limit, value }))
+                return Err(LimitError::OverLimit(LimitReport {
+                    limit: upper_limit,
+                    value,
+                }));
             } else if value < lower_limit {
-                return Err(LimitError::UnderLimit(LimitReport{limit: lower_limit, value }))
+                return Err(LimitError::UnderLimit(LimitReport {
+                    limit: lower_limit,
+                    value,
+                }));
             }
         }
         Ok(())
     }
-
 }
 
-pub struct MotorPosLimit{
+pub struct MotorPosLimit {
     enabled: bool,
 }
 impl MotorPosLimit {
     pub fn new(enabled: bool) -> MotorPosLimit {
-        MotorPosLimit{enabled}
+        MotorPosLimit { enabled }
     }
 }
 impl Limit<f32> for MotorPosLimit {
@@ -97,12 +110,12 @@ impl Limit<f32> for MotorPosLimit {
         self.enabled = enable;
     }
 }
-pub struct MotorVelLimit{
+pub struct MotorVelLimit {
     enabled: bool,
 }
 impl MotorVelLimit {
     pub fn new(enabled: bool) -> MotorVelLimit {
-        MotorVelLimit {enabled}
+        MotorVelLimit { enabled }
     }
 }
 impl Limit<f32> for MotorVelLimit {
@@ -122,17 +135,29 @@ mod tests {
     #[test]
     fn test_limit_within() {
         let test_motor_vel_limit = MotorVelLimit::new(true);
-        assert!(test_motor_vel_limit.check(10f32)== Ok(()));
+        assert!(test_motor_vel_limit.check(10f32) == Ok(()));
     }
     #[test]
     fn test_limit_above() {
         let test_motor_vel_limit = MotorVelLimit::new(true);
-        assert!(test_motor_vel_limit.check(1e7) == Err(LimitError::OverLimit(LimitReport{ limit: 1e6, value: 1e7 })));
+        assert!(
+            test_motor_vel_limit.check(1e7)
+                == Err(LimitError::OverLimit(LimitReport {
+                    limit: 1e6,
+                    value: 1e7
+                }))
+        );
     }
     #[test]
     fn test_limit_below() {
         let test_motor_vel_limit = MotorVelLimit::new(true);
-        assert!(test_motor_vel_limit.check(-1e7) == Err(LimitError::UnderLimit(LimitReport{ limit: -1e6, value: -1e7 })));
+        assert!(
+            test_motor_vel_limit.check(-1e7)
+                == Err(LimitError::UnderLimit(LimitReport {
+                    limit: -1e6,
+                    value: -1e7
+                }))
+        );
     }
     #[test]
     fn test_limit_above_disabled() {

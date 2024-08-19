@@ -1,22 +1,19 @@
-use embedded_time::duration::Microseconds;
 use crate::app::control_primitives::KinState;
+use embedded_time::duration::Microseconds;
 
-pub struct SetPointGenCH {
-
-}
+pub struct SetPointGenCH {}
 impl SetPointGen for SetPointGenCH {
-    fn reset(&mut self, _time: Microseconds<u64>) {
-    }
+    fn reset(&mut self, _time: Microseconds<u64>) {}
 
-    fn get_sp(&mut self, _time: Microseconds<u64>) -> [KinState;2] {
-        [KinState{
+    fn get_sp(&mut self, _time: Microseconds<u64>) -> [KinState; 2] {
+        [KinState {
             pos: 0.0,
             speed: 0.0,
             accel: 0.0,
-        };2]
+        }; 2]
     }
 }
-pub trait SetPointGen{
+pub trait SetPointGen {
     fn reset(&mut self, time: Microseconds<u64>);
-    fn get_sp(&mut self, time: Microseconds<u64>) -> [KinState;2];
+    fn get_sp(&mut self, time: Microseconds<u64>) -> [KinState; 2];
 }

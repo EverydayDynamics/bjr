@@ -1,9 +1,9 @@
+use atomic_float::AtomicF32;
 use core::f32::consts::{FRAC_PI_2, PI};
+use core::fmt::Write;
 use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
-use atomic_float::AtomicF32;
 use strum_macros::{Display, EnumIter, EnumString};
-use core::fmt::Write;
 
 struct ByteWriter<'a>(&'a mut [u8]);
 
@@ -97,9 +97,9 @@ macro_rules! generate_parameter_types {
     };
 }
 
-const BASE_CIRCLE_RADIUS:f32 = 40.0;
-const HINGE_OFFSET:f32 = 6.5;
-const JOINT_CIRCLE_RADIUS:f32 = 17.5; //
+const BASE_CIRCLE_RADIUS: f32 = 40.0;
+const HINGE_OFFSET: f32 = 6.5;
+const JOINT_CIRCLE_RADIUS: f32 = 17.5; //
 generate_parameter_types!(
     (AtomicF32, f32, MotorM2Ustep, 8e5),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
@@ -128,7 +128,6 @@ generate_parameter_types!(
     (AtomicF32, f32, KinJointCircRad, 23.351e-3),
     (AtomicF32, f32, KinMinHeight, 89.902e-3),
     (AtomicF32, f32, KinSurface2JointCircDist, 27.96261e-3),
-
     //piston parameters
     (AtomicF32, f32, PistonBodyLen, 91.2e-3),
     //feedforward mode parameters
@@ -136,8 +135,6 @@ generate_parameter_types!(
     (AtomicF32, f32, FFDefaultLinAccel, 20e-3),
     (AtomicF32, f32, FFDefaultAngSpeed, FRAC_PI_2),
     (AtomicF32, f32, FFDefaultAngAccel, PI),
-
-
 );
 // Parameter manager
 
@@ -154,7 +151,7 @@ impl Default for ParameterManager {
 impl ParameterManager {
     pub const fn new() -> Self {
         Self {
-            storage: ParameterStorage::default()
+            storage: ParameterStorage::default(),
         }
     }
 
@@ -168,7 +165,6 @@ impl ParameterManager {
         let atomic = T::get_atomic(&self.storage);
         T::atomic_store(value, atomic)
     }
-
 }
 
 // Create a static instance of the ParameterManager
