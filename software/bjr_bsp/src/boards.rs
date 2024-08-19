@@ -1,5 +1,5 @@
 use core::fmt::{Debug, Display, Formatter};
-use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TemperatureSensor, TouchSensor, TouchSensorError};
+use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TouchSensor, TouchSensorError};
 use core::result::Result;
 
 pub trait BoardResources {
