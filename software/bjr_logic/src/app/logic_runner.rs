@@ -9,7 +9,7 @@ use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
 use crate::app::state_runner::StateRunnerCommand;
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
-use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperMotorController, TouchSensor};
+use bsp_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;
@@ -19,6 +19,8 @@ enum LogicRunnerError {
     TimeOverrun,
     EventHandlerError(EventHandlerError),
 }
+impl LoggableMessage for LogicRunnerError {}
+#[cfg(not(feature = "defmt"))]
 impl Display for LogicRunnerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -27,6 +29,19 @@ impl Display for LogicRunnerError {
             }
             LogicRunnerError::EventHandlerError(error) => {
                 write!(f, "Event handler error: {}", error)
+            }
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for LogicRunnerError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            LogicRunnerError::TimeOverrun => {
+                defmt::write!(f, "Time Overrun")
+            }
+            LogicRunnerError::EventHandlerError(error) => {
+                defmt::write!(f, "Event handler error: {}", error)
             }
         }
     }

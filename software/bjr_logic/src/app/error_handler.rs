@@ -1,61 +1,75 @@
 use crate::app::event::{EventError, GlobEvent};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use crate::str_to_display;
-use crate::utils::DisplayStr;
-use bsp_traits::{Logger, MotorEnabler};
-use core::fmt::Display;
+use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use core::fmt::{Display, Formatter};
 use heapless::mpmc::Q8;
 
-// Define the ErrorHandler struct
 pub struct ErrorHandler {
     event_queue: &'static Q8<GlobEvent>,
 }
+struct ErrorIgnoredMessage<ERR:LoggableMessage>(ERR);
+impl<ERR: LoggableMessage> LoggableMessage for ErrorIgnoredMessage<ERR> {}
+#[cfg(not(feature = "defmt"))]
+impl<ERR: LoggableMessage> Display for ErrorIgnoredMessage<ERR> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "Ignored Error: {}", self.0)
+    }
+}
 
+
+#[cfg(feature = "defmt")]
+impl<ERR: LoggableMessage> defmt::Format for  ErrorIgnoredMessage<ERR> {
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f, "Ignored Error: {}", self.0);
+    }
+}
 impl ErrorHandler {
     pub fn new(event_queue: &'static Q8<GlobEvent>) -> Self {
         ErrorHandler { event_queue }
     }
 }
 impl ErrorHandler {
-    pub fn panic<T: Display, LOG: Logger>(
+    pub fn panic<LOG: Logger>(
         &mut self,
-        error: T,
         motor_enabler: &mut dyn MotorEnabler,
-        log_device: &mut LOG,
+        _log_device: &mut LOG,
     ) {
         motor_enabler.set_enable(false);
-        log_device.error(&error);
         panic!();
     }
-    pub fn handle_error<ERR: Severity + Display, LOG: Logger>(
+    pub fn handle_error<ERR: Severity + LoggableMessage, LOG: Logger>(
         &mut self,
         motor_enabler: &mut dyn MotorEnabler,
         log_device: &mut LOG,
         error: ERR,
     ) {
-        match error.get_severity() {
+        let severity = error.get_severity();
+        match severity {
+            ErrorSeverity::Ignore => {
+                log_device.warn(ErrorIgnoredMessage(error));
+            }
             _ => {
-                log_device.error(&error);
+                log_device.error(error);
             }
         }
-        match error.get_severity() {
-            ErrorSeverity::Panic => self.panic(error, motor_enabler, log_device),
+        match severity {
+            ErrorSeverity::Panic => self.panic(motor_enabler, log_device),
             ErrorSeverity::ImmediateShutdown => {
                 motor_enabler.set_enable(false);
                 let event = GlobEvent::ErrorWithImmediateShutdown;
                 if self.event_queue.enqueue(event).is_err() {
-                    self.panic(EventError::QueueFull(event), motor_enabler, log_device);
+                    let new_error = EventError::QueueFull(event);
+                    log_device.error(new_error);
+                    self.panic(motor_enabler, log_device);
                 }
             }
             ErrorSeverity::GracefulShutdown => {
                 let event = GlobEvent::ErrorWithGracefulShutdown;
                 if self.event_queue.enqueue(event).is_err() {
-                    self.panic(event, motor_enabler, log_device);
+                    let new_error = EventError::QueueFull(event);
+                    log_device.error(new_error);
+                    self.panic(motor_enabler, log_device);
                 }
-            }
-
-            ErrorSeverity::Ignore => {
-                log_device.warn(&str_to_display!("Ignored error: {}", error));
             }
             _ => {}
         }
@@ -102,15 +116,20 @@ mod tests {
     }
     pub struct TestLogger {}
     impl Logger for TestLogger {
-        fn trace(&mut self, message: &dyn Display) {}
+        fn trace<MSG: LoggableMessage>(&mut self, message: MSG) {
+        }
 
-        fn debug(&mut self, message: &dyn Display) {}
+        fn debug<MSG: LoggableMessage>(&mut self, message: MSG) {
+        }
 
-        fn info(&mut self, message: &dyn Display) {}
+        fn info<MSG: LoggableMessage>(&mut self, message: MSG) {
+        }
 
-        fn warn(&mut self, message: &dyn Display) {}
+        fn warn<MSG: LoggableMessage>(&mut self, message: MSG) {
+        }
 
-        fn error(&mut self, message: &dyn Display) {}
+        fn error<MSG: LoggableMessage>(&mut self, message: MSG) {
+        }
     }
 
     #[test]

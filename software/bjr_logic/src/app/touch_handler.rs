@@ -1,7 +1,5 @@
 use crate::app::control_primitives::KinState;
-use crate::app::parameter_manager::{
-    parameter_manager, TouchCenterOffsetX, TouchCenterOffsetY, TouchScaleX, TouchScaleY,
-};
+use crate::app::parameter_manager::{parameter_manager, TouchCenterOffsetX, TouchCenterOffsetY, TouchScaleXX, TouchScaleXY, TouchScaleYX, TouchScaleYY};
 use crate::utils::usec2sec;
 use bsp_traits::{TouchSensor, TouchSensorError};
 use embedded_time::duration::Microseconds;
@@ -36,7 +34,7 @@ where
         let delta_t = usec2sec((call_time - self.last_call_time).integer());
         let speed = (pos - last_state.pos) / delta_t;
         let accel = (speed - last_state.speed) / delta_t;
-        let state: KinState = KinState { pos, speed, accel };
+        let state: KinState = KinState { pos: (pos+last_state.pos)/2.0, speed, accel };
 
         state
     }
@@ -48,10 +46,14 @@ where
         if let Some(touch_pos) = self.touch_sensor.get_touch()? {
             let x_offset = parameter_manager().get::<TouchCenterOffsetX>();
             let y_offset = parameter_manager().get::<TouchCenterOffsetY>();
-            let x_scale = parameter_manager().get::<TouchScaleX>();
-            let y_scale = parameter_manager().get::<TouchScaleY>();
-            let x_pos = (touch_pos.x + x_offset) as f32 * x_scale;
-            let y_pos = (touch_pos.y + y_offset) as f32 * y_scale;
+            let xx_scale = parameter_manager().get::<TouchScaleXX>();
+            let xy_scale = parameter_manager().get::<TouchScaleXY>();
+            let yx_scale = parameter_manager().get::<TouchScaleYX>();
+            let yy_scale = parameter_manager().get::<TouchScaleYY>();
+            let x_offseted = (touch_pos.x + x_offset)as f32;
+            let y_offseted = (touch_pos.y + y_offset)as f32;
+            let x_pos = x_offseted * xx_scale + y_offseted * xy_scale;
+            let y_pos = x_offseted * yx_scale + y_offseted * yy_scale;
             let mut new_sate = None;
             if let Some(last_state) = self.last_state {
                 let xkinstate = self.calc_kin(x_pos, call_time, last_state[0]);
@@ -65,7 +67,7 @@ where
                     accel: 0.0,
                 };
                 let y_trivial_state = KinState {
-                    pos: x_pos,
+                    pos: y_pos,
                     speed: 0.0,
                     accel: 0.0,
                 };

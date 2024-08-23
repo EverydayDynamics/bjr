@@ -81,6 +81,7 @@ dependencies = [
  "log",
  "strum",
  "strum_macros",
+ "ufmt",
 ]
 
 [[package]]
@@ -246,8 +247,6 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 [[package]]
 name = "menu"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce98110899b3b97775dd181d9088ebee9abcb6804bb7ead4e9450c1f5419562d"
 
 [[package]]
 name = "num"

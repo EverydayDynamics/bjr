@@ -117,10 +117,12 @@ generate_parameter_types!(
     //running period
     (AtomicU32, u32, LogicRunnerPeriodUs, 10000),
     //Touch sensor parameters
-    (AtomicI32, i32, TouchCenterOffsetX, -2048),
-    (AtomicI32, i32, TouchCenterOffsetY, -2048),
-    (AtomicF32, f32, TouchScaleY, 5.180_664e-5),
-    (AtomicF32, f32, TouchScaleX, 3.886_718_7e-5),
+    (AtomicI32, i32, TouchCenterOffsetX, -2712),
+    (AtomicI32, i32, TouchCenterOffsetY, -1933),
+    (AtomicF32, f32, TouchScaleXX, 0.032181205648158066),
+    (AtomicF32, f32, TouchScaleXY, -0.012809686388226736),
+    (AtomicF32, f32, TouchScaleYX, 0.0016535647770429401),
+    (AtomicF32, f32, TouchScaleYY, -0.04407568335827352),
     //No ball parameters
     (AtomicF32, f32, NoBallTargetHeight, 10e-3),
     //Kinematics parameters
@@ -136,6 +138,16 @@ generate_parameter_types!(
     (AtomicF32, f32, FFDefaultLinAccel, 20e-3),
     (AtomicF32, f32, FFDefaultAngSpeed, FRAC_PI_2),
     (AtomicF32, f32, FFDefaultAngAccel, PI),
+    //MotorController
+    (AtomicF32, f32, MCKp, 5e1),
+    (AtomicF32, f32, MCAccel, 1e-3),
+    (AtomicF32, f32, MCVelMax, 40e-3),
+    (AtomicF32, f32, MCVelMin, -40e-3),
+    //PlatePDController
+    (AtomicF32, f32, PlatePDCtrlKp, 0.01),
+    (AtomicF32, f32, PlatePDCtrlKd, 0.001),
+
+
 );
 // Parameter manager
 

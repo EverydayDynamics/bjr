@@ -13,7 +13,7 @@ where
 {
     pub fn new(spi_dev: SPI) -> Result<Self, TouchSensorError> {
         Ok(Tsc2046TouchDev {
-            driver: Tsc2046::new(spi_dev, false, 100.0f32)
+            driver: Tsc2046::new(spi_dev, false, 10.0f32)
                 .map_err(|e| TouchSensorError::CommunicationError(ErrorWrapper(e).into()))?,
         })
     }

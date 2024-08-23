@@ -5,7 +5,7 @@ use bjr_logic::app::error_handler::ErrorHandler;
 use bjr_logic::app::event_handler::EventHandler;
 use bjr_logic::app::event_queue::get_event_queue;
 use bjr_logic::app::io_manager::DefaultIOManager;
-use bjr_logic::app::limits::{MotorPosLimit, MotorVelLimit};
+use bjr_logic::app::limits::{LimitLevel, MotorPosLimit, MotorVelLimit};
 use bjr_logic::app::logic_runner::LogicRunner;
 use bjr_logic::app::menu_handler::{MenuContext, MenuHandler};
 use bjr_logic::app::motor_handler::MotorHandler;
@@ -13,13 +13,14 @@ use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
 use bjr_logic::app::state_manager::StateManager;
 use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
 use bjr_logic::app::touch_handler::TouchHandler;
-use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperMotorController, TouchSensor};
+use bsp_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
 use embedded_time::duration::Microseconds;
 
 pub enum AppError {
     SetupError(BoardCreationError),
 }
+impl LoggableMessage for AppError {}
 impl Severity for AppError {
     fn get_severity(&self) -> ErrorSeverity {
         match self {
@@ -27,11 +28,22 @@ impl Severity for AppError {
         }
     }
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for AppError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             AppError::SetupError(bce) => {
                 write!(f, "ApplicationError, Board initialization failed: {}", bce)
+            }
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for AppError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            AppError::SetupError(bce) => {
+                defmt::write!(f, "ApplicationError, Board initialization failed: {}", bce)
             }
         }
     }
@@ -71,8 +83,8 @@ pub fn build_application<
                 stp_a,
                 stp_b,
                 stp_c,
-                MotorPosLimit::new(true),
-                MotorVelLimit::new(true),
+                MotorPosLimit::new(LimitLevel::Error),
+                MotorVelLimit::new(LimitLevel::Error),
             );
             let touch_handler = TouchHandler::new(touch_sensor, Microseconds::default(), None);
             let io_manager = DefaultIOManager::new(motor_handler, touch_handler);

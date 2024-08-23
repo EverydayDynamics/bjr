@@ -36,6 +36,7 @@ pub enum BoardCreationError {
     StepperDriveInitError(StepperDeviceError, usize),
     TouchSensorInitError(TouchSensorError),
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for BoardCreationError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -48,6 +49,27 @@ impl Display for BoardCreationError {
             }
             BoardCreationError::TouchSensorInitError(err) => {
                 write!(
+                    f,
+                    "BoardCreationError Touch sensor initialization error: {}",
+                    err
+                )
+            }
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for BoardCreationError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            BoardCreationError::StepperDriveInitError(err, idx) => {
+                defmt::write!(
+                    f,
+                    "BoardCreationError Stepper drive initialization error: {}, idx: {}",
+                    err, idx
+                )
+            }
+            BoardCreationError::TouchSensorInitError(err) => {
+                defmt::write!(
                     f,
                     "BoardCreationError Touch sensor initialization error: {}",
                     err

@@ -1,3 +1,4 @@
+use core::fmt::{Display, Formatter};
 use crate::app::parameter_manager::{
     parameter_manager, FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed,
 };
@@ -9,6 +10,11 @@ pub struct KinState {
     pub pos: f32,
     pub speed: f32,
     pub accel: f32,
+}
+impl Display for KinState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "(p:{} s:{} a:{})", self.pos, self.speed, self.accel)
+    }
 }
 
 impl Add for KinState {
@@ -70,12 +76,33 @@ impl Div<f32> for KinState {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct PlateState {
     pub height: KinState,
     pub angle: [KinState; 2],
 }
 impl PlateState {
+    pub fn new_with_null_sa(height: f32, alpha: f32, beta: f32) -> PlateState {
+        PlateState {
+            height: KinState {
+                pos: height,
+                speed: 0.0,
+                accel: 0.0,
+            },
+            angle: [
+                KinState {
+                    pos: alpha,
+                    speed: 0.0,
+                    accel: 0.0,
+                },
+                KinState {
+                    pos: beta,
+                    speed: 0.0,
+                    accel: 0.0,
+                },
+            ],
+        }
+    }
     pub fn new_with_default_sa(height: f32, alpha: f32, beta: f32) -> PlateState {
         let default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
         let default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();

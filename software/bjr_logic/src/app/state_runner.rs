@@ -1,11 +1,13 @@
-use crate::app::control_primitives::PlateState;
+use crate::app::control_primitives::{KinState, PlateState};
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, IOManagerError};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use bsp_traits::{Logger, MotorEnabler};
+use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
+use crate::app::consts::MOTOR_NUM;
+use crate::app::event_handler::State;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum StateRunnerError {
@@ -17,6 +19,8 @@ pub enum StateRunnerError {
     QueueFull(GlobEvent),
     IOError(IOManagerError),
 }
+impl LoggableMessage for StateRunnerError{}
+#[cfg(not(feature = "defmt"))]
 impl Display for StateRunnerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -47,6 +51,37 @@ impl Display for StateRunnerError {
         }
     }
 }
+#[cfg(feature = "defmt")]
+impl defmt::Format for StateRunnerError{
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            StateRunnerError::HomingIOError(e) => {
+                defmt::write!(f, "Homing IO error: {}", e)
+            }
+            StateRunnerError::HomingOverrun => {
+                defmt::write!(f, "Homing Overrun")
+            }
+            StateRunnerError::HomingLimistSWStuckAtSafePos => {
+                defmt::write!(f, "Homing Limit switch stuck at safet position")
+            }
+            StateRunnerError::HomingUnexpectedStopGoingToSafePos => {
+                defmt::write!(
+                    f,
+                    "Homing Unexpectedly stopped while going to safe position"
+                )
+            }
+            StateRunnerError::HomingInErrorState => {
+                defmt::write!(f, "Homing is in error state")
+            }
+            StateRunnerError::QueueFull(e) => {
+                defmt::write!(f, "Event Queue is full. Missed message: {}", e)
+            }
+            StateRunnerError::IOError(e) => {
+                defmt::write!(f, "IO error: {}", e)
+            }
+        }
+    }
+}
 impl Severity for StateRunnerError {
     fn get_severity(&self) -> ErrorSeverity {
         match self {
@@ -63,8 +98,16 @@ impl Severity for StateRunnerError {
     }
 }
 #[derive(Copy, Clone)]
+pub struct CirclingParams {
+    pub height: f32,
+    pub angulation_angle: f32,
+    pub angulation_time: f32,
+}
+#[derive(Copy, Clone)]
 pub enum StateRunnerCommand {
-    FeedForwardCommand(PlateState),
+    FeedForwardPlateCommand(PlateState),
+    FeedForwardMotorCommand([KinState;MOTOR_NUM]),
+    FeedForwardCircling(CirclingParams),
     NoCommand,
 }
 pub trait RunnableState {

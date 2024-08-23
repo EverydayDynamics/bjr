@@ -94,6 +94,7 @@ where
         *self.map.dmax_mut() = reg::DMAX::from(700);
         *self.map.d1_mut() = reg::D1::from(0);
         *self.map.vstop_mut() = reg::VSTOP::from(10);
+        *self.map.vstart_mut() = reg::VSTART::from(0);
         *self.map.rampmode_mut() = reg::RAMPMODE::from(0);
         *self.map.xactual_mut() = reg::XACTUAL::from(0);
         *self.map.vactual_mut() = reg::VACTUAL::default();
@@ -112,6 +113,7 @@ where
             tmc5130::Action::write(self.map.state(reg::Address::DMAX)),
             tmc5130::Action::write(self.map.state(reg::Address::D1)),
             tmc5130::Action::write(self.map.state(reg::Address::VSTOP)),
+            tmc5130::Action::write(self.map.state(reg::Address::VSTART)),
             tmc5130::Action::write(self.map.state(reg::Address::RAMPMODE)),
             tmc5130::Action::write(self.map.state(reg::Address::XACTUAL)),
         ];

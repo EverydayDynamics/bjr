@@ -77,20 +77,16 @@ pub trait Reader {
     fn read(&mut self, buf: &mut [u8]) -> usize;
 }
 #[cfg(not(feature = "defmt"))]
-pub trait Logger {
-    fn trace<MSG: Display>(&mut self, message: MSG);
-    fn debug<MSG: Display>(&mut self, message: MSG);
-    fn info<MSG: Display>(&mut self, message: MSG);
-    fn warn<MSG: Display>(&mut self, message: MSG);
-    fn error<MSG: Display>(&mut self, message: MSG);
-}
+pub trait LoggableMessage: core::fmt::Display {}
 #[cfg(feature = "defmt")]
+pub trait LoggableMessage: defmt::Format {}
+
 pub trait Logger {
-    fn trace<T: defmt::Format>(&mut self, message: T);
-    fn debug<T: defmt::Format>(&mut self, message: T);
-    fn info<T: defmt::Format>(&mut self, message: T);
-    fn warn<T: defmt::Format>(&mut self, message: T);
-    fn error<T: defmt::Format>(&mut self, message: T);
+    fn trace<MSG: LoggableMessage>(&mut self, message: MSG);
+    fn debug<MSG: LoggableMessage>(&mut self, message: MSG);
+    fn info<MSG: LoggableMessage>(&mut self, message: MSG);
+    fn warn<MSG: LoggableMessage>(&mut self, message: MSG);
+    fn error<MSG: LoggableMessage>(&mut self, message: MSG);
 }
 pub enum DeviceError {
     CommunicationError,

@@ -178,10 +178,10 @@ where
             kinstate.speed = (motstate.velocity as f64 / motm2us as f64) as f32;
             kinstate.pos = (motstate.position as f64 / motm2us as f64) as f32;
             self.vellim
-                .check(kinstate.speed)
+                .check(&mut kinstate.speed)
                 .map_err(|e| MotorHandlerError::MotorVelocityLimitError(e, motor_idx))?;
             self.poslim
-                .check(kinstate.pos)
+                .check(&mut kinstate.pos)
                 .map_err(|e| MotorHandlerError::MotorPositionLimitError(e, motor_idx))?;
             let status = MotorStatus {
                 limit_reached: motstate.limit_reached,

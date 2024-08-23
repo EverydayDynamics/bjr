@@ -1,12 +1,10 @@
-use crate::app::control_primitives::PlateState;
+use crate::app::control_primitives::{KinState, PlateState};
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::get_event_queue;
-use crate::app::parameter_manager::{
-    ParameterList,
-};
+use crate::app::parameter_manager::{FFDefaultLinAccel, FFDefaultLinSpeed, parameter_manager, ParameterList};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use crate::app::state_runner::StateRunnerCommand;
-use bsp_traits::Reader;
+use crate::app::state_runner::{CirclingParams, StateRunnerCommand};
+use bsp_traits::{LoggableMessage, Reader};
 use core::fmt::{Display, Formatter, Write};
 use core::str::FromStr;
 use menu::{Item, ItemType, Menu, Parameter, Runner};
@@ -18,6 +16,7 @@ pub enum MenuError {
     EventBufferOverflow,
     MenuInterfaceWriteError,
 }
+impl LoggableMessage for MenuError {}
 impl Display for MenuError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -26,6 +25,19 @@ impl Display for MenuError {
             }
             MenuError::MenuInterfaceWriteError => {
                 write!(f, "Menu Interface Writing Error")
+            }
+        }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for MenuError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            MenuError::EventBufferOverflow => {
+                defmt::write!(f, "Menu Event Buffer Overflow")
+            }
+            MenuError::MenuInterfaceWriteError => {
+                defmt::write!(f, "Menu Interface Writing Error")
             }
         }
     }
@@ -136,7 +148,8 @@ where
                     help: Some("Send commands in feedforward mode"),
                     item_type: ItemType::Menu(&Menu {
                         label: "Feedforward mode commands",
-                        items: &[&Item {
+                        items: &[
+                            &Item {
                             command: "setplate",
                             help: Some("set the plate state"),
                             item_type: ItemType::Callback {
@@ -160,7 +173,48 @@ where
                                     },
                                 ],
                             },
-                        }],
+                        },
+                            &Item {
+                                command: "setmot",
+                                help: Some("set the motor state"),
+                                item_type: ItemType::Callback {
+                                    function: set_motor_state,
+                                    parameters: &[
+                                        Parameter::Mandatory {
+                                            parameter_name: "motor0",
+                                            help: None},
+                                        Parameter::Mandatory {
+                                            parameter_name: "motor1",
+                                            help: None
+                                        },
+                                        Parameter::Mandatory {
+                                            parameter_name: "motor2",
+                                            help: None
+                                        },
+                                    ],
+                                },
+                            },
+                            &Item {
+                                command: "angulate",
+                                help: Some("continiously angulate the plate"),
+                                item_type: ItemType::Callback {
+                                    function: set_angulate,
+                                    parameters: &[
+                                        Parameter::Mandatory {
+                                            parameter_name: "angle",
+                                            help: None},
+                                        Parameter::Mandatory {
+                                            parameter_name: "time",
+                                            help: None
+                                        },
+                                        Parameter::Mandatory {
+                                            parameter_name: "height",
+                                            help: None
+                                        },
+                                    ],
+                                },
+                            },
+                        ],
                         entry: Some(enter_feedforward_mode),
                         exit: Some(exit_feedforward_mode),
                     }),
@@ -359,7 +413,7 @@ fn fallible_set_plate_state<MIO: Reader + Write>(
     if let Ok(height) = f32::from_str(args[0]) {
         if let Ok(alpha) = f32::from_str(args[1]) {
             if let Ok(beta) = f32::from_str(args[2]) {
-                context.state_runner_command = StateRunnerCommand::FeedForwardCommand(
+                context.state_runner_command = StateRunnerCommand::FeedForwardPlateCommand(
                     PlateState::new_with_default_sa(height * 1e-3, alpha * DEG2RAD, beta * DEG2RAD),
                 );
             } else {
@@ -375,6 +429,111 @@ fn fallible_set_plate_state<MIO: Reader + Write>(
     } else {
         interface
             .write_str("Couldn't parse Height parameter. Please enter a number.")
+            .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+    }
+    Ok(())
+}
+fn set_motor_state<MIO: Reader + Write>(
+    _menu: &Menu<MIO, Context>,
+    _item: &Item<MIO, Context>,
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) {
+    context.error = fallible_set_motor_state(args, interface, context);
+}
+fn fallible_set_motor_state<MIO: Reader + Write>(
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) -> Result<(), MenuError> {
+    const DEG2RAD: f32 = 0.017_453_292;
+    get_event_queue()
+        .enqueue(GlobEvent::EnterFeedforward)
+        .map_err(|_| MenuError::EventBufferOverflow)?;
+    if let Ok(motor1) = f32::from_str(args[0]) {
+        if let Ok(motor2) = f32::from_str(args[1]) {
+            if let Ok(motor3) = f32::from_str(args[2]) {
+                let ff_default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
+                let ff_default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();
+                context.state_runner_command = StateRunnerCommand::FeedForwardMotorCommand(
+                    [
+                        KinState{
+                        pos: motor1,
+                        speed: ff_default_lin_speed,
+                        accel: ff_default_lin_accel,
+                        },
+                        KinState{
+                            pos: motor2,
+                            speed: ff_default_lin_speed,
+                            accel: ff_default_lin_accel,
+                        },
+                        KinState{
+                            pos: motor3,
+                            speed: ff_default_lin_speed,
+                            accel: ff_default_lin_accel,
+                        },
+
+                    ]
+                );
+            } else {
+                interface
+                    .write_str("Couldn't parse motor 0. Please enter a number.")
+                    .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+            }
+        } else {
+            interface
+                .write_str("Couldn't parse motor 1. Please enter a number.")
+                .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+        }
+    } else {
+        interface
+            .write_str("Couldn't parse motor 2. Please enter a number.")
+            .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+    }
+    Ok(())
+}
+fn set_angulate<MIO: Reader + Write>(
+    _menu: &Menu<MIO, Context>,
+    _item: &Item<MIO, Context>,
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) {
+    context.error = fallible_set_angulate(args, interface, context);
+}
+fn fallible_set_angulate<MIO: Reader + Write>(
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) -> Result<(), MenuError> {
+    const DEG2RAD: f32 = 0.017_453_292;
+    get_event_queue()
+        .enqueue(GlobEvent::EnterFeedforward)
+        .map_err(|_| MenuError::EventBufferOverflow)?;
+    if let Ok(angle) = f32::from_str(args[0]) {
+        if let Ok(time) = f32::from_str(args[1]) {
+            if let Ok(height) = f32::from_str(args[2]) {
+                context.state_runner_command = StateRunnerCommand::FeedForwardCircling(
+                    CirclingParams{
+                        height: height* 1e-3,
+                        angulation_angle: angle * DEG2RAD,
+                        angulation_time: time,
+                    }
+                );
+            } else {
+                interface
+                    .write_str("Couldn't parse angle parameter. Please enter a number.")
+                    .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+            }
+        } else {
+            interface
+                .write_str("Couldn't parse time paramter. Please enter a number.")
+                .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+        }
+    } else {
+        interface
+            .write_str("Couldn't parse height. Please enter a number.")
             .map_err(|_| MenuError::MenuInterfaceWriteError)?;
     }
     Ok(())

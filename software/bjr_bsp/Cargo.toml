@@ -25,6 +25,7 @@ env_logger = {version = "0.11.5", optional = true}
 defmt = { version = "0.3.8", optional = true }
 strum = { version = "0.26.3", default-features = false, features = ["derive"] }
 strum_macros = "0.26.4"
+ufmt = "0.2.0"
 
 # cargo build/run
 [profile.dev]

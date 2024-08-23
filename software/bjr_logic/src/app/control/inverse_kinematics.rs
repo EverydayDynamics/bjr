@@ -42,7 +42,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
     let pistion_body_len = parameter_manager().get::<PistonBodyLen>();
     [
         aligned_state(
-            (plate.angle[0] * SQ3 - plate.angle[1]) / 2.0,
+            (plate.angle[0] * SQ3 - (plate.angle[1]*(-1.0))) / 2.0,
             plate.height,
             base_circle_radius,
             hinge_offset,
@@ -51,7 +51,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
             pistion_body_len,
         ),
         aligned_state(
-            plate.angle[1],
+            plate.angle[1]*(-1.0),
             plate.height,
             base_circle_radius,
             hinge_offset,
@@ -60,7 +60,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
             pistion_body_len,
         ),
         aligned_state(
-            (-plate.angle[0] * SQ3 - plate.angle[1]) / 2.0,
+            (-plate.angle[0] * SQ3 - (plate.angle[1]*(-1.0))) / 2.0,
             plate.height,
             base_circle_radius,
             hinge_offset,

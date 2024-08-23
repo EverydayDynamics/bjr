@@ -1,7 +1,7 @@
 use crate::app::event::GlobEvent;
 use crate::app::parameter_manager::{parameter_manager, LongPressThresholdMs};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use bsp_traits::Button;
+use bsp_traits::{Button, LoggableMessage};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;
@@ -10,11 +10,24 @@ use heapless::mpmc::Q8;
 pub enum ButtonHandlerError {
     QueueFull(GlobEvent),
 }
+impl LoggableMessage for ButtonHandlerError {}
+#[cfg(not(feature = "defmt"))]
 impl Display for ButtonHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ButtonHandlerError::QueueFull(ge) => {
                 write!(f, "ButtonHandlerError Queue Full. Dropped msg: {}", ge)
+            }
+        }
+    }
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for ButtonHandlerError {
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            ButtonHandlerError::QueueFull(ge) => {
+                defmt::write!(f, "ButtonHandlerError Queue Full. Dropped msg: {}", ge)
             }
         }
     }

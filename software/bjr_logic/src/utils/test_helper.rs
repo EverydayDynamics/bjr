@@ -3,10 +3,11 @@ pub mod bsp_mocks {
     use crate::app::control_primitives::KinState;
     use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
-    use bsp_traits::{Logger, MotorEnabler, Point, TouchSensor, TouchSensorError};
+    use bsp_traits::{Logger, LoggableMessage, MotorEnabler, Point, TouchSensor, TouchSensorError};
     use core::fmt::Display;
     use embedded_time::duration::*;
     use mockall::mock;
+
 
     mock! {
         pub TouchSensor {}
@@ -24,14 +25,13 @@ pub mod bsp_mocks {
     mock! {
         pub TestLogger {}
         impl<'a> Logger for TestLogger {
-                fn trace(&mut self, msg: &dyn Display);
-                fn debug(&mut self, msg: &dyn Display);
-                fn info(&mut self, msg: &dyn Display);
-                fn warn(&mut self, msg: &dyn Display);
-                fn error(&mut self, msg: &dyn Display);
-
+        fn trace<MSG: LoggableMessage>(&mut self, message: MSG);
+        fn debug<MSG: LoggableMessage>(&mut self, message: MSG);
+        fn info<MSG: LoggableMessage>(&mut self, message: MSG);
+        fn warn<MSG: LoggableMessage>(&mut self, message: MSG);
+        fn error<MSG: LoggableMessage>(&mut self, message: MSG);
+            }
         }
-    }
     mock! {
         pub TestIOManager {}
         impl<'a> IOManager for TestIOManager {

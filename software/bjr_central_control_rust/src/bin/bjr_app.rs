@@ -29,6 +29,7 @@ mod app {
     use rtic_monotonics::stm32::*;
     use rtic_monotonics::Monotonic;
     use stm32f4xx_hal::prelude::*;
+    use defmt;
 
     pub enum AppError {
         SetupError(BoardCreationError),
@@ -40,11 +41,22 @@ mod app {
             }
         }
     }
+    #[cfg(not(feature = "defmt"))]
     impl Display for AppError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             match self {
                 AppError::SetupError(bce) => {
                     write!(f, "ApplicationError, Board initialization failed: {}", bce)
+                }
+            }
+        }
+    }
+    #[cfg(feature = "defmt")]
+    impl defmt::Format for AppError{
+        fn format(&self, f: defmt::Formatter) {
+            match self {
+                AppError::SetupError(bce) => {
+                    defmt::write!(f, "ApplicationError, Board initialization failed: {}", bce)
                 }
             }
         }

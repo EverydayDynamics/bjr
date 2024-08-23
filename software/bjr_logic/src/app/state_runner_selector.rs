@@ -74,7 +74,7 @@ impl DefaultStateRunnerSelector {
             initializing_state_runner: StateRunnerWrapper::Initializing(Default::default()),
             homing_state_runner: StateRunnerWrapper::Homing(HomingStateRunner::new()),
             center_hold_control_runner: StateRunnerWrapper::CenterHoldControl(ControlStateRunner::new(
-                PIDController {},
+                PIDController::default(),
                 FFGenCH {},
                 SetPointGenCH {},
             )),

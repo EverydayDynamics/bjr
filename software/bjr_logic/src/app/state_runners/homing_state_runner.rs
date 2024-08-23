@@ -9,9 +9,7 @@ use crate::app::parameter_manager::{
     HomingSafePosition,
 };
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
-use crate::str_to_display;
-use crate::utils::DisplayStr;
-use bsp_traits::{Logger, MotorEnabler};
+use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 
@@ -27,6 +25,7 @@ pub enum HomingStateRunnerState {
     Done,
     Error,
 }
+#[cfg(not(feature = "defmt"))]
 impl Display for HomingStateRunnerState {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -58,6 +57,58 @@ impl Display for HomingStateRunnerState {
                 write!(f, "Error")
             }
         }
+    }
+}
+#[cfg(feature = "defmt")]
+impl defmt::Format for  HomingStateRunnerState{
+    fn format(&self, f: defmt::Formatter) {
+        match self {
+            HomingStateRunnerState::Default => {
+                defmt::write!(f, "Default")
+            }
+            HomingStateRunnerState::FastApproach => {
+                defmt::write!(f, "FastApproach")
+            }
+            HomingStateRunnerState::StoppingAfterFastApproach => {
+                defmt::write!(f, "StoppingAfterFastApproach")
+            }
+            HomingStateRunnerState::SlowApproach => {
+                defmt::write!(f, "SlowApproach")
+            }
+            HomingStateRunnerState::StoppingAfterSlowApproach => {
+                defmt::write!(f, "StoppingAfterSlowApproach")
+            }
+            HomingStateRunnerState::FirstGoingToSafeSpot => {
+                defmt::write!(f, "FirstGoingToSafeSpot")
+            }
+            HomingStateRunnerState::FinalGoingToSafeSpot => {
+                defmt::write!(f, "FinalGoingToSafeSpot")
+            }
+            HomingStateRunnerState::Done => {
+                defmt::write!(f, "Done")
+            }
+            HomingStateRunnerState::Error => {
+                defmt::write!(f, "Error")
+            }
+        }
+    }
+}
+struct HomingStateChangeMessage(HomingStateRunnerState, HomingStateRunnerState, usize);
+impl LoggableMessage for HomingStateChangeMessage {}
+
+#[cfg(not(feature = "defmt"))]
+impl Display for  HomingStateChangeMessage{
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f,"changing homing state from ({}) to ({}) in motor ({})", self.0, self.1, self.2)
+
+    }
+}
+
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for  HomingStateChangeMessage{
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f,"changing homing state from ({}) to ({}) in motor ({})", self.0, self.1, self.2);
     }
 }
 pub struct HomingStateRunner {
@@ -105,12 +156,6 @@ impl RunnableState for HomingStateRunner {
         let inputs = iomanager
             .read_motor_inputs()
             .map_err(StateRunnerError::HomingIOError)?;
-        logger.debug(&str_to_display!(
-            " ({}) ({})({})",
-            inputs[0].1.limit_reached,
-            inputs[1].1.limit_reached,
-            inputs[2].1.limit_reached
-        ));
         let mut outputs: [Option<(KinState, ControlMode)>; 3] = [None; MOTOR_NUM];
         let mut motor_idx = 0;
         let mut done_counter = 0;
@@ -261,12 +306,7 @@ impl RunnableState for HomingStateRunner {
                 }
             }
             if let Some(next_state) = maybe_next_state {
-                logger.debug(&str_to_display!(
-                    "changing homing state from ({}) to ({}) in motor ({})",
-                    state,
-                    next_state,
-                    motor_idx
-                ));
+                logger.debug(HomingStateChangeMessage(*state, next_state, motor_idx));
                 *state = next_state;
             }
             motor_idx += 1;
