@@ -5,6 +5,7 @@ use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use bsp_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
 use core::fmt::Display;
 use core::fmt::Formatter;
+use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(PartialEq, Copy, Clone, Default)]
 pub enum ControlMode {
@@ -165,7 +166,7 @@ where
         }
     }
     pub fn get_motor_state(
-        &mut self,
+        &mut self, telemetry_builder: &mut TelemetryBuilder
     ) -> Result<[(KinState, MotorStatus); MOTOR_NUM], MotorHandlerError> {
         let mut state: [(KinState, MotorStatus); MOTOR_NUM] = Default::default();
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
@@ -189,6 +190,7 @@ where
                 velocity_reached: motstate.velocity_reached,
                 standstill: motstate.standstill,
             };
+            telemetry_builder.add_motor_state(motor_idx, &kinstate);
             state[motor_idx] = (kinstate, status)
         }
         Ok(state)
@@ -196,10 +198,12 @@ where
     pub fn maybe_set_motor_input(
         &mut self,
         inputs: [Option<(KinState, ControlMode)>; MOTOR_NUM],
+        telemetry_builder: &mut TelemetryBuilder
     ) -> Result<(), MotorHandlerError> {
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
         for motor_idx in 0..MOTOR_NUM {
             if let Some((state, mode)) = inputs[motor_idx] {
+                telemetry_builder.add_motor_target(motor_idx, &state);
                 let motor_mode = match mode {
                     ControlMode::Position => MotorMode::PositionCtrl,
                     ControlMode::Velocity => MotorMode::VelocityCtrl,
@@ -226,10 +230,12 @@ where
     pub fn set_motor_input(
         &mut self,
         inputs: [(KinState, ControlMode); MOTOR_NUM],
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), MotorHandlerError> {
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
         for motor_idx in 0..MOTOR_NUM {
             let (state, mode) = inputs[motor_idx];
+            telemetry_builder.add_motor_target(motor_idx, &state);
             let motor_mode = match mode {
                 ControlMode::Position => MotorMode::PositionCtrl,
                 ControlMode::Velocity => MotorMode::VelocityCtrl,
@@ -246,6 +252,7 @@ where
                     .map_err(|_| MotorHandlerError::InputOverflow)?,
                 mode: motor_mode,
             };
+
             self.motors[motor_idx]
                 .set_inputs(input)
                 .map_err(|e| MotorHandlerError::MotorError(e, motor_idx))?;

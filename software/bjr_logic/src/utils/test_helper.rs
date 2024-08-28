@@ -1,6 +1,7 @@
 #[cfg(test)]
 pub mod bsp_mocks {
-    use crate::app::control_primitives::KinState;
+    use crate::app::telemetry_handler::TelemetryBuilder;
+use crate::app::control_primitives::KinState;
     use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
     use bsp_traits::{Logger, LoggableMessage, MotorEnabler, Point, TouchSensor, TouchSensorError};
@@ -23,22 +24,12 @@ pub mod bsp_mocks {
         }
     }
     mock! {
-        pub TestLogger {}
-        impl<'a> Logger for TestLogger {
-        fn trace<MSG: LoggableMessage>(&mut self, message: MSG);
-        fn debug<MSG: LoggableMessage>(&mut self, message: MSG);
-        fn info<MSG: LoggableMessage>(&mut self, message: MSG);
-        fn warn<MSG: LoggableMessage>(&mut self, message: MSG);
-        fn error<MSG: LoggableMessage>(&mut self, message: MSG);
-            }
-        }
-    mock! {
         pub TestIOManager {}
         impl<'a> IOManager for TestIOManager {
-            fn read_all_inputs(&mut self, call_time: Microseconds<u64>) -> Result<Inputs, IOManagerError>;
-            fn write_all_outputs(&mut self, outputs: Outputs) -> Result<(), IOManagerError>;
-            fn read_motor_inputs(&mut self) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
-            fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3]) -> Result<(), IOManagerError>;
+            fn read_all_inputs(&mut self, call_time: Microseconds<u64>, telemetry_builder: &mut TelemetryBuilder ) -> Result<Inputs, IOManagerError>;
+            fn write_all_outputs(&mut self, outputs: Outputs, telemetry_builder: &mut TelemetryBuilder) -> Result<(), IOManagerError>;
+            fn read_motor_inputs(&mut self, telemetry_builder: &mut TelemetryBuilder) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
+            fn write_motor_outputs(&mut self, output: [Option<(KinState, ControlMode)>;3], telemetry_builder: &mut TelemetryBuilder) -> Result<(), IOManagerError>;
             fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError>;
         }
     }

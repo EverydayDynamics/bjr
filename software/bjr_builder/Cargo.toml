@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bsp_traits = { path = "../bsp_traits", version = "0.1.0" }
+os_traits = {path = "../os_traits"}
 bjr_logic = { path = "../bjr_logic", version = "0.1.0" }
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0" }
 embedded-time = "0.12.1"

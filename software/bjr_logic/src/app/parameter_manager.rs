@@ -119,10 +119,10 @@ generate_parameter_types!(
     //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -2712),
     (AtomicI32, i32, TouchCenterOffsetY, -1933),
-    (AtomicF32, f32, TouchScaleXX, 0.032181205648158066),
-    (AtomicF32, f32, TouchScaleXY, -0.012809686388226736),
-    (AtomicF32, f32, TouchScaleYX, 0.0016535647770429401),
-    (AtomicF32, f32, TouchScaleYY, -0.04407568335827352),
+    (AtomicF32, f32, TouchScaleXX, 0.032181205648158066e-3),
+    (AtomicF32, f32, TouchScaleXY, -0.012809686388226736e-3),
+    (AtomicF32, f32, TouchScaleYX, 0.0016535647770429401e-3),
+    (AtomicF32, f32, TouchScaleYY, -0.04407568335827352e-3),
     //No ball parameters
     (AtomicF32, f32, NoBallTargetHeight, 10e-3),
     //Kinematics parameters
@@ -139,13 +139,14 @@ generate_parameter_types!(
     (AtomicF32, f32, FFDefaultAngSpeed, FRAC_PI_2),
     (AtomicF32, f32, FFDefaultAngAccel, PI),
     //MotorController
-    (AtomicF32, f32, MCKp, 5e1),
-    (AtomicF32, f32, MCAccel, 1e-3),
+    (AtomicF32, f32, MCKp, 2.75e1),
+    (AtomicF32, f32, MCAccel, 5e-3),
     (AtomicF32, f32, MCVelMax, 40e-3),
     (AtomicF32, f32, MCVelMin, -40e-3),
+    (AtomicF32, f32, MCDeadBand, 1e-4),
     //PlatePDController
-    (AtomicF32, f32, PlatePDCtrlKp, 0.01),
-    (AtomicF32, f32, PlatePDCtrlKd, 0.001),
+    (AtomicF32, f32, PlatePDCtrlKp, 10.0),
+    (AtomicF32, f32, PlatePDCtrlKd, 0.1),
 
 
 );

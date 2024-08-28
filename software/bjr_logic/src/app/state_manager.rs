@@ -5,6 +5,7 @@ use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerErr
 use crate::app::state_runner_selector::StateRunnerSelector;
 use bsp_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
+use crate::app::telemetry_handler::TelemetryBuilder;
 
 pub struct StateManager<STRS, IOMAN> {
     runners: STRS,
@@ -31,6 +32,7 @@ where
         motor_enabler: &mut dyn MotorEnabler,
         logger: &mut LOG,
         command: &StateRunnerCommand,
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), StateRunnerError> {
         if self.current_state != state {
             self.runners
@@ -48,6 +50,7 @@ where
             event_queue,
             logger,
             command,
+            telemetry_builder,
         )?;
         Ok(())
     }

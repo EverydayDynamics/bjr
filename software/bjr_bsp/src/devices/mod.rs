@@ -12,3 +12,5 @@ pub mod rtt_rw_interface;
 pub mod tmc5130_stepper_dev;
 #[cfg(feature = "embedded")]
 pub mod tsc2046_touchscreen_dev;
+#[cfg(feature = "embedded")]
+pub mod rtt_telemetry;

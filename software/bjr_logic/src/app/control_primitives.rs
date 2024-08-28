@@ -152,7 +152,6 @@ pub struct ControlInputs {
     pub measured_ball_state: [KinState; 2],
 }
 
-pub struct TelemetryPacket {}
 pub enum BallPattern {
     CenterHold,
     Triangle,

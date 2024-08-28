@@ -1,7 +1,4 @@
-use bsp_traits::{
-    Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TouchSensor,
-    TouchSensorError,
-};
+use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor, TouchSensorError};
 use core::fmt::{Debug, Display, Formatter};
 use core::result::Result;
 
@@ -17,6 +14,7 @@ pub trait BoardResources {
     type StepperDriveC: StepperMotorController;
     type TouchSensor: TouchSensor;
     type MenuIO: core::fmt::Write + Reader;
+    type TelemetrySender: TelemetrySender;
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO);
 
     fn get_fallible_resources(
@@ -28,6 +26,7 @@ pub trait BoardResources {
             Self::StepperDriveB,
             Self::StepperDriveC,
             Self::TouchSensor,
+            Self::TelemetrySender,
         ),
         BoardCreationError,
     >;
@@ -35,8 +34,8 @@ pub trait BoardResources {
 pub enum BoardCreationError {
     StepperDriveInitError(StepperDeviceError, usize),
     TouchSensorInitError(TouchSensorError),
+    TelemetrySenderInitError(TelemetrySenderError),
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for BoardCreationError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -54,26 +53,13 @@ impl Display for BoardCreationError {
                     err
                 )
             }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for BoardCreationError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            BoardCreationError::StepperDriveInitError(err, idx) => {
-                defmt::write!(
+            BoardCreationError::TelemetrySenderInitError(err) => {
+                write!(
                     f,
-                    "BoardCreationError Stepper drive initialization error: {}, idx: {}",
-                    err, idx
-                )
-            }
-            BoardCreationError::TouchSensorInitError(err) => {
-                defmt::write!(
-                    f,
-                    "BoardCreationError Touch sensor initialization error: {}",
+                    "Telemetry sender initialization error: {}",
                     err
                 )
+
             }
         }
     }

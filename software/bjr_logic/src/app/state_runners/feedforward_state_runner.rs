@@ -12,6 +12,7 @@ use crate::app::consts::MOTOR_NUM;
 use crate::app::control::feedforward_generator::{FeedForwardGen, FFGenContCircle};
 use crate::app::control::MotorController::MotorController;
 use crate::app::control_primitives::{KinState, PlateState};
+use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(Default, Display, Copy, Clone)]
 enum FeedForwardStateRunnerState {
@@ -50,6 +51,7 @@ impl RunnableState for FeedforwardStateRunner {
         _event_queue: EventQueue,
         logger: &mut LOG,
         command: &StateRunnerCommand,
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), StateRunnerError> {
         match command {
             StateRunnerCommand::FeedForwardPlateCommand(ff_plate_state) => {
@@ -57,7 +59,7 @@ impl RunnableState for FeedforwardStateRunner {
                 iomanager
                     .write_all_outputs(Outputs {
                         piston_state: motor_outputs.map(|o| (o, ControlMode::Position)),
-                    })
+                    },telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
 
                 self.state = FeedForwardStateRunnerState::NoState;
@@ -66,7 +68,7 @@ impl RunnableState for FeedforwardStateRunner {
             StateRunnerCommand::FeedForwardMotorCommand(motor_command) => {
                 iomanager.write_all_outputs(Outputs {
                     piston_state: motor_command.map(|o| (o, ControlMode::Position)),
-                })
+                }, telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
 
                 self.state = FeedForwardStateRunnerState::NoState;
@@ -80,7 +82,7 @@ impl RunnableState for FeedforwardStateRunner {
         match self.state {
             FeedForwardStateRunnerState::NoState => {}
             FeedForwardStateRunnerState::Circling => {
-                let motors_state = iomanager.read_motor_inputs().map_err(|e|StateRunnerError::IOError(e))?;
+                let motors_state = iomanager.read_motor_inputs(telemetry_builder).map_err(|e|StateRunnerError::IOError(e))?;
                 let desired_state = PlateState::default() + self.ff_circler.get_ff(call_time);
                 let mut motors_setpoint = inverse_kinematics(&desired_state);
                 let mut motor_outputs: [KinState;3] = Default::default();
@@ -90,7 +92,7 @@ impl RunnableState for FeedforwardStateRunner {
                 iomanager
                     .write_all_outputs(Outputs {
                         piston_state: motor_outputs.map(|o| (o, ControlMode::Velocity)),
-                    })
+                    }, telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
             }
         }

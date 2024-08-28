@@ -270,3 +270,19 @@ impl defmt::Format for CommsError {
         }
     }
 }
+#[derive(Clone, Copy)]
+pub enum TelemetrySenderError {
+    ConnectionError,
+    SendError,
+}
+impl Display for TelemetrySenderError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            TelemetrySenderError::ConnectionError => {write!(f, "Connection Error")}
+            TelemetrySenderError::SendError => {write!(f, "Sending Error")}
+        }
+    }
+}
+pub trait TelemetrySender {
+    fn send(&mut self, data:&[u8])-> Result<(),TelemetrySenderError>;
+}

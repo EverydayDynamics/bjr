@@ -1,5 +1,5 @@
 use crate::boards::{BoardCreationError, BoardResources};
-use bsp_traits::StepperMotorController;
+use bsp_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError};
 use bsp_traits::{
     Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, Point, Reader,
     StepperDeviceError, TouchSensor, TouchSensorError,
@@ -8,10 +8,11 @@ use core::fmt::Display;
 use log;
 use std::io;
 use std::io::{Read, Write};
-use std::sync::mpsc;
+use std::sync::{Arc, mpsc, Mutex};
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::TryRecvError;
 use std::{thread, time};
+use std::net::{TcpListener, TcpStream};
 
 // global logger
 pub struct MockBoard {}
@@ -35,6 +36,7 @@ impl BoardResources for MockBoard {
     type StepperDriveC = Dummy;
     type TouchSensor = Dummy;
     type MenuIO = NativeIO;
+    type TelemetrySender = TcpTelemetrySender;
 
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO) {
         env_logger::init();
@@ -49,10 +51,12 @@ impl BoardResources for MockBoard {
             Self::StepperDriveB,
             Self::StepperDriveC,
             Self::TouchSensor,
+            Self::TelemetrySender,
         ),
         BoardCreationError,
     > {
-        Ok((Dummy {}, Dummy {}, Dummy {}, Dummy {}, Dummy {}))
+        let telemetry = TcpTelemetrySender::new("127.0.0.1:8080").map_err(|e|BoardCreationError::TelemetrySenderInitError(e))?;
+        Ok((Dummy {}, Dummy {}, Dummy {}, Dummy {}, Dummy {}, telemetry))
     }
 }
 impl MockBoard {
@@ -153,5 +157,35 @@ impl core::fmt::Write for NativeIO {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         io::stdout().write(s.as_ref()).unwrap();
         Ok(())
+    }
+}
+pub struct TcpTelemetrySender {
+    address: &'static str,
+    stream: Option<TcpStream>,
+}
+
+impl TcpTelemetrySender {
+    // Constructor
+    pub fn new(address: &'static str) -> Result<Self, TelemetrySenderError> {
+
+        Ok(TcpTelemetrySender { address, stream: None })    }
+}
+
+// Implement the TelemetrySender trait for our struct
+impl TelemetrySender for TcpTelemetrySender {
+    fn send(&mut self, data: &[u8]) -> Result<(), TelemetrySenderError> {
+        if let Some(stream) = &mut self.stream {
+            stream.write(data).map_err(|_|TelemetrySenderError::SendError)?;
+            Ok(())
+        } else {
+            if let Ok(mut stream) = TcpStream::connect(self.address) {
+                stream.write(data).map_err(|_|TelemetrySenderError::SendError)?;
+                self.stream = Some(stream);
+                Ok(())
+            } else {
+                Err(TelemetrySenderError::SendError)
+
+            }
+        }
     }
 }

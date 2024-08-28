@@ -8,6 +8,7 @@ use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::event_handler::State;
+use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum StateRunnerError {
@@ -124,6 +125,7 @@ pub trait RunnableState {
         event_queue: EventQueue,
         logger: &mut LOG,
         command: &StateRunnerCommand,
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), StateRunnerError>;
     fn exit<LOG: Logger>(&mut self, call_time: Microseconds<u64>, logger: &mut LOG);
 }

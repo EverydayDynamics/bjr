@@ -98,6 +98,7 @@ mod tests {
         Report,
         Ignore,
     }
+    impl LoggableMessage for TestError{}
     impl Display for TestError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             write!(f, "{:?}", self)

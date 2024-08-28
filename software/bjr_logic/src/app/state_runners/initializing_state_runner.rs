@@ -5,6 +5,8 @@ use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerErr
 use bsp_traits::Logger;
 use bsp_traits::MotorEnabler;
 use embedded_time::duration::Microseconds;
+use crate::app::telemetry_handler::TelemetryBuilder;
+
 #[derive(Default)]
 pub struct InitializingStateRunner {}
 impl RunnableState for InitializingStateRunner {
@@ -22,6 +24,7 @@ impl RunnableState for InitializingStateRunner {
         event_queue: EventQueue,
         logger: &mut LOG,
         _command: &StateRunnerCommand,
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), StateRunnerError> {
         event_queue
             .enqueue(GlobEvent::InitFinished)

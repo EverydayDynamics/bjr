@@ -12,6 +12,7 @@ use crate::app::state_runners::default_state_runner::DefaultStateRunner;
 use crate::app::state_runners::feedforward_state_runner::FeedforwardStateRunner;
 use crate::app::state_runners::homing_state_runner::HomingStateRunner;
 use crate::app::state_runners::initializing_state_runner::InitializingStateRunner;
+use crate::app::telemetry_handler::TelemetryBuilder;
 
 pub trait StateRunnerSelector {
     fn get_runner(&mut self, state: State) -> &mut StateRunnerWrapper;
@@ -34,13 +35,13 @@ impl RunnableState for StateRunnerWrapper {
         }
     }
 
-    fn update<LOG: Logger>(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut LOG, command: &StateRunnerCommand) -> Result<(), StateRunnerError> {
+    fn update<LOG: Logger>(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut LOG, command: &StateRunnerCommand,telemetry_builder: &mut TelemetryBuilder ) -> Result<(), StateRunnerError> {
         match self {
-            StateRunnerWrapper::Default(runner) => {runner.update(iomanager, call_time, event_queue, logger,command)}
-            StateRunnerWrapper::Initializing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command)}
-            StateRunnerWrapper::CenterHoldControl(runner) => {runner.update(iomanager, call_time, event_queue, logger,command)}
-            StateRunnerWrapper::Feedforward(runner) => {runner.update(iomanager, call_time, event_queue, logger,command)}
-            StateRunnerWrapper::Homing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command)}
+            StateRunnerWrapper::Default(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
+            StateRunnerWrapper::Initializing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
+            StateRunnerWrapper::CenterHoldControl(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
+            StateRunnerWrapper::Feedforward(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
+            StateRunnerWrapper::Homing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
         }
     }
 

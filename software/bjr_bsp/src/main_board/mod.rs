@@ -19,8 +19,9 @@ use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130Steppe
 use crate::utils::error_wrapper::ErrorWrapper;
 use crate::utils::spidev::{SpiDevError, Spidev};
 use embedded_hal::spi::{Error, ErrorKind};
-use rtt_target::{rtt_init, ChannelMode};
+use rtt_target::{rtt_init, ChannelMode, UpChannel, DownChannel};
 use stm32f4xx_hal::pac::SPI1;
+use crate::devices::rtt_telemetry::RttTelemetry;
 
 // global logger
 pub struct MyBoard {
@@ -34,6 +35,8 @@ pub struct MyBoard {
     cs_touch_sense_pin: Option<Pin<'A', 8, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
+    rtt_up_channels: [Option<UpChannel>;3],
+    rtt_down_channels: [Option<DownChannel>;1],
 }
 pub struct InfallibleResources {
     pub motor_enabler: GPIOMotorEnabler<Pin<'B', 7, Output>>,
@@ -76,6 +79,32 @@ impl MyBoard {
             2000.kHz(),
             &clocks,
         );
+        let channels = rtt_init! {
+            up: {
+                0: {
+                    size: 512,
+                    mode: ChannelMode::NoBlockSkip,
+                    name: "Menu output"
+                }
+                1: {
+                    size: 1024,
+                    mode: ChannelMode::NoBlockSkip,
+                    name: "Log output"
+                }
+                2: {
+                    size: 1024,
+                    mode: ChannelMode::NoBlockSkip,
+                    name: "Telemetry output"
+                }
+            }
+            down: {
+                0: {
+                    size: 512,
+                    mode: ChannelMode::NoBlockSkip,
+                    name: "Menu Input"
+                }
+            }
+        };
         MyBoard {
             button_pin,
             mot_a_lim_pin,
@@ -83,10 +112,12 @@ impl MyBoard {
             mot_c_lim_pin,
             motor_enabler_pin: Some(motor_enabler_pin),
             spi1: Some(spi),
+            rtt_up_channels: [Some(channels.up.0), Some(channels.up.1), Some(channels.up.2)],
             cs_mot_a_pin: Some(cs_mot_a_pin),
             cs_mot_b_pin: Some(cs_mot_b_pin),
             cs_mot_c_pin: Some(cs_mot_c_pin),
             cs_touch_sense_pin: Some(cs_touch_sense_pin),
+            rtt_down_channels: [Some(channels.down.0)],
         }
     }
 }
@@ -102,33 +133,13 @@ impl BoardResources for MyBoard {
         TMC5130StepperDev<Spidev<'static, Spi<SPI1>, Pin<'A', 9, Output>>, Pin<'A', 10>>;
     type TouchSensor = Tsc2046TouchDev<Spidev<'static, Spi<SPI1>, Pin<'A', 8, Output>>>;
     type MenuIO = RttRWInterface;
+    type TelemetrySender = RttTelemetry;
 
     fn get_infallible_resources(&mut self) -> (Self::MotorEnabler, Self::LogDevice, Self::MenuIO) {
-        let channels = rtt_init! {
-            up: {
-                0: {
-                    size: 512,
-                    mode: ChannelMode::BlockIfFull,
-                    name: "Menu output"
-                }
-                1: {
-                    size: 1024,
-                    mode: ChannelMode::BlockIfFull,
-                    name: "Log output"
-                }
-            }
-            down: {
-                0: {
-                    size: 512,
-                    mode: ChannelMode::BlockIfFull,
-                    name: "Menu Input"
-                }
-            }
-        };
         (
             GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()),
-            RttLogger::new(channels.up.1),
-            RttRWInterface::new(channels.up.0, channels.down.0),
+            RttLogger::new(self.rtt_up_channels[1].take().unwrap()),
+            RttRWInterface::new(self.rtt_up_channels[0].take().unwrap(), self.rtt_down_channels[0].take().unwrap()),
         )
     }
     fn get_fallible_resources(
@@ -140,6 +151,7 @@ impl BoardResources for MyBoard {
             Self::StepperDriveB,
             Self::StepperDriveC,
             Self::TouchSensor,
+            Self::TelemetrySender,
         ),
         BoardCreationError,
     > {
@@ -172,12 +184,14 @@ impl BoardResources for MyBoard {
             .map_err(|e| BoardCreationError::StepperDriveInitError(e, 2))?;
         let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device)
             .map_err(|e| BoardCreationError::TouchSensorInitError(e))?;
+        let telemetry_sender = RttTelemetry::new(self.rtt_up_channels[2].take().unwrap());
         Ok((
             button,
             stp_motor_drive_a,
             stp_motor_drive_b,
             stp_motor_drive_c,
             touch_sense_dev,
+            telemetry_sender,
         ))
     }
 }

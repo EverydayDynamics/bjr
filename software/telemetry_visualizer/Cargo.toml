@@ -1,0 +1,12 @@
+[package]
+name = "telemetry_visualizer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bjr_telemetry = {path = "../bjr_telemetry"}
+eframe = "0.28.1"
+egui_plot = "0.28.1"
+serde = { version = "1.0.208", features = ["derive"] }
+strum = { version = "0.26.3", default-features = false, features = ["derive"] }
+postcard = "1.0.10"

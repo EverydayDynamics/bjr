@@ -95,14 +95,13 @@ mod app {
         let mut board = Board::new();
         let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
         let timer_clock_hz = 75_000_000; // ??????????????????????????????
-                                         // Start the monotonic
-        Mono::start(timer_clock_hz, token);
+        Mono::start(timer_clock_hz, token); // Start the monotonic;
         let mut menu_context = MenuContext::default();
 
         let mut logic_runner = build_application(&mut board, &mut menu_context);
         loop {
             let now = Mono::now().ticks();
-            let next_run = logic_runner.update(Microseconds(now));
+            let next_run = logic_runner.update();
             let baba: Instant<u64, 1, 1000000> =
                 Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());
             Mono::delay_until(baba).await;

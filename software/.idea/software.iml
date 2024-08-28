@@ -10,12 +10,20 @@
       <sourceFolder url="file://$MODULE_DIR$/bjr_logic/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bjr_on_host/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/bsp_traits/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/bjr_telemetry/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/telemetry_visualizer/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/os_al/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/os_traits/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/bjr_bsp/target" />
       <excludeFolder url="file://$MODULE_DIR$/bjr_builder/target" />
       <excludeFolder url="file://$MODULE_DIR$/bjr_central_control_rust/target" />
       <excludeFolder url="file://$MODULE_DIR$/bjr_logic/target" />
       <excludeFolder url="file://$MODULE_DIR$/bjr_on_host/target" />
       <excludeFolder url="file://$MODULE_DIR$/bsp_traits/target" />
+      <excludeFolder url="file://$MODULE_DIR$/bjr_telemetry/target" />
+      <excludeFolder url="file://$MODULE_DIR$/telemetry_visualizer/target" />
+      <excludeFolder url="file://$MODULE_DIR$/os_al/target" />
+      <excludeFolder url="file://$MODULE_DIR$/os_traits/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
