@@ -8,7 +8,7 @@ use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{Inputs, IOManager, Outputs};
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{parameter_manager, NoBallTargetHeight};
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
@@ -23,11 +23,11 @@ pub struct ControlStateRunner<CTRL, FFG, SPG> {
     motor_controllers: [MotorController;MOTOR_NUM],
     last_plate_state: PlateState,
 }
-struct CtrlDebugMsg<'a> (&'a PlateState);
+struct CtrlDebugMsg<'a> (&'a [KinState;2]);
 impl<'a> LoggableMessage for CtrlDebugMsg<'a> {}
 impl<'a> Display for CtrlDebugMsg<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-            write!(f, "bst: x:{} \n y:{}", self.0.angle[0], self.0.angle[1])
+            write!(f, "sp:\n x:{} \n y:{}\n t:{}", self.0[0].pos, self.0[1].pos, self.0[0].accel)
     }
 }
 impl<CTRL, FFG, SPG> ControlStateRunner<CTRL, FFG, SPG>
@@ -62,35 +62,29 @@ where
 {
     fn entry<LOG: Logger>(
         &mut self,
-        call_time: Microseconds<u64>,
-        _motor_enabler: &mut dyn MotorEnabler,
-        _logger: &mut LOG,
+        ctx: &mut StateRunnerContext<LOG>
     ) {
-        self.controller.reset(call_time);
-        self.ff_generator.reset(call_time);
-        self.sp_generator.reset(call_time);
+        self.controller.reset(ctx.call_time);
+        self.ff_generator.reset(ctx.call_time);
+        self.sp_generator.reset(ctx.call_time);
         self.counter=0;
     }
     fn update<LOG: Logger>(
         &mut self,
-        iomanager: &mut dyn IOManager,
-        call_time: Microseconds<u64>,
-        _event_queue: EventQueue,
-        logger: &mut LOG,
-        _command: &StateRunnerCommand,
-        telemetry_builder: &mut TelemetryBuilder,
+        ctx: &mut StateRunnerContext<LOG>
     ) -> Result<(), StateRunnerError> {
         let target_height_pos = parameter_manager().get::<NoBallTargetHeight>();
-        let inputs = iomanager
-            .read_all_inputs(call_time, telemetry_builder)
+        let inputs = ctx.iomanager
+            .read_all_inputs(ctx.call_time, ctx.telemetry_builder)
             .map_err(StateRunnerError::IOError)?;
-        let feed_forward = self.ff_generator.get_ff(call_time);
+        let feed_forward = self.ff_generator.get_ff(ctx.call_time);
         let target_plate_state = if let Some(ball_state) = inputs.measured_ball_state {
-            if self.counter >5 {
+            if self.counter >0 {
                 self.counter =0;
-                let setpoint = self.sp_generator.get_sp(call_time);
+                let setpoint = self.sp_generator.get_sp(ctx.call_time);
+                ctx.logger.debug(CtrlDebugMsg(&setpoint));
                 self.last_plate_state = self.controller.update(
-                    call_time,
+                    ctx.call_time,
                     ControlInputs {
                         ball_setpoint: setpoint,
                         measured_plate_state: PlateState {
@@ -114,15 +108,20 @@ where
         let motor_setpoints = inverse_kinematics(&final_target);
         let mut motor_outputs: [KinState;MOTOR_NUM] = Default::default();
         for mot_idx in 0..MOTOR_NUM {
-            motor_outputs[mot_idx] = self.motor_controllers[mot_idx].calc(motor_setpoints[mot_idx], inputs.measured_motors_state[mot_idx].0);
+            let mut tracking_error:f32 = 0.0;
+            (motor_outputs[mot_idx], tracking_error) = self.motor_controllers[mot_idx].calc(motor_setpoints[mot_idx], inputs.measured_motors_state[mot_idx].0);
+            ctx.telemetry_builder.add_motor_control(mot_idx, tracking_error);
         }
 
-        iomanager
+        ctx.iomanager
             .write_all_outputs(Outputs {
                 piston_state: motor_outputs.map(|o| (o, ControlMode::Velocity)),
-            }, telemetry_builder)
+            }, ctx.telemetry_builder)
             .map_err(StateRunnerError::IOError)?;
         Ok(())
     }
-    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, _logger: &mut LOG) {}
+    fn exit<LOG: Logger>(
+        &mut self,
+        ctx: &mut StateRunnerContext<LOG>
+    ) {}
 }

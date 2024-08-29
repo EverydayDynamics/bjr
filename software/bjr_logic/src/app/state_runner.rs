@@ -111,21 +111,24 @@ pub enum StateRunnerCommand {
     FeedForwardCircling(CirclingParams),
     NoCommand,
 }
+pub struct StateRunnerContext<'a, LOG> {
+    pub iomanager: &'a mut dyn IOManager,
+    pub call_time: Microseconds<u64>,
+    pub event_queue: EventQueue,
+    pub logger: &'a mut LOG,
+    pub command: &'a StateRunnerCommand,
+    pub telemetry_builder: &'a mut TelemetryBuilder,
+    pub motor_enabler: &'a mut dyn MotorEnabler,
+}
 pub trait RunnableState {
     fn entry<LOG: Logger>(
         &mut self,
-        call_time: Microseconds<u64>,
-        motor_enabler: &mut dyn MotorEnabler,
-        logger: &mut LOG,
+        ctx: &mut StateRunnerContext<LOG>
     );
     fn update<LOG: Logger>(
         &mut self,
-        iomanager: &mut dyn IOManager,
-        call_time: Microseconds<u64>,
-        event_queue: EventQueue,
-        logger: &mut LOG,
-        command: &StateRunnerCommand,
-        telemetry_builder: &mut TelemetryBuilder,
+        ctx: &mut StateRunnerContext<LOG>
     ) -> Result<(), StateRunnerError>;
-    fn exit<LOG: Logger>(&mut self, call_time: Microseconds<u64>, logger: &mut LOG);
+    fn exit<LOG: Logger>(&mut self,
+                         ctx: &mut StateRunnerContext<LOG>);
 }

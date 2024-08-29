@@ -3,7 +3,7 @@ use crate::app::control::inverse_kinematics::inverse_kinematics;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, Outputs};
 use crate::app::motor_handler::ControlMode;
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use embedded_time::fixed_point::FixedPoint;
@@ -38,37 +38,30 @@ impl Display for FFDebugMsg {
 impl RunnableState for FeedforwardStateRunner {
     fn entry<LOG: Logger>(
         &mut self,
-        _call_time: Microseconds<u64>,
-        _motor_enabler: &mut dyn MotorEnabler,
-        _logger: &mut LOG,
+        ctx: &mut StateRunnerContext<LOG>
     ) {
         //self.state = FeedForwardStateRunnerState::NoState;
     }
     fn update<LOG: Logger>(
         &mut self,
-        iomanager: &mut dyn IOManager,
-        call_time: Microseconds<u64>,
-        _event_queue: EventQueue,
-        logger: &mut LOG,
-        command: &StateRunnerCommand,
-        telemetry_builder: &mut TelemetryBuilder,
+        ctx: &mut StateRunnerContext<LOG>
     ) -> Result<(), StateRunnerError> {
-        match command {
+        match ctx.command {
             StateRunnerCommand::FeedForwardPlateCommand(ff_plate_state) => {
                 let motor_outputs = inverse_kinematics(ff_plate_state);
-                iomanager
+                ctx.iomanager
                     .write_all_outputs(Outputs {
                         piston_state: motor_outputs.map(|o| (o, ControlMode::Position)),
-                    },telemetry_builder)
+                    },ctx.telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
 
                 self.state = FeedForwardStateRunnerState::NoState;
             }
             StateRunnerCommand::NoCommand => {}
             StateRunnerCommand::FeedForwardMotorCommand(motor_command) => {
-                iomanager.write_all_outputs(Outputs {
+                ctx.iomanager.write_all_outputs(Outputs {
                     piston_state: motor_command.map(|o| (o, ControlMode::Position)),
-                }, telemetry_builder)
+                }, ctx.telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
 
                 self.state = FeedForwardStateRunnerState::NoState;
@@ -78,25 +71,30 @@ impl RunnableState for FeedforwardStateRunner {
                 self.state = FeedForwardStateRunnerState::Circling;
             }
         }
-        logger.debug(FFDebugMsg(self.state, call_time.integer()));
+        ctx.logger.debug(FFDebugMsg(self.state, ctx.call_time.integer()));
         match self.state {
             FeedForwardStateRunnerState::NoState => {}
             FeedForwardStateRunnerState::Circling => {
-                let motors_state = iomanager.read_motor_inputs(telemetry_builder).map_err(|e|StateRunnerError::IOError(e))?;
-                let desired_state = PlateState::default() + self.ff_circler.get_ff(call_time);
+                let motors_state = ctx.iomanager.read_motor_inputs(ctx.telemetry_builder).map_err(|e|StateRunnerError::IOError(e))?;
+                let desired_state = PlateState::default() + self.ff_circler.get_ff(ctx.call_time);
                 let mut motors_setpoint = inverse_kinematics(&desired_state);
                 let mut motor_outputs: [KinState;3] = Default::default();
                 for mot_idx in 0..MOTOR_NUM {
-                    motor_outputs[mot_idx] = self.motor_controllers[mot_idx].calc(motors_setpoint[mot_idx], motors_state[mot_idx].0);
+                    let mut tracking_error:f32 = 0.0;
+                    (motor_outputs[mot_idx],tracking_error) = self.motor_controllers[mot_idx].calc(motors_setpoint[mot_idx], motors_state[mot_idx].0);
+                    ctx.telemetry_builder.add_motor_control(mot_idx, tracking_error);
                 }
-                iomanager
+                ctx.iomanager
                     .write_all_outputs(Outputs {
                         piston_state: motor_outputs.map(|o| (o, ControlMode::Velocity)),
-                    }, telemetry_builder)
+                    }, ctx.telemetry_builder)
                     .map_err(StateRunnerError::IOError)?;
             }
         }
         Ok(())
     }
-    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, _logger: &mut LOG) {}
+    fn exit<LOG: Logger>(
+        &mut self,
+        ctx: &mut StateRunnerContext<LOG>
+    ) {}
 }

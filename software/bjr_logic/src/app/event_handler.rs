@@ -183,7 +183,7 @@ impl EventHandler {
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
                 },
                 State::RunningCircling => match event {
-                    GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningTriangle),
+                    GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCenterHold),
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),

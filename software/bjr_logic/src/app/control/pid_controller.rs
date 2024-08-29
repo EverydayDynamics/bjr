@@ -23,9 +23,9 @@ impl Controller for PIDController {
         let mut output_angles = [KinState::default(); 2];
         for axis in 0..2 {
             let error = inputs.ball_setpoint[axis].pos - inputs.measured_ball_state[axis].pos;
-            let error_d = (error-self.last_error[axis])/usec2sec((call_time- self.last_call_time).integer());
+            let error_d = inputs.ball_setpoint[axis].speed - inputs.measured_ball_state[axis].speed;
             self.last_error[axis] = error;
-            let target_ball_accel = error* k_p + error_d * k_d;
+            let target_ball_accel = error* k_p + error_d * k_d + inputs.ball_setpoint[axis].accel;
             let target_angle = asinf((target_ball_accel/g)*(7.0/5.0));
             output_angles[axis].pos = target_angle;
         }

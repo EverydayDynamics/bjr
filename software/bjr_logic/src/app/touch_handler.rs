@@ -105,8 +105,8 @@ pub trait Differentiator {
 //[ 1.        ,  2.08333333,  1.45833333,  0.41666667,  0.04166667]]
 //for the first derivative we need the second column
 pub struct SGDifferentiator<const WIN: usize, const ORD:usize> {
-    ring_buffer: Deque<f32,11>,
-    coeffs:[f32;11]
+    ring_buffer: Deque<f32,21>,
+    coeffs:[f32;21]
 }
 impl<const WIN: usize, const ORD:usize> SGDifferentiator<WIN, ORD> {
     pub fn new()->SGDifferentiator<WIN, ORD> {
@@ -119,17 +119,27 @@ impl<const WIN: usize, const ORD:usize> SGDifferentiator<WIN, ORD> {
         SGDifferentiator{
             ring_buffer: Deque::new(), coeffs:
             [
-                -4.54545455e-02,
-                -3.63636364e-02,
-                -2.72727273e-02,
-                -1.81818182e-02,
-                -9.09090909e-03,
-                3.61385101e-18,
-                9.09090909e-03,
-                1.81818182e-02,
-                2.72727273e-02,
-                3.63636364e-02,
-                4.54545455e-02
+                -0.012987012987012988 ,
+                -0.011688311688311684 ,
+                -0.010389610389610388 ,
+                -0.00909090909090909 ,
+                -0.007792207792207791 ,
+                -0.006493506493506494 ,
+                -0.005194805194805194 ,
+                -0.0038961038961038957 ,
+                -0.002597402597402597 ,
+                -0.0012987012987012985 ,
+                0.0 ,
+                0.0012987012987012985 ,
+                0.0025974025974025974 ,
+                0.0038961038961038952 ,
+                0.005194805194805193 ,
+                0.006493506493506491 ,
+                0.00779220779220779 ,
+                0.00909090909090909 ,
+                0.010389610389610388 ,
+                0.011688311688311687 ,
+                0.012987012987012986 ,
             ]
         }
     }

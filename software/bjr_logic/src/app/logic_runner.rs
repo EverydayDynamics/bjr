@@ -7,7 +7,7 @@ use crate::app::menu_handler::MenuHandler;
 use crate::app::parameter_manager::{parameter_manager, LogicRunnerPeriodUs};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
-use crate::app::state_runner::StateRunnerCommand;
+use crate::app::state_runner::{StateRunnerCommand, StateRunnerContext};
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
 use bsp_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
@@ -65,7 +65,8 @@ where
     button_handler: ButtonHandler<BTN>,
     event_queue: &'static Q8<GlobEvent>,
     event_handler: EventHandler,
-    state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC, TS, DIFF>>,
+    state_manager: StateManager<DefaultStateRunnerSelector>,
+    io_manager: DefaultIOManager<MA, MB, MC, TS, DIFF>,
     error_handler: ErrorHandler,
     log_device: LOG,
     motor_enabler: ME,
@@ -93,7 +94,8 @@ where
     pub fn new(
         button_handler: ButtonHandler<BTN>,
         event_queue: &'static Q8<GlobEvent>,
-        state_manager: StateManager<DefaultStateRunnerSelector, DefaultIOManager<MA, MB, MC, TS, DIFF>>,
+        state_manager: StateManager<DefaultStateRunnerSelector>,
+        io_manager: DefaultIOManager<MA, MB, MC, TS, DIFF>,
         event_handler: EventHandler,
         error_handler: ErrorHandler,
         log_device: LOG,
@@ -110,6 +112,7 @@ where
             event_queue,
             event_handler,
             state_manager,
+            io_manager,
             error_handler,
             log_device,
             motor_enabler,
@@ -164,14 +167,18 @@ where
                     self.handle_error(Err(error));
                 }
                 Ok(state) => {
+                    let mut state_ctx = StateRunnerContext{
+                        iomanager: &mut self.io_manager,
+                        call_time,
+                        event_queue: self.event_queue,
+                        logger: &mut self.log_device,
+                        command: &self.state_runner_command,
+                        telemetry_builder: &mut telemetry_builder,
+                        motor_enabler: &mut self.motor_enabler,
+                    };
                     let state_manager_result = self.state_manager.update(
                         state,
-                        call_time,
-                        self.event_queue,
-                        &mut self.motor_enabler,
-                        &mut self.log_device,
-                        &self.state_runner_command,
-                        &mut telemetry_builder,
+                        &mut state_ctx
                     );
                     self.handle_error(state_manager_result);
                 }
@@ -183,7 +190,7 @@ where
             let telem_result = self.telemetry_handler.send_packet(telemetry_builder
                     .get_packet())
                 .map_err(|e|LogicRunnerError::TelementryError(e));
-        self.handle_error(telem_result);
+        //self.handle_error(telem_result);
         self.next_call_time = Some(next_call_time);
         let end_time = self.time_control.get_tick();
         self.last_end_time = Some(Microseconds::<u64>::new(end_time));

@@ -115,7 +115,7 @@ generate_parameter_types!(
     (AtomicF32, f32, HomingMaxTravel, 20e-3),
     (AtomicF32, f32, HomingAccel, 5e-3),
     //running period
-    (AtomicU32, u32, LogicRunnerPeriodUs, 10000),
+    (AtomicU32, u32, LogicRunnerPeriodUs, 3000),
     //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -2712),
     (AtomicI32, i32, TouchCenterOffsetY, -1933),
@@ -143,10 +143,13 @@ generate_parameter_types!(
     (AtomicF32, f32, MCAccel, 5e-3),
     (AtomicF32, f32, MCVelMax, 40e-3),
     (AtomicF32, f32, MCVelMin, -40e-3),
-    (AtomicF32, f32, MCDeadBand, 1e-4),
+    (AtomicF32, f32, MCPosDeadBand, 1e-5),
     //PlatePDController
     (AtomicF32, f32, PlatePDCtrlKp, 10.0),
-    (AtomicF32, f32, PlatePDCtrlKd, 0.1),
+    (AtomicF32, f32, PlatePDCtrlKd, 1.0),
+    //circling setpoint generator
+    (AtomicF32, f32, SPCirclingRadius, 20e-3),
+    (AtomicF32, f32, SPCirclingTime, 5.0),
 
 
 );

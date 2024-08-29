@@ -94,13 +94,14 @@ pub fn build_application<
             );
             let touch_handler = TouchHandler::new(touch_sensor, [SGDifferentiator::new(), SGDifferentiator::new()], Microseconds::default(), None);
             let io_manager = DefaultIOManager::new(motor_handler, touch_handler);
-            let state_manager = StateManager::new(DefaultStateRunnerSelector::new(), io_manager);
+            let state_manager = StateManager::new(DefaultStateRunnerSelector::new());
             let event_handler = EventHandler::new(event_queue);
             let telemetry_handler = TelemetryHandler::new(telemetry);
             LogicRunner::new(
                 button_handler,
                 event_queue,
                 state_manager,
+                io_manager,
                 event_handler,
                 error_handler,
                 log_device,

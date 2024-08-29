@@ -27,10 +27,26 @@ mod app {
     use rtic_monotonics::stm32::fugit::Instant;
     use rtic_monotonics::stm32::Tim2 as Mono;
     use rtic_monotonics::stm32::*;
-    use rtic_monotonics::Monotonic;
+    use rtic_monotonics::{InterruptToken, Monotonic};
     use stm32f4xx_hal::prelude::*;
     use defmt;
+    use os_traits::TimeControl;
+    struct STM32TimeControl {
 
+    }
+    impl<> STM32TimeControl
+    {
+       fn new<T:InterruptToken<Tim2>>(token:T, rate_hz:u32) -> STM32TimeControl {
+           Mono::start(rate_hz, token); // Start the monotonic;
+           STM32TimeControl{}
+       }
+
+    }
+    impl TimeControl for STM32TimeControl {fn get_tick(&self) -> u64 {
+        Mono::now().ticks()
+    }
+
+    }
     pub enum AppError {
         SetupError(BoardCreationError),
     }
@@ -89,18 +105,15 @@ mod app {
         }
     }
 
-    // TODO: Add tasks
     #[task(priority = 1)]
     async fn task1(cx: task1::Context) {
         let mut board = Board::new();
         let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
         let timer_clock_hz = 75_000_000; // ??????????????????????????????
-        Mono::start(timer_clock_hz, token); // Start the monotonic;
         let mut menu_context = MenuContext::default();
-
-        let mut logic_runner = build_application(&mut board, &mut menu_context);
+        let time_control = STM32TimeControl::new(token, timer_clock_hz);
+        let mut logic_runner = build_application(&mut board, &mut menu_context, time_control);
         loop {
-            let now = Mono::now().ticks();
             let next_run = logic_runner.update();
             let baba: Instant<u64, 1, 1000000> =
                 Instant::<u64, 1, 1000000>::from_ticks(next_run.integer());

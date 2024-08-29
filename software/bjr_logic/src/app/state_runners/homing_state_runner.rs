@@ -8,7 +8,7 @@ use crate::app::parameter_manager::{
     parameter_manager, HomingAccel, HomingHighVelocity, HomingLowVelocity, HomingMaxTravel,
     HomingSafePosition,
 };
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
@@ -131,22 +131,15 @@ impl HomingStateRunner {
 impl RunnableState for HomingStateRunner {
     fn entry<LOG: Logger>(
         &mut self,
-        _call_time: Microseconds<u64>,
-        motor_enabler: &mut dyn MotorEnabler,
-        _logger: &mut LOG,
+        ctx: &mut StateRunnerContext<LOG>
     ) {
-        motor_enabler.set_enable(true);
+        ctx.motor_enabler.set_enable(true);
         self.states = [HomingStateRunnerState::Default; MOTOR_NUM];
     }
 
     fn update<LOG: Logger>(
         &mut self,
-        iomanager: &mut dyn IOManager,
-        _call_time: Microseconds<u64>,
-        event_queue: EventQueue,
-        logger: &mut LOG,
-        _command: &StateRunnerCommand,
-        telemetry_builder: &mut TelemetryBuilder,
+        ctx: &mut StateRunnerContext<LOG>
     ) -> Result<(), StateRunnerError> {
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();
@@ -155,8 +148,8 @@ impl RunnableState for HomingStateRunner {
         let homing_accel = parameter_manager().get::<HomingAccel>();
 
         let mut retval = Ok(());
-        let inputs = iomanager
-            .read_motor_inputs(telemetry_builder)
+        let inputs = ctx.iomanager
+            .read_motor_inputs(ctx.telemetry_builder)
             .map_err(StateRunnerError::HomingIOError)?;
         let mut outputs: [Option<(KinState, ControlMode)>; 3] = [None; MOTOR_NUM];
         let mut motor_idx = 0;
@@ -170,7 +163,7 @@ impl RunnableState for HomingStateRunner {
             let mut maybe_next_state: Option<HomingStateRunnerState> = None;
             match state {
                 HomingStateRunnerState::Default => {
-                    iomanager
+                    ctx.iomanager
                         .reset_motor_pos(motor_idx)
                         .map_err(StateRunnerError::HomingIOError)?;
                     if input.1.limit_reached {
@@ -197,7 +190,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::FastApproach => {
                     if input.1.limit_reached {
-                        iomanager
+                        ctx.iomanager
                             .reset_motor_pos(motor_idx)
                             .map_err(StateRunnerError::HomingIOError)?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterFastApproach);
@@ -232,7 +225,7 @@ impl RunnableState for HomingStateRunner {
                 }
                 HomingStateRunnerState::SlowApproach => {
                     if input.1.limit_reached {
-                        iomanager
+                        ctx.iomanager
                             .reset_motor_pos(motor_idx)
                             .map_err(StateRunnerError::HomingIOError)?;
                         maybe_next_state.replace(HomingStateRunnerState::StoppingAfterSlowApproach);
@@ -308,22 +301,25 @@ impl RunnableState for HomingStateRunner {
                 }
             }
             if let Some(next_state) = maybe_next_state {
-                logger.debug(HomingStateChangeMessage(*state, next_state, motor_idx));
+                ctx.logger.debug(HomingStateChangeMessage(*state, next_state, motor_idx));
                 *state = next_state;
             }
             motor_idx += 1;
         }
-        iomanager
-            .write_motor_outputs(outputs, telemetry_builder)
+        ctx.iomanager
+            .write_motor_outputs(outputs, ctx.telemetry_builder)
             .map_err(StateRunnerError::HomingIOError)?;
         if done_counter == MOTOR_NUM {
             // All motors homed.
-            event_queue
+            ctx.event_queue
                 .enqueue(GlobEvent::HomingFinished)
                 .map_err(StateRunnerError::QueueFull)?;
         }
         retval
     }
 
-    fn exit<LOG: Logger>(&mut self, _call_time: Microseconds<u64>, logger: &mut LOG) {}
+    fn exit<LOG: Logger>(
+        &mut self,
+        ctx: &mut StateRunnerContext<LOG>
+    ) {}
 }

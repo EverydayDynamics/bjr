@@ -40,8 +40,10 @@ pub enum TelemetryData{
     MotorStateCVel(f32),
     UnfilteredBallXVel(f32),
     UnfilteredBallYVel(f32),
-    MotorCtrlTrackingError(f32),
     CpuUse(f32),
+    MotorACtrlTrackingError(f32),
+    MotorBCtrlTrackingError(f32),
+    MotorCCtrlTrackingError(f32),
 }
 impl TelemetryData {
     pub fn get_idx(&self) -> usize{
@@ -67,8 +69,10 @@ impl TelemetryData {
             TelemetryData::MotorStateCVel(_) => 18,
             TelemetryData::UnfilteredBallXVel(_) => 19,
             TelemetryData::UnfilteredBallYVel(_) => 20,
-            TelemetryData::MotorCtrlTrackingError(_) => 21,
-            TelemetryData::CpuUse(_) => 22,
+            TelemetryData::CpuUse(_) => 21,
+            TelemetryData::MotorACtrlTrackingError(_) => 22,
+            TelemetryData::MotorBCtrlTrackingError(_) => 22,
+            TelemetryData::MotorCCtrlTrackingError(_) => 22,
         }
     }
     pub fn get_printable_value(&self) -> f64 {
@@ -94,8 +98,10 @@ impl TelemetryData {
             TelemetryData::MotorStateCVel(data) => {data}
             TelemetryData::UnfilteredBallXVel(data) => data,
             TelemetryData::UnfilteredBallYVel(data) => data,
-            TelemetryData::MotorCtrlTrackingError(data) => data,
             TelemetryData::CpuUse(data) => data,
+            TelemetryData::MotorACtrlTrackingError(data) => data,
+            TelemetryData::MotorBCtrlTrackingError(data) => data,
+            TelemetryData::MotorCCtrlTrackingError(data) => data,
         };
         *data as f64
     }

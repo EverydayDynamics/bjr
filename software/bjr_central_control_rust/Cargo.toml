@@ -13,6 +13,7 @@ harness = false
 [dependencies]
 bjr_logic = { path = "../bjr_logic", version = "0.1.0", features = [] }
 bsp_traits = { path = "../bsp_traits", version = "0.1.0", features = [] }
+os_traits = {path = "../os_traits"}
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0", features = ["main_board"]}
 bjr_builder = { path = "../bjr_builder", version = "0.1.0", features = []}
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }

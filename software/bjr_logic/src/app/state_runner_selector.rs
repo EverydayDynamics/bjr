@@ -2,11 +2,11 @@ use embedded_time::duration::Microseconds;
 use bsp_traits::{Logger, MotorEnabler};
 use crate::app::control::feedforward_generator::FFGenCH;
 use crate::app::control::pid_controller::PIDController;
-use crate::app::control::setpoint_generator::SetPointGenCH;
+use crate::app::control::setpoint_generator::{SetPointGenCH, SetPointGenCircling};
 use crate::app::event_handler::State;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use crate::app::state_runners::control_state_runner::ControlStateRunner;
 use crate::app::state_runners::default_state_runner::DefaultStateRunner;
 use crate::app::state_runners::feedforward_state_runner::FeedforwardStateRunner;
@@ -22,36 +22,40 @@ pub enum StateRunnerWrapper {
     Initializing(InitializingStateRunner),
     Homing(HomingStateRunner),
     CenterHoldControl(ControlStateRunner<PIDController, FFGenCH, SetPointGenCH>),
+    CirclingControl(ControlStateRunner<PIDController, FFGenCH, SetPointGenCircling>),
     Feedforward(FeedforwardStateRunner),
 }
 impl RunnableState for StateRunnerWrapper {
-    fn entry<LOG: Logger>(&mut self, call_time: Microseconds<u64>, motor_enabler: &mut dyn MotorEnabler, logger: &mut LOG) {
+    fn entry<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>) {
         match self {
-            StateRunnerWrapper::Default(runner) => {runner.entry(call_time,motor_enabler, logger)}
-            StateRunnerWrapper::Initializing(runner) => {runner.entry(call_time,motor_enabler, logger)}
-            StateRunnerWrapper::CenterHoldControl(runner) => {runner.entry(call_time,motor_enabler, logger)}
-            StateRunnerWrapper::Feedforward(runner) => {runner.entry(call_time,motor_enabler, logger)}
-            StateRunnerWrapper::Homing(runner) => {runner.entry(call_time,motor_enabler, logger)}
+            StateRunnerWrapper::Default(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::Initializing(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::CenterHoldControl(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::CirclingControl(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::Feedforward(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::Homing(runner) => {runner.entry(ctx)}
         }
     }
 
-    fn update<LOG: Logger>(&mut self, iomanager: &mut dyn IOManager, call_time: Microseconds<u64>, event_queue: EventQueue, logger: &mut LOG, command: &StateRunnerCommand,telemetry_builder: &mut TelemetryBuilder ) -> Result<(), StateRunnerError> {
+    fn update<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>) -> Result<(), StateRunnerError> {
         match self {
-            StateRunnerWrapper::Default(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
-            StateRunnerWrapper::Initializing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
-            StateRunnerWrapper::CenterHoldControl(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
-            StateRunnerWrapper::Feedforward(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
-            StateRunnerWrapper::Homing(runner) => {runner.update(iomanager, call_time, event_queue, logger,command,telemetry_builder)}
+            StateRunnerWrapper::Default(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::Initializing(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::CenterHoldControl(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::CirclingControl(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::Feedforward(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::Homing(runner) => {runner.update(ctx)}
         }
     }
 
-    fn exit<LOG: Logger>(&mut self, call_time: Microseconds<u64>, logger: &mut LOG) {
+    fn exit<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>) {
         match self {
-            StateRunnerWrapper::Default(runner) => {runner.exit(call_time, logger)}
-            StateRunnerWrapper::Initializing(runner) => {runner.exit(call_time, logger)}
-            StateRunnerWrapper::CenterHoldControl(runner) => {runner.exit(call_time, logger)}
-            StateRunnerWrapper::Feedforward(runner) => {runner.exit(call_time, logger)}
-            StateRunnerWrapper::Homing(runner) => {runner.exit(call_time, logger)}
+            StateRunnerWrapper::Default(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::Initializing(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::CenterHoldControl(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::CirclingControl(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::Feedforward(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::Homing(runner) => {runner.exit(ctx)}
         }
     }
 }
@@ -60,6 +64,7 @@ pub struct DefaultStateRunnerSelector {
     initializing_state_runner: StateRunnerWrapper,
     homing_state_runner: StateRunnerWrapper,
     center_hold_control_runner: StateRunnerWrapper,
+    circling_control_runner: StateRunnerWrapper,
     feedforward_state_runner: StateRunnerWrapper,
 }
 impl Default for DefaultStateRunnerSelector {
@@ -79,6 +84,11 @@ impl DefaultStateRunnerSelector {
                 FFGenCH {},
                 SetPointGenCH {},
             )),
+            circling_control_runner: StateRunnerWrapper::CirclingControl(ControlStateRunner::new(
+                PIDController::default(),
+                FFGenCH {},
+                SetPointGenCircling::default(),
+            )),
             feedforward_state_runner: StateRunnerWrapper::Feedforward(Default::default()),
         }
     }
@@ -89,7 +99,7 @@ impl StateRunnerSelector for DefaultStateRunnerSelector {
             State::Initializing => &mut self.initializing_state_runner,
             State::Homing => &mut self.homing_state_runner,
             State::RunningCenterHold => &mut self.center_hold_control_runner,
-            State::RunningCircling => &mut self.center_hold_control_runner,
+            State::RunningCircling => &mut self.circling_control_runner,
             State::RunningTriangle => &mut self.center_hold_control_runner,
             State::FeedForward => &mut self.feedforward_state_runner,
             State::Deinit => &mut self.default_state_runner,

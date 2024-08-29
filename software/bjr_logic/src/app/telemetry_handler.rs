@@ -68,6 +68,14 @@ impl TelemetryBuilder {
         }
 
     }
+    pub fn add_motor_control(&mut self, motor_idx: usize, tracking_error: f32){
+        match motor_idx {
+            0 => {self.packet.set_field(TelemetryData::MotorACtrlTrackingError(tracking_error));}
+            1 => {self.packet.set_field(TelemetryData::MotorBCtrlTrackingError(tracking_error));}
+            2 => {self.packet.set_field(TelemetryData::MotorCCtrlTrackingError(tracking_error));}
+            _ => {}
+        }
+    }
     pub fn get_packet(self) ->TelemetryPacket {
         self.packet
     }
