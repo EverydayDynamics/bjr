@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="tamas@homelab:22" type="ssh/sftp" uuid="88b8e378-3494-4328-b168-4a853a97e754">
+        <config>
+          <option name="projectRootOnTarget" value="/home/tamas/bjr_central_control_rust" />
+          <option name="serverName" value="tamas@homelab:22 password" />
+        </config>
+        <ContributedStateBase type="RsLanguageRuntime">
+          <config>
+            <option name="cargoPath" value="/home/tamas/.cargo/bin/cargo" />
+            <option name="cargoVersion" value="1.77.2 (e52e36006 2024-03-26)" />
+            <option name="rustcPath" value="/home/tamas/.cargo/bin/rustc" />
+            <option name="rustcVersion" value="1.77.2 (25ef9e3d8 2024-04-09)" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

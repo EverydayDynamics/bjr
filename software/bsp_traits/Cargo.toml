@@ -1,0 +1,10 @@
+[package]
+name = "bsp_traits"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+defmt = { version = "0.3.8", optional = true }
+ufmt = "0.2.0"
+[features]
+defmt = ["dep:defmt"]

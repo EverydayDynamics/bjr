@@ -1,0 +1,14 @@
+[default.general]
+chip = "STM32F446RETx"
+
+[default.rtt]
+# Whether or not an RTTUI should be opened after flashing.
+enabled = true
+up_channels = [
+    { channel = 0, mode = "NoBlockSkip", format = "String" },
+    { channel = 1, mode = "NoBlockSkip", format = "String"},
+    { channel = 2, mode = "NoBlockSkip", format = "BinaryLE", socket = "127.0.0.1:8080" },
+]
+tabs = [
+    { up_channel = 0, name = "Log" },
+]
