@@ -1,4 +1,4 @@
-use bsp_traits::Logger;
+use device_traits::Logger;
 use core::fmt::Display;
 use defmt::Format;
 

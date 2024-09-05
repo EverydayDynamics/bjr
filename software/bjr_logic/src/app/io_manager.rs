@@ -1,7 +1,7 @@
 use crate::app::control_primitives::KinState;
 use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, MotorStatus};
 use crate::app::touch_handler::{Differentiator, TouchHandler};
-use bsp_traits::{StepperMotorController, TouchSensor, TouchSensorError};
+use device_traits::{StepperMotorController, TouchSensor, TouchSensorError};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::telemetry_handler::TelemetryBuilder;

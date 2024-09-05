@@ -1,4 +1,4 @@
-use bsp_traits::Button;
+use device_traits::Button;
 use embedded_hal::digital::InputPin;
 pub struct GpioButton<PIN> {
     pub(crate) pin: PIN,

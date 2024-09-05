@@ -4,7 +4,7 @@ use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, Outputs};
 use crate::app::motor_handler::ControlMode;
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
-use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use embedded_time::fixed_point::FixedPoint;
 use strum_macros::Display;

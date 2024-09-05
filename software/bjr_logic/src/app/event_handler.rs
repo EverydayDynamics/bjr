@@ -1,6 +1,6 @@
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
-use bsp_traits::{LoggableMessage, Logger};
+use device_traits::{LoggableMessage, Logger};
 use core::fmt::{Display, Formatter};
 #[cfg(feature = "defmt")]
 use defmt;

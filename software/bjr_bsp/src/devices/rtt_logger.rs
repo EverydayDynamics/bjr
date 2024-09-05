@@ -1,4 +1,4 @@
-use bsp_traits::{LoggableMessage, Logger};
+use device_traits::{LoggableMessage, Logger};
 use core::fmt::{Display, Write};
 use rtt_target;
 use rtt_target::UpChannel;

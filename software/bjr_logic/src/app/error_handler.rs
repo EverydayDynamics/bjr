@@ -1,6 +1,6 @@
 use crate::app::event::{EventError, GlobEvent};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use heapless::mpmc::Q8;
 

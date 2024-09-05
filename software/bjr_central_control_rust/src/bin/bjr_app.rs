@@ -20,7 +20,7 @@ mod app {
     use bjr_builder::build_application;
     use bjr_logic::app::menu_handler::MenuContext;
     use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
-    use bsp_traits::StepperMotorController;
+    use device_traits::StepperMotorController;
     use core::fmt::{Display, Formatter, Write};
     use embedded_time::duration::*;
     use rtic_monotonics;

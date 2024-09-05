@@ -2,7 +2,7 @@ use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use embedded_time::fixed_point::FixedPoint;
 use bjr_telemetry::{TelemetryData, TelemetryPacket};
-use bsp_traits::{TelemetrySender, TelemetrySenderError};
+use device_traits::{TelemetrySender, TelemetrySenderError};
 use crate::app::control_primitives::KinState;
 use postcard;
 

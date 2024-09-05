@@ -12,7 +12,7 @@ harness = false
 
 [dependencies]
 bjr_logic = { path = "../bjr_logic", version = "0.1.0", features = [] }
-bsp_traits = { path = "../bsp_traits", version = "0.1.0", features = [] }
+device_traits = { path = "../device_traits", version = "0.1.0", features = [] }
 os_traits = {path = "../os_traits"}
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0", features = ["main_board"]}
 bjr_builder = { path = "../bjr_builder", version = "0.1.0", features = []}
@@ -72,4 +72,4 @@ overflow-checks = false  # <-
 
 [features]
 default = []
-defmt = ["bsp_traits/defmt", "bjr_bsp/defmt", "bjr_builder/defmt", "bjr_logic/defmt"]
+defmt = ["device_traits/defmt", "bjr_bsp/defmt", "bjr_builder/defmt", "bjr_logic/defmt"]

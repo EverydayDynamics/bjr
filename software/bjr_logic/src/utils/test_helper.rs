@@ -4,7 +4,7 @@ pub mod bsp_mocks {
 use crate::app::control_primitives::KinState;
     use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
-    use bsp_traits::{Logger, LoggableMessage, MotorEnabler, Point, TouchSensor, TouchSensorError};
+    use device_traits::{Logger, LoggableMessage, MotorEnabler, Point, TouchSensor, TouchSensorError};
     use core::fmt::Display;
     use embedded_time::duration::*;
     use mockall::mock;

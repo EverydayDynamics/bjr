@@ -4,7 +4,7 @@ use crate::app::event_queue::get_event_queue;
 use crate::app::parameter_manager::{FFDefaultLinAccel, FFDefaultLinSpeed, parameter_manager, ParameterList};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_runner::{CirclingParams, StateRunnerCommand};
-use bsp_traits::{LoggableMessage, Reader};
+use device_traits::{LoggableMessage, Reader};
 use core::fmt::{Display, Formatter, Write};
 use core::str::FromStr;
 use menu::{Item, ItemType, Menu, Parameter, Runner};

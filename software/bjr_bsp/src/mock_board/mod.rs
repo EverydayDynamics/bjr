@@ -1,6 +1,6 @@
 use crate::boards::{BoardCreationError, BoardResources};
-use bsp_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError};
-use bsp_traits::{
+use device_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError};
+use device_traits::{
     Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, Point, Reader,
     StepperDeviceError, TouchSensor, TouchSensorError,
 };

@@ -1,5 +1,5 @@
 use embedded_time::duration::Microseconds;
-use bsp_traits::{Logger, MotorEnabler};
+use device_traits::{Logger, MotorEnabler};
 use crate::app::control::feedforward_generator::FFGenCH;
 use crate::app::control::pid_controller::PIDController;
 use crate::app::control::setpoint_generator::{SetPointGenCH, SetPointGenCircling};

@@ -1,5 +1,5 @@
 use crate::utils::error_wrapper::ErrorWrapper;
-use bsp_traits::{
+use device_traits::{
     MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController,
     StepperMotorPhase,
 };

@@ -3,7 +3,7 @@ use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::IOManager;
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use crate::app::state_runner_selector::StateRunnerSelector;
-use bsp_traits::{Logger, MotorEnabler};
+use device_traits::{Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::telemetry_handler::TelemetryBuilder;
 

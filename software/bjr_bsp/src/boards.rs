@@ -1,4 +1,4 @@
-use bsp_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor, TouchSensorError};
+use device_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor, TouchSensorError};
 use core::fmt::{Debug, Display, Formatter};
 use core::result::Result;
 

@@ -9,7 +9,7 @@ use crate::app::parameter_manager::{
     HomingSafePosition,
 };
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
-use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::telemetry_handler::TelemetryBuilder;

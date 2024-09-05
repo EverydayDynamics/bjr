@@ -9,7 +9,7 @@ use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
 use crate::app::state_runner::{StateRunnerCommand, StateRunnerContext};
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
-use bsp_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor};
+use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;

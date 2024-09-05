@@ -1,6 +1,6 @@
 use crate::boards::{BoardCreationError, BoardResources};
-use bsp_traits::StepperMotorController;
-use bsp_traits::{
+use device_traits::StepperMotorController;
+use device_traits::{
     Button, CommsError, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError,
 };
 use core::cell::RefCell;

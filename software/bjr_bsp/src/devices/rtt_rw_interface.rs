@@ -1,4 +1,4 @@
-use bsp_traits::Reader;
+use device_traits::Reader;
 use core::fmt::Write;
 use rtt_target;
 use rtt_target::{DownChannel, UpChannel};

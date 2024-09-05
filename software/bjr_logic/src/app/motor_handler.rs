@@ -2,7 +2,7 @@ use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
 use crate::app::limits::{Limit, LimitError, MotorPosLimit, MotorVelLimit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
-use bsp_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
+use device_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
 use core::fmt::Display;
 use core::fmt::Formatter;
 use crate::app::telemetry_handler::TelemetryBuilder;
@@ -275,7 +275,7 @@ mod tests {
     use super::*;
     use crate::app::event_queue::drain_event_queue;
     use crate::app::parameter_manager::parameter_manager;
-    use bsp_traits::{MotorInput, MotorState};
+    use device_traits::{MotorInput, MotorState};
     use mockall::mock;
 
     mock! {

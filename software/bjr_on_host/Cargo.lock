@@ -85,7 +85,7 @@ checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
 name = "bjr_bsp"
 version = "0.1.0"
 dependencies = [
- "bsp_traits",
+ "device_traits",
  "env_logger",
  "log",
  "strum",
@@ -99,7 +99,7 @@ version = "0.1.0"
 dependencies = [
  "bjr_bsp",
  "bjr_logic",
- "bsp_traits",
+ "device_traits",
  "embedded-time",
  "os_traits",
  "strum",
@@ -112,7 +112,7 @@ version = "0.1.0"
 dependencies = [
  "atomic_float",
  "bjr_telemetry",
- "bsp_traits",
+ "device_traits",
  "embedded-time",
  "fast-math",
  "heapless",
@@ -147,13 +147,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bsp_traits"
-version = "0.1.0"
-dependencies = [
- "ufmt",
-]
-
-[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -170,6 +163,13 @@ name = "colorchoice"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
+
+[[package]]
+name = "device_traits"
+version = "0.1.0"
+dependencies = [
+ "ufmt",
+]
 
 [[package]]
 name = "embedded-time"

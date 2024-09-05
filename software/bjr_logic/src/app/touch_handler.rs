@@ -2,7 +2,7 @@ use core::convert::identity;
 use crate::app::control_primitives::KinState;
 use crate::app::parameter_manager::{LogicRunnerPeriodUs, parameter_manager, TouchCenterOffsetX, TouchCenterOffsetY, TouchScaleXX, TouchScaleXY, TouchScaleYX, TouchScaleYY};
 use crate::utils::usec2sec;
-use bsp_traits::{TouchSensor, TouchSensorError};
+use device_traits::{TouchSensor, TouchSensorError};
 use embedded_time::duration::Microseconds;
 use embedded_time::fixed_point::FixedPoint;
 use crate::app::telemetry_handler::TelemetryBuilder;
@@ -220,7 +220,7 @@ mod tests {
     use crate::app::parameter_manager::{
     };
     use crate::app::touch_handler::{Differentiator, Taylor5Differentiator, TouchHandler};
-    use bsp_traits::Point;
+    use device_traits::Point;
     use embedded_time::duration::{Microseconds, Seconds};
     #[test]
     fn test_differentiator() {

@@ -1,6 +1,6 @@
 use core::fmt::{Display, Formatter};
 use strum_macros::{EnumString, VariantNames};
-use bsp_traits::LoggableMessage;
+use device_traits::LoggableMessage;
 
 #[derive(PartialEq, Copy, Clone, EnumString, VariantNames)]
 pub enum GlobEvent {

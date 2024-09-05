@@ -13,7 +13,7 @@ use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
 use bjr_logic::app::state_manager::StateManager;
 use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
 use bjr_logic::app::touch_handler::{Differentiator, SGDifferentiator, TouchHandler};
-use bsp_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
+use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
 use embedded_time::duration::Microseconds;
 use bjr_logic::app::telemetry_handler::TelemetryHandler;

@@ -1,5 +1,5 @@
 use crate::utils::error_wrapper::ErrorWrapper;
-use bsp_traits::{CommsError, DeviceError, Point, TouchSensor, TouchSensorError};
+use device_traits::{CommsError, DeviceError, Point, TouchSensor, TouchSensorError};
 use embedded_hal::spi::SpiDevice;
 use tsc2046::Tsc2046;
 

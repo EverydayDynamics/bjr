@@ -41,8 +41,8 @@ version = "0.1.0"
 dependencies = [
  "atomic_float",
  "bjr_telemetry",
- "bsp_traits",
  "defmt",
+ "device_traits",
  "embedded-time",
  "fast-math",
  "heapless",
@@ -62,14 +62,6 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "strum",
-]
-
-[[package]]
-name = "bsp_traits"
-version = "0.1.0"
-dependencies = [
- "defmt",
- "ufmt",
 ]
 
 [[package]]
@@ -120,6 +112,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff4a5fefe330e8d7f31b16a318f9ce81000d8e35e69b93eae154d16d2278f70f"
 dependencies = [
  "thiserror",
+]
+
+[[package]]
+name = "device_traits"
+version = "0.1.0"
+dependencies = [
+ "defmt",
+ "ufmt",
 ]
 
 [[package]]

@@ -3,7 +3,7 @@ use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, IOManagerError};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;

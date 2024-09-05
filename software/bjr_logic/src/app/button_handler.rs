@@ -1,7 +1,7 @@
 use crate::app::event::GlobEvent;
 use crate::app::parameter_manager::{parameter_manager, LongPressThresholdMs};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use bsp_traits::{Button, LoggableMessage};
+use device_traits::{Button, LoggableMessage};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;

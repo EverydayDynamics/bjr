@@ -9,7 +9,7 @@ use crate::app::io_manager::{Inputs, IOManager, Outputs};
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{parameter_manager, NoBallTargetHeight};
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
-use bsp_traits::{LoggableMessage, Logger, MotorEnabler};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control::MotorController::MotorController;
