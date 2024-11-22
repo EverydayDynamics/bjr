@@ -1,0 +1,31 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model SHF-105-01-L-D-RA
+#/368826/1257479/2.50/10/3/Connector
+DEF SHF-105-01-L-D-RA J 0 30 Y Y 1 F N
+F0 "J" 750 300 50 H V L CNN
+F1 "SHF-105-01-L-D-RA" 750 200 50 H V L CNN
+F2 "SHF10501LDRA" 750 100 50 H I L CNN
+F3 "https://suddendocs.samtec.com/prints/shf-1xx-01-x-d-xx-xx-xx-mkt.pdf?_gl=1*1it6dlj*_ga*MTA2MjMwMjY5Ny4xNjcwNzQ1Mjgy*_ga_3KFNZC07WW*MTY4Mzc5MDQwOC4xMjQuMS4xNjgzNzkwNDE5LjQ5LjAuMA.." 750 0 50 H I L CNN
+F4 "Samtec, SHF, 10 Way, 2 Row, Right Angle PCB Header" 750 -100 50 H I L CNN "Description"
+F5 "5.72" 750 -200 50 H I L CNN "Height"
+F6 "" 750 -300 50 H I L CNN "Farnell Part Number"
+F7 "" 750 -400 50 H I L CNN "Farnell Price/Stock"
+F8 "SAMTEC" 750 -500 50 H I L CNN "Manufacturer_Name"
+F9 "SHF-105-01-L-D-RA" 750 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X 1 1 0 0 200 R 50 50 0 0 P
+X 2 2 900 0 200 L 50 50 0 0 P
+X 3 3 0 -100 200 R 50 50 0 0 P
+X 4 4 900 -100 200 L 50 50 0 0 P
+X 5 5 0 -200 200 R 50 50 0 0 P
+X 6 6 900 -200 200 L 50 50 0 0 P
+X 7 7 0 -300 200 R 50 50 0 0 P
+X 8 8 900 -300 200 L 50 50 0 0 P
+X 9 9 0 -400 200 R 50 50 0 0 P
+X 10 10 900 -400 200 L 50 50 0 0 P
+P 5 0 1 6 200 100 700 100 700 -500 200 -500 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library

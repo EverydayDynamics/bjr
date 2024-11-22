@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP LQH3NPN100MJRL
+D LQH3NPN_JR Series Inductor 10uH +/-20% 1212 (3030)
+K
+F https://psearch.en.murata.com/inductor/product/LQH3NPN100MJR%23.html
+$ENDCMP
+#
+#End Doc Library

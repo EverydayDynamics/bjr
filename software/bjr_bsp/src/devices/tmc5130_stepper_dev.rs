@@ -64,8 +64,7 @@ where
         self.get_error_from_spistatus(status)?;
         *self.map.ioin_mut() = read_ioin;
         if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
-            Ok(())
-            //Err(StepperDeviceError::SelfTestVersionMismatch)
+            Err(StepperDeviceError::SelfTestVersionMismatch)
         } else {
             Ok(())
         }

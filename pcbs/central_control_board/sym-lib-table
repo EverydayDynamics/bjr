@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "bjr_symbol_lib")(type "KiCad")(uri "/home/tamas/general/bjr/pcbs/bjr_symbol_lib.kicad_sym")(options "")(descr ""))
+  (lib (name "B4B-ZR_LF__SN_")(type "KiCad")(uri "/home/tamas/Downloads/LIB_B4B-ZR_LF__SN_/B4B-ZR_LF__SN_/KiCad/B4B-ZR_LF__SN_.kicad_sym")(options "")(descr ""))
+)

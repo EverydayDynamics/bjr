@@ -176,10 +176,10 @@ impl BoardResources for MyBoard {
         let mot_b_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_b_pin);
         let mot_c_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_mot_c_pin);
         let touch_sense_driver_spi_device = Spidev::new(&GUARDED_SPI, cs_touch_sense_pin);
-        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device, mot_a_lim_pin)
-            .map_err(|e| BoardCreationError::StepperDriveInitError(e, 0))?;
         let stp_motor_drive_b = TMC5130StepperDev::new(mot_b_driver_spi_device, mot_b_lim_pin)
             .map_err(|e| BoardCreationError::StepperDriveInitError(e, 1))?;
+        let stp_motor_drive_a = TMC5130StepperDev::new(mot_a_driver_spi_device, mot_a_lim_pin)
+            .map_err(|e| BoardCreationError::StepperDriveInitError(e, 0))?;
         let stp_motor_drive_c = TMC5130StepperDev::new(mot_c_driver_spi_device, mot_c_lim_pin)
             .map_err(|e| BoardCreationError::StepperDriveInitError(e, 2))?;
         let touch_sense_dev = Tsc2046TouchDev::new(touch_sense_driver_spi_device)

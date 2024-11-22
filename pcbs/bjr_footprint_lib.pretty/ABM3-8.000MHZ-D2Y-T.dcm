@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ABM3-8.000MHZ-D2Y-T
+D MEMS Crystal Oscillator 66.666MHz +/-50ppm 4-Pin SMD Bulk
+K
+F https://abracon.com/Resonators/abm3.pdf
+$ENDCMP
+#
+#End Doc Library

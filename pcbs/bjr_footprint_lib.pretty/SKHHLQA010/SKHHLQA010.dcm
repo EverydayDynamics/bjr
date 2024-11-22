@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP SKHHLQA010
+D Tact switch,PCB,SPST,black,0.98N o/force Black Stem Tactile Switch, SPST-NO 50 mA 8.35mm
+K
+F https://tech.alpsalpine.com/e/products/detail/SKHHLQA010/#ancFig1
+$ENDCMP
+#
+#End Doc Library
