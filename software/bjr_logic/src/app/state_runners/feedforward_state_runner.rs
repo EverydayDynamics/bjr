@@ -40,6 +40,7 @@ impl RunnableState for FeedforwardStateRunner {
         &mut self,
         ctx: &mut StateRunnerContext<LOG>
     ) {
+        ctx.motor_enabler.set_enable(true);
         //self.state = FeedForwardStateRunnerState::NoState;
     }
     fn update<LOG: Logger>(
@@ -70,8 +71,13 @@ impl RunnableState for FeedforwardStateRunner {
                 self.ff_circler.update_params(circling_params);
                 self.state = FeedForwardStateRunnerState::Circling;
             }
+            StateRunnerCommand::DebugMotorTest(id) => {
+
+                ctx.motor_enabler.set_enable(true);
+                ctx.iomanager.motor_test_motion(*id).map_err(StateRunnerError::IOError)?;
+                ctx.logger.debug(FFDebugMsg(self.state, ctx.call_time.integer()));
+            }
         }
-        ctx.logger.debug(FFDebugMsg(self.state, ctx.call_time.integer()));
         match self.state {
             FeedForwardStateRunnerState::NoState => {}
             FeedForwardStateRunnerState::Circling => {

@@ -221,7 +221,7 @@ impl EventHandler {
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
                     GlobEvent::HomingFinished => EventResponse::NewState(State::RunningCenterHold),
                     GlobEvent::InitFinished => EventResponse::Unexpected,
-                    GlobEvent::EnterFeedforward => EventResponse::Ignore,
+                    GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
                 },
                 State::Error => match event {

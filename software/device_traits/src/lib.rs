@@ -33,6 +33,7 @@ pub trait StepperMotorController {
     fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
     fn get_state(&mut self) -> Result<MotorState, StepperDeviceError>;
     fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError>;
+    fn test_motion(&mut self) -> Result<(), StepperDeviceError>;
 }
 
 pub struct Point {

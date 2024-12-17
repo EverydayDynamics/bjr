@@ -1,18 +1,14 @@
-use embedded_time::duration::Microseconds;
-use device_traits::{Logger, MotorEnabler};
+use device_traits::{Logger};
 use crate::app::control::feedforward_generator::FFGenCH;
 use crate::app::control::pid_controller::PIDController;
 use crate::app::control::setpoint_generator::{SetPointGenCH, SetPointGenCircling};
 use crate::app::event_handler::State;
-use crate::app::event_queue::EventQueue;
-use crate::app::io_manager::IOManager;
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerContext, StateRunnerError};
 use crate::app::state_runners::control_state_runner::ControlStateRunner;
 use crate::app::state_runners::default_state_runner::DefaultStateRunner;
 use crate::app::state_runners::feedforward_state_runner::FeedforwardStateRunner;
 use crate::app::state_runners::homing_state_runner::HomingStateRunner;
 use crate::app::state_runners::initializing_state_runner::InitializingStateRunner;
-use crate::app::telemetry_handler::TelemetryBuilder;
 
 pub trait StateRunnerSelector {
     fn get_runner(&mut self, state: State) -> &mut StateRunnerWrapper;

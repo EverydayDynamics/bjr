@@ -75,16 +75,18 @@ where
         self.map.chopconf_mut().set_hend(1);
         self.map.chopconf_mut().set_tbl(2);
         self.map.chopconf_mut().set_chm(false);
+        self.map.chopconf_mut().set_vsense(false);
         //set microstep resolution to 8 usteps
         self.map.chopconf_mut().set_mres(5);
-        self.map.ihold_irun_mut().set_ihold(1);
-        self.map.ihold_irun_mut().set_irun(10);
+        self.map.ihold_irun_mut().set_ihold(3);
+        self.map.ihold_irun_mut().set_irun(30);
         self.map.ihold_irun_mut().set_ihold_delay(6);
         self.map.pwmconf_mut().set_pwm_autoscale(true);
         self.map.pwmconf_mut().set_pwm_ampl(200);
         self.map.pwmconf_mut().set_pwm_grad(1);
         self.map.pwmconf_mut().set_pwm_freq(0);
         self.map.gconf_mut().set_en_pwm_mode(true);
+        self.map.gconf_mut().set_shaft(true);
         *self.map.tpowerdown_mut() = reg::TPOWERDOWN::from(10);
         *self.map.tpwmthrs_mut() = reg::TPWMTHRS::from(1000);
         *self.map.a1_mut() = reg::A1::from(0);
@@ -122,7 +124,8 @@ where
             .dev_driver
             .bulk_register_action(&mut actions)
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
-        Ok(())
+        self.get_error_from_spistatus(status)
+        //Ok(())
     }
     pub fn new(spi: SPI, limit_pin: PIN) -> Result<Self, StepperDeviceError> {
         let dev_driver = Tmc5130::new(spi);
@@ -225,5 +228,48 @@ where
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         self.get_error_from_spistatus(status)?;
         Ok(())
+    }
+
+    fn test_motion(&mut self) -> Result<(), StepperDeviceError> {
+        self.map.chopconf_mut().set_toff(3);
+        self.map.chopconf_mut().set_hstrt(4);
+        self.map.chopconf_mut().set_hend(1);
+        self.map.chopconf_mut().set_tbl(2);
+        self.map.chopconf_mut().set_chm(false);
+        //set microstep resolution to 8 usteps
+        self.map.ihold_irun_mut().set_ihold(10);
+        self.map.ihold_irun_mut().set_irun(31);
+        self.map.ihold_irun_mut().set_ihold_delay(6);
+        self.map.tpowerdown_mut().set(10);
+        self.map.tpwmthrs_mut().set(500);
+        *self.map.a1_mut() = reg::A1::from(1000);
+        *self.map.v1_mut() = reg::V1::from(50000);
+        *self.map.amax_mut() = reg::AMAX::from(500);
+        *self.map.vmax_mut() = reg::VMAX::from(200000);
+        *self.map.dmax_mut() = reg::DMAX::from(700);
+        *self.map.d1_mut() = reg::D1::from(1400);
+        *self.map.vstop_mut() = reg::VSTOP::from(10);
+        self.map.rampmode_mut().set(0);
+        self.map.xtarget_mut().set(-151200);
+        let mut actions = [
+            tmc5130::Action::write(self.map.state(reg::Address::CHOPCONF)),
+            tmc5130::Action::write(self.map.state(reg::Address::IHOLD_IRUN)),
+            tmc5130::Action::write(self.map.state(reg::Address::TPOWERDOWN)),
+            tmc5130::Action::write(self.map.state(reg::Address::TPWMTHRS)),
+            tmc5130::Action::write(self.map.state(reg::Address::A1)),
+            tmc5130::Action::write(self.map.state(reg::Address::V1)),
+            tmc5130::Action::write(self.map.state(reg::Address::AMAX)),
+            tmc5130::Action::write(self.map.state(reg::Address::VMAX)),
+            tmc5130::Action::write(self.map.state(reg::Address::DMAX)),
+            tmc5130::Action::write(self.map.state(reg::Address::D1)),
+            tmc5130::Action::write(self.map.state(reg::Address::VSTOP)),
+            tmc5130::Action::write(self.map.state(reg::Address::RAMPMODE)),
+            tmc5130::Action::write(self.map.state(reg::Address::XTARGET)),
+        ];
+        let status = self
+            .dev_driver
+            .bulk_register_action(&mut actions)
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        self.get_error_from_spistatus(status)
     }
 }

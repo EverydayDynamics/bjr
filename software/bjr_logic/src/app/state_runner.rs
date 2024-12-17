@@ -109,6 +109,7 @@ pub enum StateRunnerCommand {
     FeedForwardPlateCommand(PlateState),
     FeedForwardMotorCommand([KinState;MOTOR_NUM]),
     FeedForwardCircling(CirclingParams),
+    DebugMotorTest(usize),
     NoCommand,
 }
 pub struct StateRunnerContext<'a, LOG> {

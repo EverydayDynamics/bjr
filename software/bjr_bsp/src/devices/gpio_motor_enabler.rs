@@ -20,9 +20,9 @@ where
 {
     fn set_enable(&mut self, enable: bool) {
         if enable {
-            self.pin.set_high().unwrap();
-        } else {
             self.pin.set_low().unwrap();
+        } else {
+            self.pin.set_high().unwrap();
         }
     }
 }

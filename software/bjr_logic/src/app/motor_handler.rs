@@ -5,6 +5,7 @@ use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use device_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
 use core::fmt::Display;
 use core::fmt::Formatter;
+use strum_macros::{EnumString, VariantNames};
 use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(PartialEq, Copy, Clone, Default)]
@@ -127,6 +128,13 @@ where
             GenericMotor::MotorA(ma) => ma.set_position(new_position),
             GenericMotor::MotorB(mb) => mb.set_position(new_position),
             GenericMotor::MotorC(mc) => mc.set_position(new_position),
+        }
+    }
+    fn test_motion(&mut self) -> Result<(), StepperDeviceError> {
+        match self {
+            GenericMotor::MotorA(ma) => ma.test_motion(),
+            GenericMotor::MotorB(mb) => mb.test_motion(),
+            GenericMotor::MotorC(mc) => mc.test_motion(),
         }
     }
 }
@@ -263,6 +271,15 @@ where
         if motor_idx < MOTOR_NUM {
             self.motors[motor_idx]
                 .set_position(0)
+                .map_err(|e| MotorHandlerError::MotorError(e, motor_idx))
+        } else {
+            Err(MotorHandlerError::MotorIdxOutOfRange(motor_idx))
+        }
+    }
+    pub fn test_motion(&mut self, motor_idx: usize) -> Result<(), MotorHandlerError> {
+        if motor_idx < MOTOR_NUM {
+            self.motors[motor_idx]
+                .test_motion()
                 .map_err(|e| MotorHandlerError::MotorError(e, motor_idx))
         } else {
             Err(MotorHandlerError::MotorIdxOutOfRange(motor_idx))

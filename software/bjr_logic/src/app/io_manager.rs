@@ -75,6 +75,7 @@ pub trait IOManager {
     ) -> Result<(), IOManagerError>;
     fn reset_motor_pos(&mut self, motor_idx: usize) -> Result<(), IOManagerError>;
     fn write_all_outputs(&mut self, outputs: Outputs, telemetry_builder: &mut TelemetryBuilder) -> Result<(), IOManagerError>;
+    fn motor_test_motion(&mut self, motor_idx: usize) -> Result<(), IOManagerError>;
 }
 impl<MA, MB, MC, TS, DIFF> DefaultIOManager<MA, MB, MC, TS, DIFF>
 where
@@ -143,5 +144,12 @@ where
         self.motor_handler
             .set_motor_input(outputs.piston_state, telemetry_builder)
             .map_err(IOManagerError::MotorOutput)
+    }
+
+    fn motor_test_motion(&mut self, motor_idx: usize) -> Result<(), IOManagerError> {
+        self.motor_handler
+            .zero_motor_pos(motor_idx)
+            .map_err(IOManagerError::MotorOutput)?;
+        self.motor_handler.test_motion(motor_idx).map_err(IOManagerError::MotorOutput)
     }
 }

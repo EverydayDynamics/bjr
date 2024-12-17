@@ -9,6 +9,7 @@ use core::fmt::{Display, Formatter, Write};
 use core::str::FromStr;
 use menu::{Item, ItemType, Menu, Parameter, Runner};
 use strum::{IntoEnumIterator, VariantNames};
+use crate::app::consts::MOTOR_NUM;
 
 const READ_BUF_LEN: usize = 64;
 #[derive(Clone)]
@@ -150,6 +151,17 @@ where
                         label: "Feedforward mode commands",
                         items: &[
                             &Item {
+                                command: "tm",
+                                help: Some("Initiates a test motion"),
+                                item_type: ItemType::Callback {
+                                    function: test_motion,
+                                    parameters: &[Parameter::Mandatory {
+                                        parameter_name: "motor",
+                                        help: Some("motor to initiate test motion. 0-3"),
+                                    }],
+                                },
+                            },
+                            &Item {
                             command: "setplate",
                             help: Some("set the plate state"),
                             item_type: ItemType::Callback {
@@ -271,6 +283,35 @@ fn fallible_send_event<MIO: Reader + Write>(
                 .write_str("\n")
                 .map_err(|_| MenuError::MenuInterfaceWriteError)?;
         }
+    }
+    Ok(())
+}
+fn test_motion<MIO: Reader + Write>(
+    _menu: &Menu<MIO, Context>,
+    _item: &Item<MIO, Context>,
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) {
+    context.error = crate::app::menu_handler::fallible_test_motion(args, interface, context);
+}
+fn fallible_test_motion<MIO: Reader + Write>(
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) -> Result<(), MenuError> {
+
+    if let Ok(motor_id) = usize::from_str(args[0]) {
+        if (motor_id > MOTOR_NUM) {
+            write!(interface, "Motor ID can't be larger than {}", MOTOR_NUM)
+                .map_err(|_| MenuError::MenuInterfaceWriteError)?;
+        } else {
+            context.state_runner_command = StateRunnerCommand::DebugMotorTest(motor_id);
+        }
+    } else {
+        interface
+            .write_str("Couldn't parse input. Give an integer number\n")
+            .map_err(|_| MenuError::MenuInterfaceWriteError)?;
     }
     Ok(())
 }
