@@ -131,9 +131,11 @@ pub enum StepperDeviceError {
     SelfTestVersionMismatch,
     DriverError,
     ShortToGround(StepperMotorPhase),
+    OpenLoad(StepperMotorPhase),
     OverTemperatureShutdown,
     UnexpectedReset,
     InvalidParameter,
+    EnableError,
     HardwareFailure,
 }
 #[cfg(not(feature = "defmt"))]
@@ -158,11 +160,17 @@ impl Display for StepperDeviceError {
             StepperDeviceError::HardwareFailure => {
                 write!(f, "Hardware Failure")
             }
+            StepperDeviceError::EnableError => {
+                write!(f, "Enable Error")
+            }
             StepperDeviceError::ShortToGround(ph) => {
                 write!(f, "Phase {} shorted to ground", ph)
             }
             StepperDeviceError::OverTemperatureShutdown => {
                 write!(f, "Over temperature shutdown")
+            }
+            StepperDeviceError::OpenLoad(ph) => {
+                write!(f, "Phase {} open load", ph)
             }
         }
     }
@@ -194,6 +202,9 @@ impl defmt::Format for StepperDeviceError {
             }
             StepperDeviceError::OverTemperatureShutdown => {
                 defmt::write!(f, "Over temperature shutdown")
+            }
+            StepperDeviceError::OpenLoad(ph) => {
+                defmt::write!(f, "Phase {} open load", ph)
             }
         }
     }

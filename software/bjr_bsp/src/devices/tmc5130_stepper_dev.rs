@@ -19,6 +19,27 @@ where
     SPI: embedded_hal::spi::SpiDevice,
     PIN: embedded_hal::digital::InputPin,
 {
+    fn get_error_from_drv_status(&mut self) -> Result<(), StepperDeviceError> {
+        let (status, read_drv_status) = self
+            .dev_driver
+            .read_register::<DRV_STATUS>()
+            .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
+        if read_drv_status.s2ga() {
+            Err(StepperDeviceError::ShortToGround(StepperMotorPhase::A))
+        } else if read_drv_status.s2gb() {
+            Err(StepperDeviceError::ShortToGround(StepperMotorPhase::B))
+        } else if read_drv_status.ot() {
+            Err(StepperDeviceError::OverTemperatureShutdown)
+        }else if read_drv_status.olb() {
+            Err(StepperDeviceError::OpenLoad(StepperMotorPhase::B))
+        } else if read_drv_status.ola() {
+            Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
+        }else {
+            //Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
+            Ok(())
+        }
+    }
+
     fn get_error_from_spistatus(
         &mut self,
         status: reg::SPISTATUS,
@@ -34,7 +55,11 @@ where
                 Err(StepperDeviceError::ShortToGround(StepperMotorPhase::B))
             } else if read_drv_status.ot() {
                 Err(StepperDeviceError::OverTemperatureShutdown)
-            } else {
+            } else if read_drv_status.ola() {
+                Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
+            }else if read_drv_status.olb() {
+                Err(StepperDeviceError::OpenLoad(StepperMotorPhase::B))
+            }else {
                 Ok(())
             }
         } else if status.reset_flag() {
@@ -63,7 +88,9 @@ where
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
         self.get_error_from_spistatus(status)?;
         *self.map.ioin_mut() = read_ioin;
-        if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
+        if self.map.ioin().drv_enn_cfg6() {
+            Err(StepperDeviceError::EnableError)
+        }else if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
             Err(StepperDeviceError::SelfTestVersionMismatch)
         } else {
             Ok(())
@@ -79,7 +106,7 @@ where
         //set microstep resolution to 8 usteps
         self.map.chopconf_mut().set_mres(5);
         self.map.ihold_irun_mut().set_ihold(3);
-        self.map.ihold_irun_mut().set_irun(30);
+        self.map.ihold_irun_mut().set_irun(20);
         self.map.ihold_irun_mut().set_ihold_delay(6);
         self.map.pwmconf_mut().set_pwm_autoscale(true);
         self.map.pwmconf_mut().set_pwm_ampl(200);
@@ -135,6 +162,7 @@ where
             map: reg::Map::default(),
         };
         stepper_device.self_test()?;
+        stepper_device.get_error_from_drv_status()?;
         stepper_device.initial_register_set()?;
         stepper_device.clear_status_flags()?;
         Ok(stepper_device)
