@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>/home/tamasfeher/general/bjr/pcbs/resistive_plate/resistive_plate.kicad_sch</source>
+    <date>Sun 19 May 2024 09:22:39 BST</date>
+    <tool>Eeschema 7.0.9-7.0.9~ubuntu22.04.1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>resistive_plate.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>0.1uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <fields>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">710-885012207072</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D"/>
+      <property name="Supplier_code" value="710-885012207072"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7fbeb3ff-b22a-4371-9ce0-1ed89ebb8cb0</tstamps>
+    </comp>
+    <comp ref="C2">
+      <value>10uF</value>
+      <fields>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">963-TMK212BBJ106KG-T</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/TAIYO-YUDEN/TMK212BBJ106KG-T?qs=PzICbMaShUdwxQxDcETuPw%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/TAIYO-YUDEN/TMK212BBJ106KG-T?qs=PzICbMaShUdwxQxDcETuPw%3D%3D"/>
+      <property name="Supplier_code" value="963-TMK212BBJ106KG-T"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>afa3a97d-c44f-49f6-8a96-92c4e0b30cd3</tstamps>
+    </comp>
+    <comp ref="C3">
+      <value>0.1uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <fields>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">710-885012207072</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D"/>
+      <property name="Supplier_code" value="710-885012207072"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>45d36d6c-0bd3-435a-b148-6f6868e2d02d</tstamps>
+    </comp>
+    <comp ref="C4">
+      <value>0.1uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <fields>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">710-885012207072</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D"/>
+      <property name="Supplier_code" value="710-885012207072"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>9bfca24f-6e54-40d1-a3f2-48415a6fcfc6</tstamps>
+    </comp>
+    <comp ref="C5">
+      <value>0.1uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder</footprint>
+      <fields>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">710-885012207072</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/Wurth-Elektronik/885012207072?qs=0KOYDY2FL28rQMV4504TxA%3D%3D"/>
+      <property name="Supplier_code" value="710-885012207072"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>1db16a88-55d3-4325-9c59-c78d57598967</tstamps>
+    </comp>
+    <comp ref="IC1">
+      <value>TSC2046EIPWR</value>
+      <footprint>SOP65P640X120-16N</footprint>
+      <datasheet>http://www.ti.com/lit/gpn/TSC2046E</datasheet>
+      <fields>
+        <field name="Height">1.2</field>
+        <field name="Manufacturer_Name">Texas Instruments</field>
+        <field name="Manufacturer_Part_Number">TSC2046EIPWR</field>
+        <field name="Mouser Part Number">595-TSC2046EIPWR</field>
+        <field name="Mouser Price/Stock">https://www.mouser.co.uk/ProductDetail/Texas-Instruments/TSC2046EIPWR?qs=0OHPnBYoB%2Fn8%252BCr%2F3vKhyw%3D%3D</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="TSC2046EIPWR" description="4-Wire Touch Screen Controller with low voltage digital I/O and extended ESD protection"/>
+      <property name="Height" value="1.2"/>
+      <property name="Mouser Part Number" value="595-TSC2046EIPWR"/>
+      <property name="Mouser Price/Stock" value="https://www.mouser.co.uk/ProductDetail/Texas-Instruments/TSC2046EIPWR?qs=0OHPnBYoB%2Fn8%252BCr%2F3vKhyw%3D%3D"/>
+      <property name="Manufacturer_Name" value="Texas Instruments"/>
+      <property name="Manufacturer_Part_Number" value="TSC2046EIPWR"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="4-Wire Touch Screen Controller with low voltage digital I/O and extended ESD protection"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3322e008-9dda-41ce-a750-61a31141489e</tstamps>
+    </comp>
+    <comp ref="IC2">
+      <value>LSM6DS3TR-C</value>
+      <footprint>bjr_footprint_lib:LGA-14_2.5X3X0.86_</footprint>
+      <datasheet>http://www.st.com/resource/en/datasheet/lsm6ds3tr-c.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer_Name">STMicroelectronics</field>
+        <field name="Manufacturer_Part_Number">LSM6DS3TR-C</field>
+        <field name="Mouser Part Number">511-LSM6DS3TR-C</field>
+        <field name="Mouser Price/Stock">https://www.mouser.co.uk/ProductDetail/STMicroelectronics/LSM6DS3TR-C?qs=u4fy%2FsgLU9NHwPlhP3LTBw%3D%3D</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="LSM6DS3TR-C" description="STMicroelectronics iNEMO inertial module: 3D accelerometer and 3D gyroscope"/>
+      <property name="Height" value=""/>
+      <property name="Mouser Part Number" value="511-LSM6DS3TR-C"/>
+      <property name="Mouser Price/Stock" value="https://www.mouser.co.uk/ProductDetail/STMicroelectronics/LSM6DS3TR-C?qs=u4fy%2FsgLU9NHwPlhP3LTBw%3D%3D"/>
+      <property name="Manufacturer_Name" value="STMicroelectronics"/>
+      <property name="Manufacturer_Part_Number" value="LSM6DS3TR-C"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="STMicroelectronics iNEMO inertial module: 3D accelerometer and 3D gyroscope"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b2a2e490-1e79-43fc-937c-9e2396f4be9f</tstamps>
+    </comp>
+    <comp ref="J1">
+      <value>SFW4R-1STE1HLF</value>
+      <footprint>bjr_footprint_lib:AMPHENOL_SFW4R-1STE1HLF</footprint>
+      <fields>
+        <field name="Availability">In Stock</field>
+        <field name="Check_prices">https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=eda</field>
+        <field name="Description">
+1.00mm Flex Connector, SFW-R series, 4 Position, Bottom side Contact, Side Entry Surface Mount ZIF Connector, Halogen-Free and Lead Free.
+</field>
+        <field name="MANUFACTURER">Amphenol</field>
+        <field name="MAXIMUM_PACKAGE_HEIGHT">--</field>
+        <field name="MF">Amphenol</field>
+        <field name="MP">SFW4R-1STE1HLF</field>
+        <field name="PARTREV">B</field>
+        <field name="Package">None</field>
+        <field name="Price">None</field>
+        <field name="Purchase-URL">https://www.snapeda.com/api/url_track_click_mouser/?unipart_id=12580016&amp;manufacturer=Amphenol&amp;part_name=SFW4R-1STE1HLF&amp;search_term=None</field>
+        <field name="SNAPEDA_PN">SFW4R-1STE1HLF</field>
+        <field name="STANDARD">Manufacturer Recommendations</field>
+        <field name="SnapEDA_Link">https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=snap</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">649-SFW4R-1STE1HLF</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Amphenol-FCI/SFW4R-1STE1HLF?qs=8KMuCLbL8BaKvAEjw%2FzA%2Fg%3D%3D</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="SFW4R-1STE1HLF" description=""/>
+      <property name="MF" value="Amphenol"/>
+      <property name="MAXIMUM_PACKAGE_HEIGHT" value="--"/>
+      <property name="Package" value="None"/>
+      <property name="Price" value="None"/>
+      <property name="Check_prices" value="https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=eda"/>
+      <property name="STANDARD" value="Manufacturer Recommendations"/>
+      <property name="PARTREV" value="B"/>
+      <property name="SnapEDA_Link" value="https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=snap"/>
+      <property name="MP" value="SFW4R-1STE1HLF"/>
+      <property name="Purchase-URL" value="https://www.snapeda.com/api/url_track_click_mouser/?unipart_id=12580016&amp;manufacturer=Amphenol&amp;part_name=SFW4R-1STE1HLF&amp;search_term=None"/>
+      <property name="Description" value="&#xA;1.00mm Flex Connector, SFW-R series, 4 Position, Bottom side Contact, Side Entry Surface Mount ZIF Connector, Halogen-Free and Lead Free.&#xA;"/>
+      <property name="MANUFACTURER" value="Amphenol"/>
+      <property name="Availability" value="In Stock"/>
+      <property name="SNAPEDA_PN" value="SFW4R-1STE1HLF"/>
+      <property name="Supplier" value="Mouser"/>
+      <property name="Supplier_code" value="649-SFW4R-1STE1HLF"/>
+      <property name="Supplier_url" value="https://www.mouser.co.uk/ProductDetail/Amphenol-FCI/SFW4R-1STE1HLF?qs=8KMuCLbL8BaKvAEjw%2FzA%2Fg%3D%3D"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f67de4de-6ac5-4412-9813-b18119034dc6</tstamps>
+    </comp>
+    <comp ref="J2">
+      <value>BM08B-SRSS-TBT_LF__SN_</value>
+      <footprint>bjr_footprint_lib:BM08BSRSSTBTLFSN</footprint>
+      <datasheet>https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe</datasheet>
+      <fields>
+        <field name="Arrow Part Number">BM08B-SRSS-TBT(LF)(SN)</field>
+        <field name="Arrow Price/Stock">https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe</field>
+        <field name="Description">Wire To Board / Wire To Wire Connector Through Hole RoHS</field>
+        <field name="Height">4.25</field>
+        <field name="Manufacturer_Name">JST (JAPAN SOLDERLESS TERMINALS)</field>
+        <field name="Manufacturer_Part_Number">BM08B-SRSS-TBT(LF)(SN)</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier_code">1679134</field>
+        <field name="Supplier_url">https://uk.farnell.com/jst-japan-solderless-terminals/bm08b-srss-tb-lf-sn/connector-header-1mm-8pos-1row/dp/1679134</field>
+      </fields>
+      <libsource lib="bjr_symbol_lib" part="BM08B-SRSS-TBT_LF__SN_" description="Wire To Board / Wire To Wire Connector Through Hole RoHS"/>
+      <property name="Description" value="Wire To Board / Wire To Wire Connector Through Hole RoHS"/>
+      <property name="Height" value="4.25"/>
+      <property name="Arrow Part Number" value="BM08B-SRSS-TBT(LF)(SN)"/>
+      <property name="Arrow Price/Stock" value="https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe"/>
+      <property name="Manufacturer_Name" value="JST (JAPAN SOLDERLESS TERMINALS)"/>
+      <property name="Manufacturer_Part_Number" value="BM08B-SRSS-TBT(LF)(SN)"/>
+      <property name="Supplier" value="Farnell"/>
+      <property name="Supplier_url" value="https://uk.farnell.com/jst-japan-solderless-terminals/bm08b-srss-tb-lf-sn/connector-header-1mm-8pos-1row/dp/1679134"/>
+      <property name="Supplier_code" value="1679134"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="resistive_plate.kicad_sch"/>
+      <property name="ki_description" value="Wire To Board / Wire To Wire Connector Through Hole RoHS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>55c1b999-9adf-4c9b-899d-6e8f80e31c4b</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="BM08B-SRSS-TBT_LF__SN_">
+      <description>Wire To Board / Wire To Wire Connector Through Hole RoHS</description>
+      <docs>https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe</docs>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">BM08B-SRSS-TBT_LF__SN_</field>
+        <field name="Footprint">bjr_footprint_lib:BM08BSRSSTBTLFSN</field>
+        <field name="Datasheet">https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe</field>
+        <field name="Description">Wire To Board / Wire To Wire Connector Through Hole RoHS</field>
+        <field name="Height">4.25</field>
+        <field name="Arrow Part Number">BM08B-SRSS-TBT(LF)(SN)</field>
+        <field name="Arrow Price/Stock">https://www.arrow.com/en/products/bm08b-srss-tbt-lf-sn/jst-manufacturing?region=europe</field>
+        <field name="Manufacturer_Name">JST (JAPAN SOLDERLESS TERMINALS)</field>
+        <field name="Manufacturer_Part_Number">BM08B-SRSS-TBT(LF)(SN)</field>
+        <field name="Supplier">Farnell</field>
+        <field name="Supplier_url">https://uk.farnell.com/jst-japan-solderless-terminals/bm08b-srss-tb-lf-sn/connector-header-1mm-8pos-1row/dp/1679134</field>
+        <field name="Supplier_code">1679134</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+        <pin num="4" name="4" type="passive"/>
+        <pin num="5" name="5" type="passive"/>
+        <pin num="6" name="6" type="passive"/>
+        <pin num="7" name="7" type="passive"/>
+        <pin num="8" name="8" type="passive"/>
+        <pin num="MP1" name="MP1" type="passive"/>
+        <pin num="MP2" name="MP2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="LSM6DS3TR-C">
+      <description>STMicroelectronics iNEMO inertial module: 3D accelerometer and 3D gyroscope</description>
+      <docs>http://www.st.com/resource/en/datasheet/lsm6ds3tr-c.pdf</docs>
+      <fields>
+        <field name="Reference">IC</field>
+        <field name="Value">LSM6DS3TR-C</field>
+        <field name="Footprint">LGA-14(2.5X3X0.86)</field>
+        <field name="Datasheet">http://www.st.com/resource/en/datasheet/lsm6ds3tr-c.pdf</field>
+        <field name="Mouser Part Number">511-LSM6DS3TR-C</field>
+        <field name="Mouser Price/Stock">https://www.mouser.co.uk/ProductDetail/STMicroelectronics/LSM6DS3TR-C?qs=u4fy%2FsgLU9NHwPlhP3LTBw%3D%3D</field>
+        <field name="Manufacturer_Name">STMicroelectronics</field>
+        <field name="Manufacturer_Part_Number">LSM6DS3TR-C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="ADO/SA0" type="passive"/>
+        <pin num="2" name="SDX" type="passive"/>
+        <pin num="3" name="SCX" type="passive"/>
+        <pin num="4" name="INT1" type="passive"/>
+        <pin num="5" name="VDDIO" type="passive"/>
+        <pin num="6" name="GND_1" type="passive"/>
+        <pin num="7" name="GND_2" type="passive"/>
+        <pin num="8" name="VDD" type="passive"/>
+        <pin num="9" name="INT2" type="passive"/>
+        <pin num="10" name="NC_1" type="passive"/>
+        <pin num="11" name="NC_2" type="passive"/>
+        <pin num="12" name="CS" type="passive"/>
+        <pin num="13" name="SCL" type="passive"/>
+        <pin num="14" name="SDA" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="SFW4R-1STE1HLF">
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">SFW4R-1STE1HLF</field>
+        <field name="Footprint">SFW4R-1STE1HLF:AMPHENOL_SFW4R-1STE1HLF</field>
+        <field name="MF">Amphenol</field>
+        <field name="MAXIMUM_PACKAGE_HEIGHT">--</field>
+        <field name="Package">None</field>
+        <field name="Price">None</field>
+        <field name="Check_prices">https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=eda</field>
+        <field name="STANDARD">Manufacturer Recommendations</field>
+        <field name="PARTREV">B</field>
+        <field name="SnapEDA_Link">https://www.snapeda.com/parts/SFW4R-1STE1HLF/Amphenol/view-part/?ref=snap</field>
+        <field name="MP">SFW4R-1STE1HLF</field>
+        <field name="Purchase-URL">https://www.snapeda.com/api/url_track_click_mouser/?unipart_id=12580016&amp;manufacturer=Amphenol&amp;part_name=SFW4R-1STE1HLF&amp;search_term=None</field>
+        <field name="Description">
+1.00mm Flex Connector, SFW-R series, 4 Position, Bottom side Contact, Side Entry Surface Mount ZIF Connector, Halogen-Free and Lead Free.
+</field>
+        <field name="MANUFACTURER">Amphenol</field>
+        <field name="Availability">In Stock</field>
+        <field name="SNAPEDA_PN">SFW4R-1STE1HLF</field>
+        <field name="Supplier">Mouser</field>
+        <field name="Supplier_code">649-SFW4R-1STE1HLF</field>
+        <field name="Supplier_url">https://www.mouser.co.uk/ProductDetail/Amphenol-FCI/SFW4R-1STE1HLF?qs=8KMuCLbL8BaKvAEjw%2FzA%2Fg%3D%3D</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+        <pin num="4" name="4" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="bjr_symbol_lib" part="TSC2046EIPWR">
+      <description>4-Wire Touch Screen Controller with low voltage digital I/O and extended ESD protection</description>
+      <docs>http://www.ti.com/lit/gpn/TSC2046E</docs>
+      <fields>
+        <field name="Reference">IC</field>
+        <field name="Value">TSC2046EIPWR</field>
+        <field name="Footprint">SOP65P640X120-16N</field>
+        <field name="Datasheet">http://www.ti.com/lit/gpn/TSC2046E</field>
+        <field name="Height">1.2</field>
+        <field name="Mouser Part Number">595-TSC2046EIPWR</field>
+        <field name="Mouser Price/Stock">https://www.mouser.co.uk/ProductDetail/Texas-Instruments/TSC2046EIPWR?qs=0OHPnBYoB%2Fn8%252BCr%2F3vKhyw%3D%3D</field>
+        <field name="Manufacturer_Name">Texas Instruments</field>
+        <field name="Manufacturer_Part_Number">TSC2046EIPWR</field>
+      </fields>
+      <pins>
+        <pin num="1" name="+VCC" type="passive"/>
+        <pin num="2" name="X+" type="passive"/>
+        <pin num="3" name="Y+" type="passive"/>
+        <pin num="4" name="X-" type="passive"/>
+        <pin num="5" name="Y-" type="passive"/>
+        <pin num="6" name="GND" type="passive"/>
+        <pin num="7" name="VBAT" type="passive"/>
+        <pin num="8" name="AUX" type="passive"/>
+        <pin num="9" name="VREF" type="passive"/>
+        <pin num="10" name="IOVDD" type="passive"/>
+        <pin num="11" name="~{PENIRQ}" type="passive"/>
+        <pin num="12" name="DOUT" type="passive"/>
+        <pin num="13" name="BUSY" type="passive"/>
+        <pin num="14" name="DIN" type="passive"/>
+        <pin num="15" name="~{CS}" type="passive"/>
+        <pin num="16" name="DCLK" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Device">
+      <uri>/usr/share/kicad/symbols//Device.kicad_sym</uri>
+    </library>
+    <library logical="bjr_symbol_lib">
+      <uri>/home/tamasfeher/general/bjr/pcbs/bjr_symbol_lib.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/CS_IMU">
+      <node ref="IC2" pin="12" pinfunction="CS" pintype="passive"/>
+      <node ref="J2" pin="5" pinfunction="5" pintype="passive"/>
+    </net>
+    <net code="2" name="/CS_TOUCH">
+      <node ref="IC1" pin="15" pinfunction="~{CS}" pintype="passive"/>
+      <node ref="J2" pin="4" pinfunction="4" pintype="passive"/>
+    </net>
+    <net code="3" name="/INT_IMU">
+      <node ref="IC2" pin="4" pinfunction="INT1" pintype="passive"/>
+      <node ref="J2" pin="6" pinfunction="6" pintype="passive"/>
+    </net>
+    <net code="4" name="/MISO">
+      <node ref="IC1" pin="12" pinfunction="DOUT" pintype="passive"/>
+      <node ref="IC2" pin="1" pinfunction="ADO/SA0" pintype="passive"/>
+      <node ref="J2" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="5" name="/MOSI">
+      <node ref="IC1" pin="14" pinfunction="DIN" pintype="passive"/>
+      <node ref="IC2" pin="14" pinfunction="SDA" pintype="passive"/>
+      <node ref="J2" pin="3" pinfunction="3" pintype="passive"/>
+    </net>
+    <net code="6" name="/SCK">
+      <node ref="IC1" pin="16" pinfunction="DCLK" pintype="passive"/>
+      <node ref="IC2" pin="13" pinfunction="SCL" pintype="passive"/>
+      <node ref="J2" pin="1" pinfunction="1" pintype="passive"/>
+    </net>
+    <net code="7" name="/X+">
+      <node ref="IC1" pin="2" pinfunction="X+" pintype="passive"/>
+      <node ref="J1" pin="1" pinfunction="1" pintype="passive"/>
+    </net>
+    <net code="8" name="/X-">
+      <node ref="IC1" pin="4" pinfunction="X-" pintype="passive"/>
+      <node ref="J1" pin="3" pinfunction="3" pintype="passive"/>
+    </net>
+    <net code="9" name="/Y+">
+      <node ref="IC1" pin="3" pinfunction="Y+" pintype="passive"/>
+      <node ref="J1" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="10" name="/Y-">
+      <node ref="IC1" pin="5" pinfunction="Y-" pintype="passive"/>
+      <node ref="J1" pin="4" pinfunction="4" pintype="passive"/>
+    </net>
+    <net code="11" name="GND">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="IC1" pin="6" pinfunction="GND" pintype="passive"/>
+      <node ref="IC2" pin="2" pinfunction="SDX" pintype="passive"/>
+      <node ref="IC2" pin="3" pinfunction="SCX" pintype="passive"/>
+      <node ref="IC2" pin="6" pinfunction="GND_1" pintype="passive"/>
+      <node ref="IC2" pin="7" pinfunction="GND_2" pintype="passive"/>
+      <node ref="J2" pin="8" pinfunction="8" pintype="passive"/>
+    </net>
+    <net code="12" name="VDD">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="IC1" pin="1" pinfunction="+VCC" pintype="passive"/>
+      <node ref="IC1" pin="10" pinfunction="IOVDD" pintype="passive"/>
+      <node ref="IC2" pin="5" pinfunction="VDDIO" pintype="passive"/>
+      <node ref="IC2" pin="8" pinfunction="VDD" pintype="passive"/>
+      <node ref="J2" pin="7" pinfunction="7" pintype="passive"/>
+    </net>
+    <net code="13" name="unconnected-(IC1-AUX-Pad8)">
+      <node ref="IC1" pin="8" pinfunction="AUX" pintype="passive+no_connect"/>
+    </net>
+    <net code="14" name="unconnected-(IC1-BUSY-Pad13)">
+      <node ref="IC1" pin="13" pinfunction="BUSY" pintype="passive+no_connect"/>
+    </net>
+    <net code="15" name="unconnected-(IC1-VBAT-Pad7)">
+      <node ref="IC1" pin="7" pinfunction="VBAT" pintype="passive+no_connect"/>
+    </net>
+    <net code="16" name="unconnected-(IC1-VREF-Pad9)">
+      <node ref="IC1" pin="9" pinfunction="VREF" pintype="passive+no_connect"/>
+    </net>
+    <net code="17" name="unconnected-(IC1-~{PENIRQ}-Pad11)">
+      <node ref="IC1" pin="11" pinfunction="~{PENIRQ}" pintype="passive+no_connect"/>
+    </net>
+    <net code="18" name="unconnected-(IC2-INT2-Pad9)">
+      <node ref="IC2" pin="9" pinfunction="INT2" pintype="passive+no_connect"/>
+    </net>
+    <net code="19" name="unconnected-(IC2-NC_1-Pad10)">
+      <node ref="IC2" pin="10" pinfunction="NC_1" pintype="passive+no_connect"/>
+    </net>
+    <net code="20" name="unconnected-(IC2-NC_2-Pad11)">
+      <node ref="IC2" pin="11" pinfunction="NC_2" pintype="passive+no_connect"/>
+    </net>
+    <net code="21" name="unconnected-(J2-PadMP1)">
+      <node ref="J2" pin="MP1" pinfunction="MP1" pintype="passive+no_connect"/>
+    </net>
+    <net code="22" name="unconnected-(J2-PadMP2)">
+      <node ref="J2" pin="MP2" pinfunction="MP2" pintype="passive+no_connect"/>
+    </net>
+  </nets>
+</export>
