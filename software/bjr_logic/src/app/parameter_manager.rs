@@ -5,16 +5,6 @@ use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
 use strum_macros::{Display, EnumIter, EnumString};
 
-struct ByteWriter<'a>(&'a mut [u8]);
-
-impl<'a> Write for ByteWriter<'a> {
-    fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        let bytes = s.as_bytes();
-        let len = bytes.len().min(self.0.len());
-        self.0[..len].copy_from_slice(&bytes[..len]);
-        Ok(())
-    }
-}
 pub trait ParameterType {
     type AtomicType;
     type ReturnType: PartialOrd;
@@ -98,9 +88,9 @@ macro_rules! generate_parameter_types {
     };
 }
 
-const BASE_CIRCLE_RADIUS: f32 = 40.0;
-const HINGE_OFFSET: f32 = 6.5;
-const JOINT_CIRCLE_RADIUS: f32 = 17.5; //
+const _BASE_CIRCLE_RADIUS: f32 = 40.0;
+const _HINGE_OFFSET: f32 = 6.5;
+const _JOINT_CIRCLE_RADIUS: f32 = 17.5; //
 generate_parameter_types!(
     (AtomicF32, f32, MotorM2Ustep, 8e5),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
@@ -119,10 +109,10 @@ generate_parameter_types!(
     //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -2712),
     (AtomicI32, i32, TouchCenterOffsetY, -1933),
-    (AtomicF32, f32, TouchScaleXX, 0.032181205648158066e-3),
-    (AtomicF32, f32, TouchScaleXY, -0.012809686388226736e-3),
-    (AtomicF32, f32, TouchScaleYX, 0.0016535647770429401e-3),
-    (AtomicF32, f32, TouchScaleYY, -0.04407568335827352e-3),
+    (AtomicF32, f32, TouchScaleXX, 3.218_120_4e-5),
+    (AtomicF32, f32, TouchScaleXY, -1.280_968_6e-5),
+    (AtomicF32, f32, TouchScaleYX, 1.653_564_8e-6),
+    (AtomicF32, f32, TouchScaleYY, -4.407_568_5e-5),
     //No ball parameters
     (AtomicF32, f32, NoBallTargetHeight, 10e-3),
     //Kinematics parameters

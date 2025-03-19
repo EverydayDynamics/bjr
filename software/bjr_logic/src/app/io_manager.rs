@@ -3,7 +3,6 @@ use crate::app::motor_handler::{ControlMode, MotorHandler, MotorHandlerError, Mo
 use crate::app::touch_handler::{Differentiator, TouchHandler};
 use device_traits::{StepperMotorController, TouchSensor, TouchSensorError};
 use core::fmt::{Display, Formatter};
-use embedded_time::duration::Microseconds;
 use crate::app::telemetry_handler::TelemetryBuilder;
 
 pub struct Inputs {
@@ -21,7 +20,6 @@ pub enum IOManagerError {
     MotorOutput(MotorHandlerError),
     BallSensor(TouchSensorError),
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for IOManagerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -37,22 +35,6 @@ impl Display for IOManagerError {
         }
     }
 }
-#[cfg(feature = "defmt")]
-impl defmt::Format for IOManagerError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            IOManagerError::MotorInput(e) => {
-                defmt::write!(f, "IOMananger Motor input error: {}", e)
-            }
-            IOManagerError::MotorOutput(e) => {
-                defmt::write!(f, "IOMananger Motor output error: {}", e)
-            }
-            IOManagerError::BallSensor(e) => {
-                defmt::write!(f, "IOMananger Ball sensor error: {}", e)
-            }
-        }
-    }
-}
 pub struct DefaultIOManager<MA, MB, MC, TS, DIFF>
 where
     MA: StepperMotorController,
@@ -63,10 +45,9 @@ where
 {
     motor_handler: MotorHandler<MA, MB, MC>,
     touch_handler: TouchHandler<TS, DIFF>,
-    last_call_time: Microseconds<u64>,
 }
 pub trait IOManager {
-    fn read_all_inputs(&mut self, call_time: Microseconds<u64>, telemetry_builder: &mut TelemetryBuilder) -> Result<Inputs, IOManagerError>;
+    fn read_all_inputs(&mut self, telemetry_builder: &mut TelemetryBuilder) -> Result<Inputs, IOManagerError>;
     fn read_motor_inputs(&mut self, telemetry_builder: &mut TelemetryBuilder ) -> Result<[(KinState, MotorStatus); 3], IOManagerError>;
     fn write_motor_outputs(
         &mut self,
@@ -92,7 +73,6 @@ where
         DefaultIOManager {
             motor_handler,
             touch_handler,
-            last_call_time: Microseconds::<u64>::new(0),
         }
     }
 }
@@ -104,11 +84,11 @@ where
     TS: TouchSensor,
     DIFF: Differentiator,
 {
-    fn read_all_inputs(&mut self, call_time: Microseconds<u64>, telemetry_builder: &mut TelemetryBuilder) -> Result<Inputs, IOManagerError> {
+    fn read_all_inputs(&mut self, telemetry_builder: &mut TelemetryBuilder) -> Result<Inputs, IOManagerError> {
         let measured_motors_state = self.read_motor_inputs(telemetry_builder)?;
         let measured_ball_state = self
             .touch_handler
-            .get_ball_state(call_time, telemetry_builder)
+            .get_ball_state(telemetry_builder)
             .map_err(IOManagerError::BallSensor)?;
 
         Ok(Inputs {

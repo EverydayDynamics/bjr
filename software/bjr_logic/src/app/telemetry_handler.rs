@@ -101,8 +101,8 @@ where TEL: TelemetrySender
     }
     pub fn send_packet(&mut self, packet: TelemetryPacket) -> Result<(), TelemetryHandlerError> {
         let mut buffer = [0u8; 1024];
-        let result = postcard::to_slice(&packet, &mut buffer).map_err(|e| TelemetryHandlerError::SerializationError(e))?;
-        self.telemetry_sender.send(result).map_err(|e| TelemetryHandlerError::SendingError(e))
+        let result = postcard::to_slice(&packet, &mut buffer).map_err(TelemetryHandlerError::SerializationError)?;
+        self.telemetry_sender.send(result).map_err(TelemetryHandlerError::SendingError)
     }
     pub fn prepare_packet(&mut self, call_time: Microseconds<u64>) -> TelemetryBuilder{
         let ret = TelemetryBuilder{ packet: TelemetryPacket::new(call_time.integer(), self.sent_packets) };

@@ -3,7 +3,6 @@ use device_traits::{
     MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController,
     StepperMotorPhase,
 };
-use tmc5130::reg::XACTUAL;
 use tmc5130::reg::{DRV_STATUS, IOIN};
 use tmc5130::{reg, Tmc5130};
 
@@ -20,7 +19,7 @@ where
     PIN: embedded_hal::digital::InputPin,
 {
     fn get_error_from_drv_status(&mut self) -> Result<(), StepperDeviceError> {
-        let (status, read_drv_status) = self
+        let (_status, read_drv_status) = self
             .dev_driver
             .read_register::<DRV_STATUS>()
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
@@ -45,7 +44,7 @@ where
         status: reg::SPISTATUS,
     ) -> Result<(), StepperDeviceError> {
         if status.driver_error() {
-            let (status, read_drv_status) = self
+            let (_status, read_drv_status) = self
                 .dev_driver
                 .read_register::<DRV_STATUS>()
                 .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
@@ -69,11 +68,11 @@ where
         }
     }
     fn clear_status_flags(&mut self) -> Result<(), StepperDeviceError> {
-        let (_, gstat) = self
+        let (_, _gstat) = self
             .dev_driver
             .read_register::<reg::GSTAT>()
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
-        let (_, gstat) = self
+        let (_, _gstat) = self
             .dev_driver
             .read_register::<reg::GSTAT>()
             .map_err(|e| StepperDeviceError::from(ErrorWrapper(e)))?;
@@ -171,7 +170,7 @@ where
 const RAMPMODE_POS_MODE: u8 = 0;
 const RAMPMODE_VEL_MODE_POS: u8 = 1;
 const RAMPMODE_VEL_MODE_NEG: u8 = 2;
-const RAMPMODE_HOLD: u8 = 3;
+const _RAMPMODE_HOLD: u8 = 3;
 
 impl<SPI, PIN> StepperMotorController for TMC5130StepperDev<SPI, PIN>
 where

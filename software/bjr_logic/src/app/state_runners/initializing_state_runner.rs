@@ -1,18 +1,13 @@
 use crate::app::event::GlobEvent;
-use crate::app::event_queue::EventQueue;
-use crate::app::io_manager::IOManager;
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerContext, StateRunnerError};
 use device_traits::Logger;
-use device_traits::MotorEnabler;
-use embedded_time::duration::Microseconds;
-use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(Default)]
 pub struct InitializingStateRunner {}
 impl RunnableState for InitializingStateRunner {
     fn entry<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        _ctx: &mut StateRunnerContext<LOG>
     ) {
     }
     fn update<LOG: Logger>(
@@ -29,6 +24,6 @@ impl RunnableState for InitializingStateRunner {
     }
     fn exit<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        _ctx: &mut StateRunnerContext<LOG>
     ) {}
 }

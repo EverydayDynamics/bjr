@@ -1,9 +1,7 @@
 use crate::app::control_primitives::{ControlInputs, Controller, KinState, PlateState};
 use embedded_time::duration::Microseconds;
-use embedded_time::fixed_point::FixedPoint;
-use crate::app::parameter_manager::{MCAccel, MCKp, parameter_manager, PlatePDCtrlKd, PlatePDCtrlKp};
+use crate::app::parameter_manager::{parameter_manager, PlatePDCtrlKd, PlatePDCtrlKp};
 use libm::asinf;
-use crate::utils::usec2sec;
 
 #[derive(Default)]
 pub struct PIDController {

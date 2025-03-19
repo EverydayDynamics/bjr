@@ -1,4 +1,3 @@
-use crate::devices::gpio_button::GpioButton;
 use device_traits::MotorEnabler;
 use embedded_hal::digital::OutputPin;
 

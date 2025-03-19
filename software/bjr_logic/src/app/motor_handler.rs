@@ -5,7 +5,6 @@ use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
 use device_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
 use core::fmt::Display;
 use core::fmt::Formatter;
-use strum_macros::{EnumString, VariantNames};
 use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(PartialEq, Copy, Clone, Default)]

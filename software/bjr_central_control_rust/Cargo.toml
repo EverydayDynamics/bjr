@@ -72,4 +72,3 @@ overflow-checks = false  # <-
 
 [features]
 default = []
-defmt = ["device_traits/defmt", "bjr_bsp/defmt", "bjr_builder/defmt", "bjr_logic/defmt"]

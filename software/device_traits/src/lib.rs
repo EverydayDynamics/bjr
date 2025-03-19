@@ -1,8 +1,5 @@
 #![no_std]
 use core::fmt::{Display, Formatter};
-#[cfg(feature = "defmt")]
-use defmt;
-use ufmt::uDisplay;
 
 pub trait TemperatureSensor {
     fn read_temperature(&self) -> Result<f32, DeviceError>;
@@ -49,21 +46,10 @@ pub enum TouchSensorError {
     CommunicationError(CommsError),
 }
 
-#[cfg(not(feature = "defmt"))]
 impl core::fmt::Display for TouchSensorError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             TouchSensorError::CommunicationError(e) => write!(f, "Communication error: {}", e),
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for TouchSensorError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            TouchSensorError::CommunicationError(e) => {
-                defmt::write!(f, "Communication error: {}", e)
-            }
         }
     }
 }
@@ -77,11 +63,7 @@ pub trait Monotonic {
 pub trait Reader {
     fn read(&mut self, buf: &mut [u8]) -> usize;
 }
-#[cfg(not(feature = "defmt"))]
 pub trait LoggableMessage: core::fmt::Display {}
-#[cfg(feature = "defmt")]
-pub trait LoggableMessage: defmt::Format {}
-
 pub trait Logger {
     fn trace<MSG: LoggableMessage>(&mut self, message: MSG);
     fn debug<MSG: LoggableMessage>(&mut self, message: MSG);

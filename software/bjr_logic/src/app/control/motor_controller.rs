@@ -20,9 +20,7 @@ impl MotorController {
         let mut pos_err = setpoint.pos - state.pos;
         if fabsf(pos_err) < pos_deadband {
             pos_err = 0.0;
-        } else {
-
-        }
+        } 
         let mut vel_output = pos_err*k_p + setpoint.speed;
         let _ = self.vel_limit.check(&mut vel_output);
 

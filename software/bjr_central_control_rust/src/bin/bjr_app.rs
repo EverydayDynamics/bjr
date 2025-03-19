@@ -15,21 +15,18 @@ dispatchers = [SPI2]
 )]
 mod app {
     use bjr_bsp;
-    use bjr_bsp::boards::{BoardCreationError, BoardResources};
+    use bjr_bsp::boards::BoardCreationError;
     use bjr_bsp::Board;
     use bjr_builder::build_application;
     use bjr_logic::app::menu_handler::MenuContext;
     use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
-    use device_traits::StepperMotorController;
-    use core::fmt::{Display, Formatter, Write};
+    use core::fmt::{Display, Formatter};
     use embedded_time::duration::*;
     use rtic_monotonics;
     use rtic_monotonics::stm32::fugit::Instant;
     use rtic_monotonics::stm32::Tim2 as Mono;
     use rtic_monotonics::stm32::*;
     use rtic_monotonics::{InterruptToken, Monotonic};
-    use stm32f4xx_hal::prelude::*;
-    use defmt;
     use os_traits::TimeControl;
     struct STM32TimeControl {
 
@@ -57,22 +54,11 @@ mod app {
             }
         }
     }
-    #[cfg(not(feature = "defmt"))]
     impl Display for AppError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             match self {
                 AppError::SetupError(bce) => {
                     write!(f, "ApplicationError, Board initialization failed: {}", bce)
-                }
-            }
-        }
-    }
-    #[cfg(feature = "defmt")]
-    impl defmt::Format for AppError{
-        fn format(&self, f: defmt::Formatter) {
-            match self {
-                AppError::SetupError(bce) => {
-                    defmt::write!(f, "ApplicationError, Board initialization failed: {}", bce)
                 }
             }
         }
@@ -87,7 +73,7 @@ mod app {
     #[local]
     struct Local {}
     #[init]
-    fn init(cx: init::Context) -> (Shared, Local) {
+    fn init(_cx: init::Context) -> (Shared, Local) {
         task1::spawn().unwrap();
         (
             Shared {
@@ -106,7 +92,7 @@ mod app {
     }
 
     #[task(priority = 1)]
-    async fn task1(cx: task1::Context) {
+    async fn task1(_cx: task1::Context) {
         let mut board = Board::new();
         let token = rtic_monotonics::create_stm32_tim2_monotonic_token!();
         let timer_clock_hz = 75_000_000; // ??????????????????????????????

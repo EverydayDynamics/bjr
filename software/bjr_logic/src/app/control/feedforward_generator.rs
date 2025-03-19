@@ -1,8 +1,7 @@
 use core::f32::consts::PI;
 use crate::app::control_primitives::{KinState, PlateDelta};
 use embedded_time::duration::*;
-use fast_math;
-use libm::{cosf, sinf, sqrtf, fabs, fabsf};
+use libm::{cosf, sinf, fabsf};
 use crate::app::state_runner::CirclingParams;
 use crate::utils::usec2sec;
 

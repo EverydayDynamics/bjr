@@ -63,7 +63,7 @@ impl Default for MenuContext {
         }
     }
 }
-struct Context {
+pub struct Context {
     _inner: u32,
     error: Result<(), MenuError>,
     state_runner_command: StateRunnerCommand,
@@ -302,7 +302,7 @@ fn fallible_test_motion<MIO: Reader + Write>(
 ) -> Result<(), MenuError> {
 
     if let Ok(motor_id) = usize::from_str(args[0]) {
-        if (motor_id > MOTOR_NUM) {
+        if motor_id > MOTOR_NUM {
             write!(interface, "Motor ID can't be larger than {}", MOTOR_NUM)
                 .map_err(|_| MenuError::MenuInterfaceWriteError)?;
         } else {
@@ -488,7 +488,6 @@ fn fallible_set_motor_state<MIO: Reader + Write>(
     interface: &mut MIO,
     context: &mut Context,
 ) -> Result<(), MenuError> {
-    const DEG2RAD: f32 = 0.017_453_292;
     get_event_queue()
         .enqueue(GlobEvent::EnterFeedforward)
         .map_err(|_| MenuError::EventBufferOverflow)?;

@@ -9,12 +9,10 @@ use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
 use crate::app::state_runner::{StateRunnerCommand, StateRunnerContext};
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
-use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor};
+use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;
-use bjr_telemetry::TelemetryPacket;
-use crate::app::control_primitives::KinState;
 use crate::app::telemetry_handler::{TelemetryBuilder, TelemetryHandler, TelemetryHandlerError};
 use crate::app::touch_handler::Differentiator;
 use os_traits::TimeControl;
@@ -73,7 +71,6 @@ where
     menu_handler: MenuHandler<'a, MIO>,
     state_runner_command: StateRunnerCommand,
     telemetry_handler: TelemetryHandler<TEL>,
-    packet_id: u64,
     time_control: TIM
 }
 
@@ -119,7 +116,6 @@ where
             menu_handler,
             state_runner_command: StateRunnerCommand::NoCommand,
             telemetry_handler,
-            packet_id:0,
             time_control,
         }
     }
@@ -189,8 +185,8 @@ where
         self.send_cpu_use_telem(period, &mut telemetry_builder);
             let telem_result = self.telemetry_handler.send_packet(telemetry_builder
                     .get_packet())
-                .map_err(|e|LogicRunnerError::TelementryError(e));
-        //self.handle_error(telem_result);
+                .map_err(LogicRunnerError::TelementryError);
+        self.handle_error(telem_result);
         self.next_call_time = Some(next_call_time);
         let end_time = self.time_control.get_tick();
         self.last_end_time = Some(Microseconds::<u64>::new(end_time));

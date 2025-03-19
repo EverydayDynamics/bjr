@@ -12,10 +12,9 @@ use bjr_logic::app::motor_handler::MotorHandler;
 use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
 use bjr_logic::app::state_manager::StateManager;
 use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
-use bjr_logic::app::touch_handler::{Differentiator, SGDifferentiator, TouchHandler};
+use bjr_logic::app::touch_handler::{SGDifferentiator, TouchHandler};
 use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
 use core::fmt::{Display, Formatter, Write};
-use embedded_time::duration::Microseconds;
 use bjr_logic::app::telemetry_handler::TelemetryHandler;
 use os_traits::TimeControl;
 
@@ -30,7 +29,6 @@ impl Severity for AppError {
         }
     }
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for AppError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -40,17 +38,6 @@ impl Display for AppError {
         }
     }
 }
-#[cfg(feature = "defmt")]
-impl defmt::Format for AppError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            AppError::SetupError(bce) => {
-                defmt::write!(f, "ApplicationError, Board initialization failed: {}", bce)
-            }
-        }
-    }
-}
-
 pub fn build_application<
     'a,
     BTN: Button,
@@ -79,10 +66,10 @@ pub fn build_application<
     time_control: TIM
 ) -> LogicRunner<'a, BTN, LOG, ME, STPA, STPB, STPC, TS, MIO, TEL, SGDifferentiator<5,3>, TIM> {
     let event_queue = get_event_queue();
-    let (mut motor_enabler, mut log_device, mut menu_io) = board.get_infallible_resources();
+    let (mut motor_enabler, mut log_device,menu_io) = board.get_infallible_resources();
     let mut error_handler = ErrorHandler::new(event_queue);
     match board.get_fallible_resources() {
-        Ok((mut button, mut stp_a, mut stp_b, mut stp_c, mut touch_sensor, telemetry)) => {
+        Ok((button, stp_a, stp_b, stp_c, touch_sensor, telemetry)) => {
             let menu_handler = MenuHandler::new(menu_io, menu_context);
             let button_handler = ButtonHandler::new(button, get_event_queue());
             let motor_handler = MotorHandler::new(
@@ -92,7 +79,7 @@ pub fn build_application<
                 MotorPosLimit::new(LimitLevel::Error),
                 MotorVelLimit::new(LimitLevel::Error),
             );
-            let touch_handler = TouchHandler::new(touch_sensor, [SGDifferentiator::new(), SGDifferentiator::new()], Microseconds::default(), None);
+            let touch_handler = TouchHandler::new(touch_sensor, [SGDifferentiator::new(), SGDifferentiator::new()]);
             let io_manager = DefaultIOManager::new(motor_handler, touch_handler);
             let state_manager = StateManager::new(DefaultStateRunnerSelector::new());
             let event_handler = EventHandler::new(event_queue);

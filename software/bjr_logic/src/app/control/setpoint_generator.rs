@@ -23,13 +23,9 @@ pub trait SetPointGen {
     fn get_sp(&mut self, time: Microseconds<u64>) -> [KinState; 2];
 }
 
+#[derive(Default)]
 pub struct SetPointGenCircling {
     start_time: Microseconds<u64>
-}
-impl Default for SetPointGenCircling {
-    fn default() -> Self {
-        SetPointGenCircling{ start_time: Default::default() }
-    }
 }
 impl SetPointGen for SetPointGenCircling {
     fn reset(&mut self, time: Microseconds<u64>) {

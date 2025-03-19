@@ -1,10 +1,7 @@
-use core::convert::identity;
 use crate::app::control_primitives::KinState;
 use crate::app::parameter_manager::{LogicRunnerPeriodUs, parameter_manager, TouchCenterOffsetX, TouchCenterOffsetY, TouchScaleXX, TouchScaleXY, TouchScaleYX, TouchScaleYY};
 use crate::utils::usec2sec;
 use device_traits::{TouchSensor, TouchSensorError};
-use embedded_time::duration::Microseconds;
-use embedded_time::fixed_point::FixedPoint;
 use crate::app::telemetry_handler::TelemetryBuilder;
 use heapless::Deque;
 use nalgebra::SMatrix;
@@ -12,8 +9,6 @@ use libm::powf;
 
 pub struct TouchHandler<TS, DIFF> {
     touch_sensor: TS,
-    last_state: Option<[KinState; 2]>,
-    last_call_time: Microseconds<u64>,
     differentiators: [DIFF;2],
     unfiltered_differentiators: [TrivialDiff;2],
 }
@@ -25,20 +20,15 @@ where
     pub fn new(
         touch_sensor: TS,
         differentiators: [DIFF;2],
-        initial_call_time: Microseconds<u64>,
-        initial_state: Option<[KinState; 2]>,
     ) -> TouchHandler<TS, DIFF> {
         TouchHandler {
             touch_sensor,
-            last_state: initial_state,
-            last_call_time: initial_call_time,
             differentiators,
             unfiltered_differentiators: [TrivialDiff::new(),TrivialDiff::new()],
         }
     }
     pub fn get_ball_state(
         &mut self,
-        call_time: Microseconds<u64>,
         telemetry_builder: &mut TelemetryBuilder
     ) -> Result<Option<[KinState; 2]>, TouchSensorError> {
         let mut result = Ok(None);
@@ -75,10 +65,10 @@ where
             );
             result = Ok(Some(state));
         } else {
-           for mut differentiator in &mut self.differentiators{
+           for differentiator in &mut self.differentiators{
                differentiator.reset();
            }
-            for mut unfiltered_diff in &mut self.unfiltered_differentiators{
+            for unfiltered_diff in &mut self.unfiltered_differentiators{
                 unfiltered_diff.reset();
             }
         }
@@ -108,6 +98,12 @@ pub struct SGDifferentiator<const WIN: usize, const ORD:usize> {
     ring_buffer: Deque<f32,21>,
     coeffs:[f32;21]
 }
+impl<const WIN: usize, const ORD:usize> Default for SGDifferentiator<WIN, ORD> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<const WIN: usize, const ORD:usize> SGDifferentiator<WIN, ORD> {
     pub fn new()->SGDifferentiator<WIN, ORD> {
         let mut vandermondre:SMatrix<f32, WIN,ORD> = SMatrix::zeros();
@@ -119,27 +115,27 @@ impl<const WIN: usize, const ORD:usize> SGDifferentiator<WIN, ORD> {
         SGDifferentiator{
             ring_buffer: Deque::new(), coeffs:
             [
-                -0.012987012987012988 ,
-                -0.011688311688311684 ,
-                -0.010389610389610388 ,
-                -0.00909090909090909 ,
-                -0.007792207792207791 ,
-                -0.006493506493506494 ,
-                -0.005194805194805194 ,
-                -0.0038961038961038957 ,
-                -0.002597402597402597 ,
-                -0.0012987012987012985 ,
+                -0.012_987_013 ,
+                -0.011_688_312 ,
+                -0.010_389_61 ,
+                -0.009_090_909 ,
+                -0.007_792_208 ,
+                -0.006_493_506_5 ,
+                -0.005_194_805 ,
+                -0.003_896_104 ,
+                -0.002_597_402_5 ,
+                -0.001_298_701_3 ,
                 0.0 ,
-                0.0012987012987012985 ,
-                0.0025974025974025974 ,
-                0.0038961038961038952 ,
-                0.005194805194805193 ,
-                0.006493506493506491 ,
-                0.00779220779220779 ,
-                0.00909090909090909 ,
-                0.010389610389610388 ,
-                0.011688311688311687 ,
-                0.012987012987012986 ,
+                0.001_298_701_3 ,
+                0.002_597_402_5 ,
+                0.003_896_104 ,
+                0.005_194_805 ,
+                0.006_493_506_5 ,
+                0.007_792_208 ,
+                0.009_090_909 ,
+                0.010_389_61 ,
+                0.011_688_312 ,
+                0.012_987_013 ,
             ]
         }
     }
@@ -169,7 +165,7 @@ impl<const WIN: usize, const ORD:usize> Differentiator for SGDifferentiator<WIN,
             for(sample,coeff) in self.ring_buffer.iter().zip(self.coeffs) {
                 diff += coeff*sample;
             }
-            diff = diff/delta_t;
+            diff /= delta_t;
             Some(diff)
         } else{
             None
@@ -179,6 +175,12 @@ impl<const WIN: usize, const ORD:usize> Differentiator for SGDifferentiator<WIN,
 pub struct TrivialDiff {
     ring_buffer: Deque<f32,2>,
 }
+impl Default for TrivialDiff {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TrivialDiff{
     pub fn new()->TrivialDiff {
         TrivialDiff{
@@ -205,7 +207,7 @@ impl Differentiator for TrivialDiff {
             for(sample,coeff) in self.ring_buffer.iter().zip(SERIES) {
                 diff += coeff*sample;
             }
-            diff = diff/delta_t;
+            diff /= delta_t;
             Some(diff)
         } else{
             None

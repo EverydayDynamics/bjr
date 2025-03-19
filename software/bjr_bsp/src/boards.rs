@@ -65,7 +65,7 @@ impl Display for BoardCreationError {
     }
 }
 impl Debug for BoardCreationError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> core::fmt::Result {
         todo!()
     }
 }

@@ -1,7 +1,6 @@
 #![no_main]
 #![no_std]
 
-use core::fmt::Write;
 use cortex_m_semihosting::debug;
 
 // TODO(5) adjust HAL import

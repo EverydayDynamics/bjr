@@ -2,8 +2,8 @@ use core::cell::RefCell;
 use core::fmt::{Debug, Formatter};
 use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
-use embedded_hal::digital::{InputPin, OutputPin};
-use embedded_hal::spi::{Error, ErrorKind, ErrorType, Operation, SpiBus, SpiDevice};
+use embedded_hal::digital::OutputPin;
+use embedded_hal::spi::{ErrorKind,Operation, SpiBus, SpiDevice};
 
 pub struct Spidev<'a, SPI, CSPIN> {
     guarded_spi: &'a Mutex<RefCell<Option<SPI>>>,
@@ -49,7 +49,7 @@ where
     SPI: SpiBus,
     CSPIN: OutputPin,
 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> core::fmt::Result {
         todo!()
     }
 }
@@ -60,7 +60,7 @@ where
 {
     fn kind(&self) -> ErrorKind {
         match self {
-            SpiDevError::SPIError(spi_error) => {
+            SpiDevError::SPIError(_spi_error) => {
                 //Todo: make the error propagation proper here
                 embedded_hal::spi::ErrorKind::Overrun
             }

@@ -1,9 +1,7 @@
 use device_traits::{LoggableMessage, Logger};
-use core::fmt::{Display, Write};
+use core::fmt::Write;
 use rtt_target;
 use rtt_target::UpChannel;
-use ufmt;
-use ufmt::uwriteln;
 
 pub struct RttLogger {
     up_channel: UpChannel,

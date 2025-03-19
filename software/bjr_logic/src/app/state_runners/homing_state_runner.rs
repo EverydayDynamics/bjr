@@ -1,18 +1,14 @@
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
 use crate::app::event::GlobEvent;
-use crate::app::event_queue::EventQueue;
-use crate::app::io_manager::IOManager;
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{
     parameter_manager, HomingAccel, HomingHighVelocity, HomingLowVelocity, HomingMaxTravel,
     HomingSafePosition,
 };
-use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
-use device_traits::{LoggableMessage, Logger, MotorEnabler};
+use crate::app::state_runner::{RunnableState, StateRunnerContext, StateRunnerError};
+use device_traits::{LoggableMessage, Logger};
 use core::fmt::{Display, Formatter};
-use embedded_time::duration::Microseconds;
-use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(Copy, Clone)]
 pub enum HomingStateRunnerState {
@@ -320,6 +316,6 @@ impl RunnableState for HomingStateRunner {
 
     fn exit<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        _ctx: &mut StateRunnerContext<LOG>
     ) {}
 }

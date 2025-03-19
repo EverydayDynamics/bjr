@@ -81,10 +81,6 @@ pub struct PlateState {
     pub height: KinState,
     pub angle: [KinState; 2],
 }
-pub struct CtrlTelemetryData{
-    pos_err:f32,
-    vel_err:f32,
-}
 impl PlateState {
     pub fn new_with_null_sa(height: f32, alpha: f32, beta: f32) -> PlateState {
         PlateState {

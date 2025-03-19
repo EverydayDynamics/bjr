@@ -1,6 +1,5 @@
 use crate::app::parameter_manager::{parameter_manager, MotorLowerPosLimit, MotorLowerVelLimit, MotorUpperPosLimit, MotorUpperVelLimit, ParameterType, MCVelMax, MCVelMin};
 use core::fmt::{Display, Formatter};
-use crate::app::severity_trait::ErrorSeverity::Report;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum LimitLevel {

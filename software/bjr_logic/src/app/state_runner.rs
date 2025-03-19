@@ -7,7 +7,6 @@ use device_traits::{LoggableMessage, Logger, MotorEnabler};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
-use crate::app::event_handler::State;
 use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(PartialEq, Copy, Clone)]

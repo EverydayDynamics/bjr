@@ -1,7 +1,6 @@
-use device_traits::{Reader, TelemetrySender, TelemetrySenderError};
-use core::fmt::Write;
+use device_traits::{TelemetrySender, TelemetrySenderError};
 use rtt_target;
-use rtt_target::{DownChannel, UpChannel};
+use rtt_target::UpChannel;
 
 pub struct RttTelemetry {
     up_channel: UpChannel,

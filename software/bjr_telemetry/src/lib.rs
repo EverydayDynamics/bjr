@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 use serde::{Serialize, Deserialize};
-use strum::{AsRefStr, EnumCount, EnumVariantNames, VariantNames};
+use strum::{AsRefStr, EnumCount, VariantNames};
 
 #[derive(Serialize, Deserialize)]
 pub struct TelemetryPacket {

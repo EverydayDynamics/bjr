@@ -1,18 +1,15 @@
 use core::fmt::{Display, Formatter};
 use crate::app::control::inverse_kinematics::inverse_kinematics;
-use crate::app::event_queue::EventQueue;
-use crate::app::io_manager::{IOManager, Outputs};
+use crate::app::io_manager::Outputs;
 use crate::app::motor_handler::ControlMode;
 use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
-use device_traits::{LoggableMessage, Logger, MotorEnabler};
-use embedded_time::duration::Microseconds;
+use device_traits::{LoggableMessage, Logger};
 use embedded_time::fixed_point::FixedPoint;
 use strum_macros::Display;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control::feedforward_generator::{FeedForwardGen, FFGenContCircle};
-use crate::app::control::MotorController::MotorController;
+use crate::app::control::motor_controller::MotorController;
 use crate::app::control_primitives::{KinState, PlateState};
-use crate::app::telemetry_handler::TelemetryBuilder;
 
 #[derive(Default, Display, Copy, Clone)]
 enum FeedForwardStateRunnerState {
@@ -81,12 +78,12 @@ impl RunnableState for FeedforwardStateRunner {
         match self.state {
             FeedForwardStateRunnerState::NoState => {}
             FeedForwardStateRunnerState::Circling => {
-                let motors_state = ctx.iomanager.read_motor_inputs(ctx.telemetry_builder).map_err(|e|StateRunnerError::IOError(e))?;
+                let motors_state = ctx.iomanager.read_motor_inputs(ctx.telemetry_builder).map_err(StateRunnerError::IOError)?;
                 let desired_state = PlateState::default() + self.ff_circler.get_ff(ctx.call_time);
-                let mut motors_setpoint = inverse_kinematics(&desired_state);
+                let motors_setpoint = inverse_kinematics(&desired_state);
                 let mut motor_outputs: [KinState;3] = Default::default();
                 for mot_idx in 0..MOTOR_NUM {
-                    let mut tracking_error:f32 = 0.0;
+                    let tracking_error:f32;
                     (motor_outputs[mot_idx],tracking_error) = self.motor_controllers[mot_idx].calc(motors_setpoint[mot_idx], motors_state[mot_idx].0);
                     ctx.telemetry_builder.add_motor_control(mot_idx, tracking_error);
                 }
@@ -101,6 +98,6 @@ impl RunnableState for FeedforwardStateRunner {
     }
     fn exit<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        _ctx: &mut StateRunnerContext<LOG>
     ) {}
 }

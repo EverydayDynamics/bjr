@@ -155,7 +155,7 @@ impl BoardResources for MyBoard {
         ),
         BoardCreationError,
     > {
-        let mut button = GpioButton::new(self.button_pin.take().unwrap());
+        let button = GpioButton::new(self.button_pin.take().unwrap());
         //let a: Result<(), Error> = spi.read();
         let spi = self.spi1.take().unwrap();
         interrupt::free(|cs| {
@@ -246,10 +246,10 @@ impl Into<CommsError> for ErrorWrapper<stm32f4xx_hal::spi::Error> {
 }
 pub struct Dummy {}
 impl MotorEnabler for Dummy {
-    fn set_enable(&mut self, enable: bool) {}
+    fn set_enable(&mut self, _enable: bool) {}
 }
 impl StepperMotorController for Dummy {
-    fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
+    fn set_inputs(&mut self, _inputs: MotorInput) -> Result<(), StepperDeviceError> {
         Ok(())
     }
 
@@ -264,7 +264,7 @@ impl StepperMotorController for Dummy {
         })
     }
 
-    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
+    fn set_position(&mut self, _new_position: i32) -> Result<(), StepperDeviceError> {
         Ok(())
     }
 
@@ -278,12 +278,12 @@ impl Button for Dummy {
     }
 }
 impl Reader for Dummy {
-    fn read(&mut self, buf: &mut [u8]) -> usize {
+    fn read(&mut self, _buf: &mut [u8]) -> usize {
         0
     }
 }
 impl core::fmt::Write for Dummy {
-    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+    fn write_str(&mut self, _s: &str) -> core::fmt::Result {
         Ok(())
     }
 }
