@@ -81,8 +81,6 @@ mod tests {
     use core::fmt::{Display, Formatter};
     use mockall::mock;
     use mockall::predicate::*;
-    use std::fmt::Arguments;
-    use std::panic::AssertUnwindSafe;
 
     mock! {
         pub MotorEnabler {}
@@ -92,7 +90,6 @@ mod tests {
     }
     #[derive(Debug, Copy, Clone)]
     pub enum TestError {
-        Panic,
         ImmediateShutdown,
         GracefulShutdown,
         Report,
@@ -107,7 +104,6 @@ mod tests {
     impl Severity for TestError {
         fn get_severity(&self) -> ErrorSeverity {
             match self {
-                TestError::Panic => ErrorSeverity::Panic,
                 TestError::ImmediateShutdown => ErrorSeverity::ImmediateShutdown,
                 TestError::GracefulShutdown => ErrorSeverity::GracefulShutdown,
                 TestError::Report => ErrorSeverity::Report,
@@ -117,19 +113,19 @@ mod tests {
     }
     pub struct TestLogger {}
     impl Logger for TestLogger {
-        fn trace<MSG: LoggableMessage>(&mut self, message: MSG) {
+        fn trace<MSG: LoggableMessage>(&mut self, _message: MSG) {
         }
 
-        fn debug<MSG: LoggableMessage>(&mut self, message: MSG) {
+        fn debug<MSG: LoggableMessage>(&mut self, _message: MSG) {
         }
 
-        fn info<MSG: LoggableMessage>(&mut self, message: MSG) {
+        fn info<MSG: LoggableMessage>(&mut self, _message: MSG) {
         }
 
-        fn warn<MSG: LoggableMessage>(&mut self, message: MSG) {
+        fn warn<MSG: LoggableMessage>(&mut self, _message: MSG) {
         }
 
-        fn error<MSG: LoggableMessage>(&mut self, message: MSG) {
+        fn error<MSG: LoggableMessage>(&mut self, _message: MSG) {
         }
     }
 

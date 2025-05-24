@@ -74,7 +74,6 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
-    use heapless::spsc::Queue;
     const EPSILON: f32 = 1e-6;
     #[test]
     fn test_level() {

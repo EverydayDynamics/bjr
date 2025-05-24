@@ -7,10 +7,11 @@ use crate::app::control_primitives::{ControlInputs, Controller, KinState, PlateS
 use crate::app::io_manager::Outputs;
 use crate::app::motor_handler::ControlMode;
 use crate::app::parameter_manager::{parameter_manager, NoBallTargetHeight};
-use crate::app::state_runner::{RunnableState, StateRunnerContext, StateRunnerError};
+use crate::app::state_runner::{RunnableState, StateRunnerCommand, StateRunnerContext, StateRunnerError};
 use device_traits::{LoggableMessage, Logger};
 use crate::app::consts::MOTOR_NUM;
 use crate::app::control::motor_controller::MotorController;
+use crate::app::trim::trimming::PlateTrimmer;
 
 pub struct ControlStateRunner<CTRL, FFG, SPG> {
     controller: CTRL,
@@ -19,6 +20,7 @@ pub struct ControlStateRunner<CTRL, FFG, SPG> {
     counter: usize,
     motor_controllers: [MotorController;MOTOR_NUM],
     last_plate_state: PlateState,
+    plate_trimmer: PlateTrimmer<5>
 }
 struct CtrlDebugMsg<'a> (&'a [KinState;2]);
 impl LoggableMessage for CtrlDebugMsg<'_> {}
@@ -44,10 +46,8 @@ where
             sp_generator,
             counter:0,
             motor_controllers: Default::default(),
-            last_plate_state:  PlateState::new_with_null_sa(0.010, 0.0, 0.0)
-
-
-
+            last_plate_state:  PlateState::new_with_null_sa(0.010, 0.0, 0.0),
+            plate_trimmer: PlateTrimmer::new(),
         }
     }
 }
@@ -65,6 +65,7 @@ where
         self.ff_generator.reset(ctx.call_time);
         self.sp_generator.reset(ctx.call_time);
         self.counter=0;
+        self.plate_trimmer.flush_buffer();
     }
     fn update<LOG: Logger>(
         &mut self,
@@ -91,6 +92,7 @@ where
                         measured_ball_state: ball_state,
                     },
                 );
+                self.plate_trimmer.load(self.last_plate_state);
             } else {
                 self.counter +=1;
             }
@@ -101,7 +103,7 @@ where
             PlateState::new_with_null_sa(target_height_pos, 0.0, 0.0)
         };
 
-        let final_target = target_plate_state + feed_forward;
+        let final_target = target_plate_state + feed_forward + self.plate_trimmer.get();
         let motor_setpoints = inverse_kinematics(&final_target);
         let mut motor_outputs: [KinState;MOTOR_NUM] = Default::default();
         for mot_idx in 0..MOTOR_NUM {
@@ -115,6 +117,12 @@ where
                 piston_state: motor_outputs.map(|o| (o, ControlMode::Velocity)),
             }, ctx.telemetry_builder)
             .map_err(StateRunnerError::IOError)?;
+        match ctx.command{
+            StateRunnerCommand::TrimPlateAngle => {
+               self.plate_trimmer.save().map_err(|e|StateRunnerError::TrimmingError(e))?;
+            }
+            _ => {}
+        }
         Ok(())
     }
     fn exit<LOG: Logger>(

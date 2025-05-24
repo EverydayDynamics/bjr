@@ -8,6 +8,7 @@ use core::fmt::{Display, Formatter};
 use embedded_time::duration::Microseconds;
 use crate::app::consts::MOTOR_NUM;
 use crate::app::telemetry_handler::TelemetryBuilder;
+use crate::app::trim::trimming::TrimmerError;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum StateRunnerError {
@@ -18,9 +19,9 @@ pub enum StateRunnerError {
     HomingInErrorState,
     QueueFull(GlobEvent),
     IOError(IOManagerError),
+    TrimmingError(TrimmerError),
 }
 impl LoggableMessage for StateRunnerError{}
-#[cfg(not(feature = "defmt"))]
 impl Display for StateRunnerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -48,36 +49,9 @@ impl Display for StateRunnerError {
             StateRunnerError::IOError(e) => {
                 write!(f, "IO error: {}", e)
             }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for StateRunnerError{
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            StateRunnerError::HomingIOError(e) => {
-                defmt::write!(f, "Homing IO error: {}", e)
-            }
-            StateRunnerError::HomingOverrun => {
-                defmt::write!(f, "Homing Overrun")
-            }
-            StateRunnerError::HomingLimistSWStuckAtSafePos => {
-                defmt::write!(f, "Homing Limit switch stuck at safet position")
-            }
-            StateRunnerError::HomingUnexpectedStopGoingToSafePos => {
-                defmt::write!(
-                    f,
-                    "Homing Unexpectedly stopped while going to safe position"
-                )
-            }
-            StateRunnerError::HomingInErrorState => {
-                defmt::write!(f, "Homing is in error state")
-            }
-            StateRunnerError::QueueFull(e) => {
-                defmt::write!(f, "Event Queue is full. Missed message: {}", e)
-            }
-            StateRunnerError::IOError(e) => {
-                defmt::write!(f, "IO error: {}", e)
+            StateRunnerError::TrimmingError(e) => {
+                write!(f, "Trimming error: {}", e)
+
             }
         }
     }
@@ -94,6 +68,7 @@ impl Severity for StateRunnerError {
             StateRunnerError::HomingInErrorState => ErrorSeverity::ImmediateShutdown,
             StateRunnerError::QueueFull(_) => ErrorSeverity::Panic,
             StateRunnerError::IOError(_) => ErrorSeverity::ImmediateShutdown,
+            StateRunnerError::TrimmingError(_) => ErrorSeverity::Report,
         }
     }
 }
@@ -109,6 +84,7 @@ pub enum StateRunnerCommand {
     FeedForwardMotorCommand([KinState;MOTOR_NUM]),
     FeedForwardCircling(CirclingParams),
     DebugMotorTest(usize),
+    TrimPlateAngle,
     NoCommand,
 }
 pub struct StateRunnerContext<'a, LOG> {

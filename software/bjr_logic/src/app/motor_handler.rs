@@ -285,24 +285,3 @@ where
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::app::event_queue::drain_event_queue;
-    use crate::app::parameter_manager::parameter_manager;
-    use device_traits::{MotorInput, MotorState};
-    use mockall::mock;
-
-    mock! {
-        pub StepperMotorController {}
-        impl StepperMotorController for StepperMotorController {
-            fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError>;
-            fn get_state(&mut self) -> Result<MotorState, StepperDeviceError>;
-            fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError>;
-        }
-    }
-
-    #[test]
-    fn test_motors() {}
-}

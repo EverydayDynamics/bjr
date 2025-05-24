@@ -4,6 +4,7 @@ use device_traits::{LoggableMessage, Logger};
 use core::fmt::{Display, Formatter};
 #[cfg(feature = "defmt")]
 use defmt;
+use crate::app::state_runner::StateRunnerCommand;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum EventHandlerError {
@@ -118,6 +119,7 @@ enum EventResponse {
     Ignore,
     Unexpected,
     NewState(State),
+    Command(StateRunnerCommand),
 }
 
 pub struct EventHandler {
@@ -148,7 +150,8 @@ impl EventHandler {
     pub fn handle_events<LOG: Logger>(
         &mut self,
         logger_device: &mut LOG,
-    ) -> Result<State, EventHandlerError> {
+    ) -> Result<(State, StateRunnerCommand), EventHandlerError> {
+        let mut command = StateRunnerCommand::NoCommand;
         while let Some(event) = self.event_queue.dequeue() {
             logger_device.info(EventReceivedMessage(event));
             let response: EventResponse = match self.state {
@@ -161,9 +164,11 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::NewState(State::Homing),
                     GlobEvent::EnterFeedforward => EventResponse::Ignore,
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                 },
                 State::Homing => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::Ignore,
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -174,6 +179,7 @@ impl EventHandler {
                 },
                 State::RunningCenterHold => match event {
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCircling),
+                    GlobEvent::ButtonDoublePress => EventResponse::Command(StateRunnerCommand::TrimPlateAngle),
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -184,6 +190,7 @@ impl EventHandler {
                 },
                 State::RunningCircling => match event {
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCenterHold),
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -196,6 +203,7 @@ impl EventHandler {
                     GlobEvent::ButtonShortPress => {
                         EventResponse::NewState(State::RunningCenterHold)
                     }
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -206,6 +214,7 @@ impl EventHandler {
                 },
                 State::Deinit => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::Ignore,
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::Ignore,
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -216,6 +225,7 @@ impl EventHandler {
                 },
                 State::Off => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Initializing),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::Ignore,
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -226,6 +236,7 @@ impl EventHandler {
                 },
                 State::Error => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::Ignore,
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::Ignore,
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::Ignore,
@@ -236,6 +247,7 @@ impl EventHandler {
                 },
                 State::FeedForward => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -256,8 +268,11 @@ impl EventHandler {
                     logger_device.info(StateChangeMessage(self.state, new_state, event));
                     self.state = new_state;
                 }
+                EventResponse::Command(resp_command) => {
+                    command = resp_command;
+                }
             }
         }
-        Ok(self.state)
+        Ok((self.state, command))
     }
 }

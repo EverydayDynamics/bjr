@@ -1,10 +1,11 @@
 use crate::app::event::GlobEvent;
-use crate::app::parameter_manager::{parameter_manager, LongPressThresholdMs};
+use crate::app::parameter_manager::{parameter_manager, DoublePressThresholdMs, LongPressThresholdMs, ParameterManager};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use device_traits::{Button, LoggableMessage};
 use core::fmt::{Display, Formatter};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;
+use crate::app::button_handler::ButtonHandlerError::QueueFull;
 
 #[derive(PartialEq)]
 pub enum ButtonHandlerError {
@@ -39,12 +40,16 @@ impl Severity for ButtonHandlerError {
         }
     }
 }
-
+enum ButtonHandlerState{
+    NoPress,
+    FirstDown(Microseconds<u64>),
+    FirstUp(Microseconds<u64>),
+    SecondDown(Microseconds<u64>),
+}
 pub struct ButtonHandler<BTN> {
     button: BTN,
     event_handler: &'static Q8<GlobEvent>,
-    last_state: bool,
-    press_start: Microseconds<u64>,
+    state: ButtonHandlerState,
 }
 
 impl<BTN: Button> ButtonHandler<BTN> {
@@ -52,34 +57,66 @@ impl<BTN: Button> ButtonHandler<BTN> {
         ButtonHandler {
             button,
             event_handler,
-            last_state: false,
-            press_start: Microseconds::new(0u64),
+            state: ButtonHandlerState::NoPress,
         }
     }
 
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Result<(), ButtonHandlerError> {
         let currently_pressed = self.button.is_pressed();
-        if self.last_state != currently_pressed {
-            // State change detected!
-            if currently_pressed {
-                // state changed to pressed
-                self.press_start = call_time;
-            } else {
-                // state changed to released
-                let press_duration = call_time - self.press_start;
-                let event_to_send = if press_duration
-                    > Milliseconds::new(parameter_manager().get::<LongPressThresholdMs>())
-                {
-                    GlobEvent::ButtonLongPress
-                } else {
-                    GlobEvent::ButtonShortPress
-                };
-                self.event_handler
-                    .enqueue(event_to_send)
-                    .map_err(ButtonHandlerError::QueueFull)?;
+        let event_to_send:Option<GlobEvent> = match self.state {
+            ButtonHandlerState::NoPress => {
+                if currently_pressed {
+                    self.state = ButtonHandlerState::FirstDown(call_time);
+                }
+                None
             }
+            ButtonHandlerState::FirstDown(fdt) => {
+                if !currently_pressed {
+                    let longpress_thrs: Microseconds<u64>= Microseconds::new(
+                        (parameter_manager().get::<LongPressThresholdMs>()*1000) as u64);
+                    if (call_time - fdt) > longpress_thrs {
+                        self.state = ButtonHandlerState::NoPress;
+                        Some(GlobEvent::ButtonLongPress)
+                    } else {
+                        self.state = ButtonHandlerState::FirstUp(call_time);
+                        None
+                    }
+                }else {
+                    None
+                }
+            }
+            ButtonHandlerState::FirstUp(fut) => {
+                let doublepress_thrs: Microseconds<u64>= Microseconds::new(
+                    (parameter_manager().get::<DoublePressThresholdMs>()*1000) as u64);
+                if (call_time-fut) > doublepress_thrs {
+                    self.state = ButtonHandlerState::NoPress;
+                    Some(GlobEvent::ButtonShortPress)
+                } else {
+                    if currently_pressed {
+                        self.state = ButtonHandlerState::SecondDown(call_time);
+                    }
+                    None
+                }
+            }
+            ButtonHandlerState::SecondDown(sdt) => {
+                if !currently_pressed {
+                    let longpress_thrs: Microseconds<u64>= Microseconds::new(
+                        (parameter_manager().get::<LongPressThresholdMs>()*1000) as u64);
+                    if (call_time - sdt) > longpress_thrs {
+                        self.state = ButtonHandlerState::NoPress;
+                        Some(GlobEvent::ButtonLongPress)
+                    } else {
+                        self.state = ButtonHandlerState::NoPress;
+                        Some(GlobEvent::ButtonDoublePress)
+                    }
+                } else {
+                   None
+                }
+            }
+        };
+        if let Some(event_to_send) = event_to_send {
+            self.event_handler.enqueue(event_to_send).map_err(|_| QueueFull(event_to_send))?;
         }
-        self.last_state = currently_pressed;
         Ok(())
     }
 }
@@ -89,7 +126,6 @@ impl<BTN: Button> ButtonHandler<BTN> {
 mod tests {
     use super::*;
     use crate::app::event_queue::drain_event_queue;
-    use crate::app::parameter_manager::parameter_manager;
     use mockall::mock;
 
     mock! {
@@ -113,7 +149,7 @@ mod tests {
         let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_1);
         for run_num in 1..(run_count + 1) {
             let call_time = call_rate * run_num;
-            test_button_handler.update(call_time);
+            assert!(test_button_handler.update(call_time)==Ok(()));
         }
         assert!(EVENT_QUEUE_1.dequeue() == None);
     }
@@ -129,7 +165,7 @@ mod tests {
         let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_2);
         for run_num in 1..(run_count + 1) {
             let call_time = call_rate * run_num;
-            test_button_handler.update(call_time);
+            assert!(test_button_handler.update(call_time)==Ok(()));
         }
         assert!(EVENT_QUEUE_2.dequeue() == Some(GlobEvent::ButtonShortPress));
         assert!(EVENT_QUEUE_2.dequeue() == None);

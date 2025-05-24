@@ -74,6 +74,7 @@ impl RunnableState for FeedforwardStateRunner {
                 ctx.iomanager.motor_test_motion(*id).map_err(StateRunnerError::IOError)?;
                 ctx.logger.debug(FFDebugMsg(self.state, ctx.call_time.integer()));
             }
+            _ => {}
         }
         match self.state {
             FeedForwardStateRunnerState::NoState => {}

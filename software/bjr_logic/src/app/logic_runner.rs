@@ -154,15 +154,13 @@ where
         } else {
             let button_handler_result = self.button_handler.update(call_time);
             self.handle_error(button_handler_result);
-            match self
-                .event_handler
-                .handle_events(&mut self.log_device)
-                .map_err(LogicRunnerError::EventHandlerError)
+            match self.event_handler.handle_events(&mut self.log_device).map_err(LogicRunnerError::EventHandlerError)
             {
                 Err(error) => {
                     self.handle_error(Err(error));
                 }
-                Ok(state) => {
+                Ok((state, command)) => {
+                    self.state_runner_command = command;
                     let mut state_ctx = StateRunnerContext{
                         iomanager: &mut self.io_manager,
                         call_time,

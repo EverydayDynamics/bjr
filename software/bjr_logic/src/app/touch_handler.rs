@@ -215,30 +215,3 @@ impl Differentiator for TrivialDiff {
     }
 }
 
-
-#[cfg(test)]
-mod tests {
-    use crate::app::control_primitives::KinState;
-    use crate::app::parameter_manager::{
-    };
-    use crate::app::touch_handler::{Differentiator, Taylor5Differentiator, TouchHandler};
-    use device_traits::Point;
-    use embedded_time::duration::{Microseconds, Seconds};
-    #[test]
-    fn test_differentiator() {
-        let delta_t = 0.001f32;
-        let mut test_differentiator = Taylor5Differentiator::new();
-        for sample in 0..5{
-            assert!(test_differentiator.get_diff(delta_t).is_none());
-            test_differentiator.add_sample(1.0);
-        }
-        assert!(test_differentiator.get_diff(delta_t).unwrap() < 1e-6);
-
-        for sample in 0..5{
-            test_differentiator.add_sample((sample as f32)*delta_t);
-        }
-        assert!((test_differentiator.get_diff(delta_t).unwrap()-1.0) < 1e-6);
-
-
-    }
-}

@@ -128,6 +128,14 @@ where
                     },
                 },
                 &Item {
+                    command: "trim",
+                    help: Some("Trim the plate angle"),
+                    item_type: ItemType::Callback {
+                        function: trim_plate,
+                        parameters: &[],
+                    },
+                },
+                &Item {
                     command: "sp",
                     help: Some("Sets the value of a parameter"),
                     item_type: ItemType::Callback {
@@ -412,6 +420,25 @@ fn fallible_list_parameters<MIO: Reader + Write>(
             .write_str("\n")
             .map_err(|_| MenuError::MenuInterfaceWriteError)?;
     }
+    Ok(())
+}
+
+fn trim_plate<MIO: Reader + Write>(
+    _menu: &Menu<MIO, Context>,
+    _item: &Item<MIO, Context>,
+    args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) {
+    context.error = fallible_trim_plate(args, interface, context);
+}
+fn fallible_trim_plate<MIO: Reader + Write>(
+    _args: &[&str],
+    interface: &mut MIO,
+    context: &mut Context,
+) -> Result<(), MenuError> {
+    context.state_runner_command = StateRunnerCommand::TrimPlateAngle;
+    write!(interface, "Plate trim command sent").map_err(|_| MenuError::MenuInterfaceWriteError)?;
     Ok(())
 }
 fn enter_feedforward_mode<MIO: Reader + Write>(

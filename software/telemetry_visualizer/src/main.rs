@@ -1,4 +1,5 @@
-use eframe::{egui, HardwareAcceleration, Theme};
+use eframe::{egui, HardwareAcceleration};
+use eframe::egui::Theme;
 use egui_plot::{Legend, Line, Plot, PlotBounds, PlotPoint, PlotPoints};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
@@ -108,7 +109,7 @@ impl eframe::App for TelemetryApp {
                         }
                         for (idx, line) in self.lines.iter().enumerate() {
                             if self.line_visibility[idx] {
-                                plot_ui.line(Line::new(PlotPoints::Owned(line.clone())).name(TelemetryData::VARIANTS[idx]));
+                                plot_ui.line(Line::new("", PlotPoints::Owned(line.clone()) ).name(TelemetryData::VARIANTS[idx]));
                             }
                         }
                         if self.reset_view{
@@ -161,8 +162,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         stencil_buffer: 0,
         hardware_acceleration: HardwareAcceleration::Required,
         renderer: Default::default(),
-        follow_system_theme: false,
-        default_theme: Theme::Dark,
         run_and_return: false,
         event_loop_builder: None,
         window_builder: None,
@@ -170,6 +169,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         centered: false,
         persist_window: false,
         persistence_path: None,
+        dithering: false,
     };
 
     eframe::run_native(

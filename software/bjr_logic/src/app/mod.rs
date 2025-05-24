@@ -21,3 +21,4 @@ pub mod state_runner_selector;
 pub mod state_runners;
 pub mod touch_handler;
 pub mod telemetry_handler;
+mod trim;

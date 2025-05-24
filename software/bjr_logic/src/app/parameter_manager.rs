@@ -94,6 +94,7 @@ const _JOINT_CIRCLE_RADIUS: f32 = 17.5; //
 generate_parameter_types!(
     (AtomicF32, f32, MotorM2Ustep, 8e5),
     (AtomicU32, u32, LongPressThresholdMs, 1000),
+    (AtomicU32, u32, DoublePressThresholdMs, 500),
     (AtomicF32, f32, MotorUpperPosLimit, 1e6),
     (AtomicF32, f32, MotorLowerPosLimit, -1e6),
     (AtomicF32, f32, MotorUpperVelLimit, 1e6),
@@ -140,6 +141,9 @@ generate_parameter_types!(
     //circling setpoint generator
     (AtomicF32, f32, SPCirclingRadius, 20e-3),
     (AtomicF32, f32, SPCirclingTime, 5.0),
+    //trimming parameters
+    (AtomicF32, f32, TrimPlateAngleA, 0.0),
+    (AtomicF32, f32, TrimPlateAngleB, 0.0),
 
 
 );
