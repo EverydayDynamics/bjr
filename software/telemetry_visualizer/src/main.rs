@@ -12,7 +12,10 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use eframe::egui::{Vec2b, ViewportBuilder};
 use bjr_telemetry::{TelemetryData, TelemetryPacket};
 use strum::{EnumCount, VariantNames};
-
+use rfd::FileDialog;
+use csv::Writer;
+use std::fs::File;
+use std::io;
 const MAX_POINTS: usize = 1000;
 struct TelemetryHolder {
     pub data: VecDeque<TelemetryPacket>,
@@ -62,6 +65,47 @@ impl TelemetryApp {
         }
 
     }
+    fn export_data(&mut self) {
+        if let Some(path) = FileDialog::new()
+            .add_filter("CSV file", &["csv"])
+            .set_file_name("data_export.csv")
+            .save_file()
+        {
+            // Open file
+            let file = File::create(path).unwrap();
+            let mut wtr = Writer::from_writer(file);
+
+            // Write header
+
+            let mut record:[String;27] = [const{String::new()};27];
+            record[0] = "Packet ID".to_string();
+            record[1] = "Timestamp [s]".to_string();
+            let mut idx = 2;
+            for field_name in TelemetryData::VARIANTS {
+                record[idx]=field_name.to_string();
+                idx+=1;
+            }
+            wtr.write_record(&record).unwrap();
+
+            // Write data rows
+            let telemetry_data = self.telemetry_data.lock().unwrap();
+            for packet in &telemetry_data.data {
+                let mut record:[String;27] = [const{String::new()};27];
+                record[0] = packet.packet_id.to_string();
+                record[1] = packet.timestamp.to_string();
+                let mut idx = 2;
+                for data in packet.data{
+                    if let Some(data) = data {
+                        record[idx]=data.get_printable_value().to_string();
+                    }
+                    idx+=1;
+                }
+                wtr.write_record(&record).unwrap();
+            }
+            // Flush writer
+            wtr.flush().unwrap();
+        }
+    }
 }
 
 impl eframe::App for TelemetryApp {
@@ -83,6 +127,9 @@ impl eframe::App for TelemetryApp {
 
                 if ui.button(self.get_update_button_text()).clicked() {
                     self.update_button_clicked();
+                }
+                if ui.button("Export").clicked() {
+                    self.export_data();
                 }
 
 

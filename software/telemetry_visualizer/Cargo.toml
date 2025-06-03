@@ -10,3 +10,5 @@ egui_plot = "0.32.1"
 serde = { version = "1.0.208", features = ["derive"] }
 strum = { version = "0.27.1", default-features = false, features = ["derive"] }
 postcard = "1.0.10"
+rfd = "0.13"
+csv = "1.3"
