@@ -1,0 +1,8 @@
+"Reference","Value","Footprint","Qty","DNP","mfg","mfg_prt_num","supplier","supplier_num"
+"C1,C4,C5","0.1uF","Capacitor_SMD:C_0603_1608Metric,Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder","3","","MULTICOMP PRO,Wurth Elektronik","885012207072,MC0603B103K160CT","Mouser,farnell","1759003,710-885012207072"
+"C2","10uF","Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder","1","","TAIYO YUDEN","TMK212BBJ106KG-T","Mouser","963-TMK212BBJ106KG-T"
+"C3,C6","1uF","Capacitor_SMD:C_0603_1608Metric","2","","SAMSUNG ELECTRO-MECHANICS","CL10A105KA8NNNC","farnell","3013382"
+"IC1","TSC2046EIPWR","SOP65P640X120-16N","1","","Texas Instruments","TSC2046EIPWR","Mouser","595-TSC2046EIPWR"
+"J1","SFW4R-1STE1HLF","bjr_footprint_lib:AMPHENOL_SFW4R-1STE1HLF","1","","Amphenol FCI","SFW4R-1STE1HLF","Mouser","649-SFW4R-1STE1HLF"
+"J3","SM08B-SRSS-TB_LF__SN_","bjr_footprint_lib:JST_SM08B-SRSS-TB_LF__SN_","1","","JST","SM08B-SRSS-TB(LF)(SN)","Mouser","306-SM08BSRSSTBLFSN"
+"U1","~","Package_TO_SOT_SMD:SOT-23-5","1","","","","",""
