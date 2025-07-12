@@ -65,6 +65,10 @@ impl TelemetryApp {
         }
 
     }
+    fn flush_buffer(&mut self){
+        let mut telemetry_data = self.telemetry_data.lock().unwrap();
+        telemetry_data.data.clear();
+    }
     fn export_data(&mut self) {
         if let Some(path) = FileDialog::new()
             .add_filter("CSV file", &["csv"])
@@ -127,6 +131,9 @@ impl eframe::App for TelemetryApp {
 
                 if ui.button(self.get_update_button_text()).clicked() {
                     self.update_button_clicked();
+                }
+                if ui.button("Flush").clicked() {
+                    self.flush_buffer();
                 }
                 if ui.button("Export").clicked() {
                     self.export_data();
