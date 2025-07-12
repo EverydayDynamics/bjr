@@ -101,6 +101,10 @@ impl TelemetryApp {
         telemetry_data.data.clear();
     }
 
+    fn flush_buffer(&mut self){
+        let mut telemetry_data = self.telemetry_data.lock().unwrap();
+        telemetry_data.data.clear();
+    }
     fn export_data(&mut self) {
         if let Some(path) = FileDialog::new()
             .add_filter("CSV file", &["csv"])
