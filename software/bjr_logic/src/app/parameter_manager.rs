@@ -108,12 +108,22 @@ generate_parameter_types!(
     //running period
     (AtomicU32, u32, LogicRunnerPeriodUs, 3000),
     //Touch sensor parameters
-    (AtomicI32, i32, TouchCenterOffsetX, -2712),
-    (AtomicI32, i32, TouchCenterOffsetY, -1933),
-    (AtomicF32, f32, TouchScaleXX, 3.218_120_4e-5),
-    (AtomicF32, f32, TouchScaleXY, -1.280_968_6e-5),
-    (AtomicF32, f32, TouchScaleYX, 1.653_564_8e-6),
-    (AtomicF32, f32, TouchScaleYY, -4.407_568_5e-5),
+    (AtomicI32, i32, TouchCenterOffsetX, -2000),
+    (AtomicI32, i32, TouchCenterOffsetY, -2000),
+    //(AtomicF32, f32, TouchScaleXX, 3.036437e-5),
+    //(AtomicF32, f32, TouchScaleXY, 0.0),
+    //(AtomicF32, f32, TouchScaleYX, 0.0),
+    //(AtomicF32, f32, TouchScaleYY, -3.881987e-5),
+    (AtomicF32, f32, TouchScaleXX, -1.51821850e-05),
+    (AtomicF32, f32, TouchScaleXY, 2.62963158e-05),
+    (AtomicF32, f32, TouchScaleYX, -2.62963158e-05),
+    (AtomicF32, f32, TouchScaleYY, -1.51821850e-05),
+    //(AtomicI32, i32, TouchCenterOffsetX, 0),
+    //(AtomicI32, i32, TouchCenterOffsetY, 0),
+    //(AtomicF32, f32, TouchScaleXX, 1.0),
+    //(AtomicF32, f32, TouchScaleXY, 0.0),
+    //(AtomicF32, f32, TouchScaleYX, 0.0),
+    //(AtomicF32, f32, TouchScaleYY, 1.0),
     //No ball parameters
     (AtomicF32, f32, NoBallTargetHeight, 10e-3),
     //Kinematics parameters
