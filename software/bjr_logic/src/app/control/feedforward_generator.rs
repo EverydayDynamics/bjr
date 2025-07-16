@@ -2,9 +2,6 @@ use core::f32::consts::PI;
 use crate::app::control_primitives::{KinState, PlateState};
 use embedded_time::duration::*;
 use libm::{cosf, sinf, fabsf};
-use menu::Parameter;
-use crate::app::parameter_manager;
-use crate::app::parameter_manager::{parameter_manager, FFDefaultLinSpeed, ParameterManager};
 use crate::app::state_runner::CirclingParams;
 use crate::utils::usec2sec;
 
