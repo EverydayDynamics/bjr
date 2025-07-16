@@ -3,7 +3,7 @@ pub mod trimming {
     use core::fmt::{Display, Formatter};
     use crate::app::parameter_manager::{parameter_manager, ParameterType, TrimPlateAngleA, TrimPlateAngleB};
     use heapless::Deque;
-    use crate::app::control_primitives::{KinState, PlateDelta, PlateState};
+    use crate::app::control_primitives::{PlateState};
 
     #[derive(PartialEq, Copy, Clone)]
     pub enum TrimmerError {
@@ -79,8 +79,8 @@ pub mod trimming {
         }
 
         /// Returns the current trimming value.
-        pub fn get(&self) ->PlateDelta  {
-            let mut plate_trim = PlateDelta::default();
+        pub fn get(&self) ->PlateState  {
+            let mut plate_trim = PlateState::default();
             plate_trim.angle[0].pos = self.plate_a_trim.get_trimming();
             plate_trim.angle[1].pos = self.plate_b_trim.get_trimming();
             plate_trim

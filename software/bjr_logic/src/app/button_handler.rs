@@ -1,5 +1,5 @@
 use crate::app::event::GlobEvent;
-use crate::app::parameter_manager::{parameter_manager, DoublePressThresholdMs, LongPressThresholdMs, ParameterManager};
+use crate::app::parameter_manager::{parameter_manager, DoublePressThresholdMs, LongPressThresholdMs};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use device_traits::{Button, LoggableMessage};
 use core::fmt::{Display, Formatter};

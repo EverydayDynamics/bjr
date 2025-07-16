@@ -33,13 +33,15 @@ pub trait StepperMotorController {
     fn test_motion(&mut self) -> Result<(), StepperDeviceError>;
 }
 
-pub struct Point {
+pub struct TouchPoint {
     pub x: i32,
     pub y: i32,
+    pub pressure: f32,
 }
 
+
 pub trait TouchSensor {
-    fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError>;
+    fn get_touch(&mut self) -> Result<Option<TouchPoint>, TouchSensorError>;
 }
 #[derive(PartialEq, Copy, Clone)]
 pub enum TouchSensorError {

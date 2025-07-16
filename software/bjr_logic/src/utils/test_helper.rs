@@ -4,14 +4,14 @@ pub mod bsp_mocks {
 use crate::app::control_primitives::KinState;
     use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
-    use device_traits::{MotorEnabler, Point, TouchSensor, TouchSensorError};
+    use device_traits::{MotorEnabler, TouchPoint, TouchSensor, TouchSensorError};
     use mockall::mock;
 
 
     mock! {
         pub TouchSensor {}
         impl TouchSensor for TouchSensor {
-            fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError>;
+            fn get_touch(&mut self) -> Result<Option<TouchPoint>, TouchSensorError>;
         }
     }
 

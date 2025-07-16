@@ -85,7 +85,46 @@ pub enum StateRunnerCommand {
     FeedForwardCircling(CirclingParams),
     DebugMotorTest(usize),
     TrimPlateAngle,
+    MotionDemo,
     NoCommand,
+}
+impl StateRunnerCommand {
+    pub fn has_command(&self) -> bool {
+        match self {
+            StateRunnerCommand::NoCommand => false,
+            _ => true,
+        }
+    }
+}
+impl Display for StateRunnerCommand {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            StateRunnerCommand::TrimPlateAngle =>{
+                writeln!(f,"Trim the plate angle")
+            }
+            StateRunnerCommand::FeedForwardPlateCommand(_) => {
+                writeln!(f,"Plate command")
+
+            }
+            StateRunnerCommand::FeedForwardMotorCommand(_) => {
+                writeln!(f,"Plate command")
+            }
+            StateRunnerCommand::FeedForwardCircling(_) => {
+                writeln!(f,"Circling")
+
+            }
+            StateRunnerCommand::DebugMotorTest(_) => {
+                writeln!(f,"Debug Motor")
+            }
+            StateRunnerCommand::NoCommand => {
+                writeln!(f,"No Command")
+            }
+            StateRunnerCommand::MotionDemo => {
+                writeln!(f,"Motion Demo")
+
+            }
+        }
+    }
 }
 pub struct StateRunnerContext<'a, LOG> {
     pub iomanager: &'a mut dyn IOManager,
