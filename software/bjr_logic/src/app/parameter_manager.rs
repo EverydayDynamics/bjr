@@ -110,14 +110,17 @@ generate_parameter_types!(
     //Touch sensor parameters
     (AtomicI32, i32, TouchCenterOffsetX, -2000),
     (AtomicI32, i32, TouchCenterOffsetY, -2000),
+    //straight
     //(AtomicF32, f32, TouchScaleXX, 3.036437e-5),
     //(AtomicF32, f32, TouchScaleXY, 0.0),
     //(AtomicF32, f32, TouchScaleYX, 0.0),
     //(AtomicF32, f32, TouchScaleYY, -3.881987e-5),
+    //angled
     (AtomicF32, f32, TouchScaleXX, -1.51821850e-05),
-    (AtomicF32, f32, TouchScaleXY, 2.62963158e-05),
+    (AtomicF32, f32, TouchScaleXY, -2.62963158e-05),
     (AtomicF32, f32, TouchScaleYX, -2.62963158e-05),
-    (AtomicF32, f32, TouchScaleYY, -1.51821850e-05),
+    (AtomicF32, f32, TouchScaleYY, 1.51821850e-05),
+
     //(AtomicI32, i32, TouchCenterOffsetX, 0),
     //(AtomicI32, i32, TouchCenterOffsetY, 0),
     //(AtomicF32, f32, TouchScaleXX, 1.0),
@@ -135,10 +138,10 @@ generate_parameter_types!(
     //piston parameters
     (AtomicF32, f32, PistonBodyLen, 91.2e-3),
     //feedforward mode parameters
-    (AtomicF32, f32, FFDefaultLinSpeed, 10e-3),
+    (AtomicF32, f32, FFDefaultLinSpeed, 0.0),
     (AtomicF32, f32, FFDefaultLinAccel, 20e-3),
-    (AtomicF32, f32, FFDefaultAngSpeed, FRAC_PI_2),
-    (AtomicF32, f32, FFDefaultAngAccel, PI),
+    (AtomicF32, f32, FFDefaultAngSpeed, 0.0),
+    (AtomicF32, f32, FFDefaultAngAccel, 0.0),
     //MotorController
     (AtomicF32, f32, MCKp, 2.75e1),
     (AtomicF32, f32, MCAccel, 5e-3),

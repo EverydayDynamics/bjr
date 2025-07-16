@@ -21,6 +21,7 @@ enum LogicRunnerError {
     TimeOverrun,
     EventHandlerError(EventHandlerError),
     TelementryError(TelemetryHandlerError),
+    CommandDropped(StateRunnerCommand),
 }
 impl LoggableMessage for LogicRunnerError {}
 impl Display for LogicRunnerError {
@@ -35,6 +36,10 @@ impl Display for LogicRunnerError {
             LogicRunnerError::TelementryError(error) => {
                 write!(f, "Telemetry sending error: {}", error)
             }
+            LogicRunnerError::CommandDropped(dropped_cmd) => {
+                write!(f, "Command Dropped: {}", dropped_cmd)
+
+            }
         }
     }
 }
@@ -43,7 +48,8 @@ impl Severity for LogicRunnerError {
         match self {
             LogicRunnerError::TimeOverrun => ErrorSeverity::ImmediateShutdown,
             LogicRunnerError::EventHandlerError(_) => ErrorSeverity::Panic,
-            LogicRunnerError::TelementryError(_) => ErrorSeverity::Report,
+            LogicRunnerError::TelementryError(_) => ErrorSeverity::Ignore,
+            LogicRunnerError::CommandDropped(_) => ErrorSeverity::Report,
         }
     }
 }
@@ -160,7 +166,13 @@ where
                     self.handle_error(Err(error));
                 }
                 Ok((state, command)) => {
-                    self.state_runner_command = command;
+                    if command.has_command() {
+                        if self.state_runner_command.has_command() {
+                            self.handle_error(Err(LogicRunnerError::CommandDropped(command)));
+                        }else {
+                            self.state_runner_command = command;
+                        }
+                    }
                     let mut state_ctx = StateRunnerContext{
                         iomanager: &mut self.io_manager,
                         call_time,

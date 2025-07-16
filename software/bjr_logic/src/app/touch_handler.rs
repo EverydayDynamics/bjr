@@ -59,6 +59,7 @@ where
                 accel: 0.0,
             }];
             telemetry_builder.add_ball_state_telemetry(&state);
+            telemetry_builder.add_ball_pressure_telemetry(touch_pos.pressure);
             telemetry_builder.add_unfiltered_ball_velocities(
                 &[self.unfiltered_differentiators[0].get_diff(delta_t).unwrap_or(0.0),
                 self.unfiltered_differentiators[0].get_diff(delta_t).unwrap_or(0.0)]

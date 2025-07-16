@@ -130,15 +130,10 @@ impl PlateState {
     }
 }
 
-#[derive(Default)]
-pub struct PlateDelta {
-    pub height: KinState,
-    pub angle: [KinState; 2],
-}
-impl Add<PlateDelta> for PlateState {
+impl Add<PlateState> for PlateState {
     type Output = PlateState;
 
-    fn add(self, rhs: PlateDelta) -> Self::Output {
+    fn add(self, rhs: PlateState) -> Self::Output {
         Self {
             height: self.height + rhs.height,
             angle: [self.angle[0] + rhs.angle[0], self.angle[1] + rhs.angle[1]],

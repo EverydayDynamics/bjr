@@ -90,4 +90,20 @@ mod tests {
         assert!((result[1].pos).abs() < EPSILON);
         assert!((result[2].pos).abs() < EPSILON);
     }
+    #[test]
+    fn test_actual_values() {
+        let test_level_plate = PlateState {
+            height: KinState { pos: 0.012, speed: 0.01, accel: 0.02},
+            angle: [KinState { pos: 0.0, speed: core::f32::consts::FRAC_PI_2, accel: core::f32::consts::PI},
+                    KinState { pos: 0.0, speed: core::f32::consts::FRAC_PI_2, accel: core::f32::consts::PI}],
+        };
+        let result = inverse_kinematics(&test_level_plate);
+        println!("{:#?}", result);
+        assert!((result[0].pos - result[1].pos).abs()<EPSILON);
+        assert!((result[0].pos - result[2].pos).abs()<EPSILON);
+        assert!((result[0].speed - result[1].speed).abs()<EPSILON);
+        assert!((result[0].speed - result[2].speed).abs()<EPSILON);
+        assert!((result[0].accel - result[1].accel).abs()<EPSILON);
+        assert!((result[0].accel - result[2].accel).abs()<EPSILON);
+    }
 }

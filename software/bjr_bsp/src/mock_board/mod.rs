@@ -1,5 +1,5 @@
 use crate::boards::{BoardCreationError, BoardResources};
-use device_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError};
+use device_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError, TouchPoint};
 use device_traits::{
     Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, Point, Reader,
     StepperDeviceError, TouchSensor, TouchSensorError,
@@ -94,7 +94,7 @@ impl Button for Dummy {
     }
 }
 impl TouchSensor for Dummy {
-    fn get_touch(&mut self) -> Result<Option<Point>, TouchSensorError> {
+    fn get_touch(&mut self) -> Result<Option<TouchPoint>, TouchSensorError> {
         Ok(None)
     }
 }

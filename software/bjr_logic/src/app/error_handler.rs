@@ -46,7 +46,7 @@ impl ErrorHandler {
         let severity = error.get_severity();
         match severity {
             ErrorSeverity::Ignore => {
-                log_device.warn(ErrorIgnoredMessage(error));
+                //log_device.warn(ErrorIgnoredMessage(error));
             }
             _ => {
                 log_device.error(error);

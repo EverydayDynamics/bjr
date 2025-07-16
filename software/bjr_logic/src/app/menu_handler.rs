@@ -475,15 +475,14 @@ fn fallible_set_plate_state<MIO: Reader + Write>(
     context: &mut Context,
 ) -> Result<(), MenuError> {
     const DEG2RAD: f32 = 0.017_453_292;
-    get_event_queue()
-        .enqueue(GlobEvent::EnterFeedforward)
-        .map_err(|_| MenuError::EventBufferOverflow)?;
+    //get_event_queue().enqueue(GlobEvent::EnterFeedforward).map_err(|_| MenuError::EventBufferOverflow)?;
     if let Ok(height) = f32::from_str(args[0]) {
         if let Ok(alpha) = f32::from_str(args[1]) {
             if let Ok(beta) = f32::from_str(args[2]) {
-                context.state_runner_command = StateRunnerCommand::FeedForwardPlateCommand(
-                    PlateState::new_with_default_sa(height * 1e-3, alpha * DEG2RAD, beta * DEG2RAD),
-                );
+                //context.state_runner_command = StateRunnerCommand::FeedForwardPlateCommand(
+                //    PlateState::new_with_default_sa(height * 1e-3, alpha * DEG2RAD, beta * DEG2RAD),
+                //);
+                context.state_runner_command = StateRunnerCommand::MotionDemo;
             } else {
                 interface
                     .write_str("Couldn't parse Beta angle parameter. Please enter a number.")
