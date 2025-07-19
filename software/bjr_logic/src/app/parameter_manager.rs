@@ -149,14 +149,32 @@ generate_parameter_types!(
     (AtomicF32, f32, MCVelMin, -40e-3),
     (AtomicF32, f32, MCPosDeadBand, 1e-5),
     //PlatePDController
-    (AtomicF32, f32, PlatePDCtrlKp, 10.0),
-    (AtomicF32, f32, PlatePDCtrlKd, 1.0),
-    //circling setpoint generator
-    (AtomicF32, f32, SPCirclingRadius, 20e-3),
-    (AtomicF32, f32, SPCirclingTime, 5.0),
+    (AtomicF32, f32, PlatePDCtrlKp, 12.0),
+    (AtomicF32, f32, PlatePDCtrlKd, 5.0),
     //trimming parameters
     (AtomicF32, f32, TrimPlateAngleA, 0.0),
     (AtomicF32, f32, TrimPlateAngleB, 0.0),
+    //circling setpoint generator
+    (AtomicF32, f32, SPCirclingRadius, 20e-3),
+    (AtomicF32, f32, SPCirclingTime, 3.0),
+    //2Point setpoint generator
+    (AtomicF32, f32, SP2Point1X, 0.02),
+    (AtomicF32, f32, SP2Point1Y, 0.0),
+    (AtomicF32, f32, SP2Point2X, -0.02),
+    (AtomicF32, f32, SP2Point2Y, 0.0),
+    (AtomicF32, f32, SP2PointPathDuration, 1.0),
+    (AtomicF32, f32, SP2PointDwellTime, 2.0),
+    //3Point setpoint generator
+    (AtomicF32, f32, SP3Point1X, 0.00),
+    (AtomicF32, f32, SP3Point1Y, -0.02),
+    (AtomicF32, f32, SP3Point2X, 0.02*(0.86602540378)/*libm::cosf(-PI/6.0)*/),
+    (AtomicF32, f32, SP3Point2Y, -0.02*(-0.5)/*libm::sinf(-PI/6.0)*/),
+    (AtomicF32, f32, SP3Point3X, -0.02*(0.86602540378)/*libm::cosf(-PI/6.0)*/),
+    (AtomicF32, f32, SP3Point3Y, -0.02*(-0.5)/*libm::sinf(-PI/6.0)*/),
+    (AtomicF32, f32, SP3PointPathDuration, 1.0),
+    (AtomicF32, f32, SP3PointDwellTime, 2.0),
+
+
 
 
 );

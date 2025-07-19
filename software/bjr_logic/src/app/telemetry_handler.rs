@@ -20,6 +20,12 @@ impl TelemetryBuilder {
         self.packet.set_field(TelemetryData::BallXVel(ball_state[0].speed));
         self.packet.set_field(TelemetryData::BallYVel(ball_state[1].speed));
     }
+    pub fn add_setpoint_telemetry(&mut self, setpoint: &[KinState; 2]) {
+        self.packet.set_field(TelemetryData::BallXTargetPos(setpoint[0].pos));
+        self.packet.set_field(TelemetryData::BallYTargetPos(setpoint[1].pos));
+        self.packet.set_field(TelemetryData::BallXTargetVel(setpoint[0].speed));
+        self.packet.set_field(TelemetryData::BallYTargetVel(setpoint[1].speed));
+    }
     pub fn add_ball_pressure_telemetry(&mut self, pressure: f32) {
         self.packet.set_field(TelemetryData::BallPressure(pressure));
     }
