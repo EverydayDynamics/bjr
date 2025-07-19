@@ -20,7 +20,8 @@ pub struct ControlStateRunner<CTRL, FFG, SPG> {
     counter: usize,
     motor_controllers: [MotorController;MOTOR_NUM],
     last_plate_state: PlateState,
-    plate_trimmer: PlateTrimmer<5>
+    plate_trimmer: PlateTrimmer<5>,
+    setpoint: [KinState;2],
 }
 struct CtrlDebugMsg<'a> (&'a [KinState;2]);
 impl LoggableMessage for CtrlDebugMsg<'_> {}
@@ -48,6 +49,7 @@ where
             motor_controllers: Default::default(),
             last_plate_state:  PlateState::new_with_null_sa(0.010, 0.0, 0.0),
             plate_trimmer: PlateTrimmer::new(),
+            setpoint: [KinState::default();2],
         }
     }
 }
@@ -77,14 +79,14 @@ where
             .map_err(StateRunnerError::IOError)?;
         let feed_forward = self.ff_generator.get_ff(ctx.call_time);
         let target_plate_state = if let Some(ball_state) = inputs.measured_ball_state {
-            if self.counter >0 {
+            if self.counter >=0 {
                 self.counter =0;
-                let setpoint = self.sp_generator.get_sp(ctx.call_time);
-                ctx.logger.debug(CtrlDebugMsg(&setpoint));
+                self.setpoint = self.sp_generator.get_sp(ctx.call_time);
+                ctx.telemetry_builder.add_setpoint_telemetry(&self.setpoint);
                 self.last_plate_state = self.controller.update(
                     ctx.call_time,
                     ControlInputs {
-                        ball_setpoint: setpoint,
+                        ball_setpoint: self.setpoint.clone(),
                         measured_plate_state: PlateState {
                             height: Default::default(),
                             angle: [KinState::default(); 2],

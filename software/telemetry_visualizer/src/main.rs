@@ -72,7 +72,7 @@ impl TelemetryApp {
     fn new(telemetry_data: Arc<Mutex<TelemetryHolder>>) -> Self {
         Self {
             telemetry_data,
-            line_visibility: [true;TelemetryData::COUNT],
+            line_visibility: [false;TelemetryData::COUNT],
             reset_view: false,
             update_view: true,
             reset_ball_view: false,

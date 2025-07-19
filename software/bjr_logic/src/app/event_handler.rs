@@ -44,6 +44,7 @@ pub enum State {
     Homing,
     RunningCenterHold,
     RunningCircling,
+    Running3point,
     RunningTriangle,
     FeedForward,
     Deinit,
@@ -51,7 +52,6 @@ pub enum State {
     Off,
 }
 impl LoggableMessage for State {}
-#[cfg(not(feature = "defmt"))]
 impl Display for State {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         let name = match self {
@@ -64,25 +64,9 @@ impl Display for State {
             State::Deinit => "Deinit",
             State::Off => "Off",
             State::Error => "Error",
+            State::Running3point => "Running3point",
         };
         write!(f, "{}", name)
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for State {
-    fn format(&self, f: defmt::Formatter) {
-        let name = match self {
-            State::Initializing => "Initializing",
-            State::Homing => "Homing",
-            State::RunningCenterHold => "RunningCenterHold",
-            State::RunningCircling => "RunningCircling",
-            State::RunningTriangle => "RunningTriangle",
-            State::FeedForward => "FeedForward",
-            State::Deinit => "Deinit",
-            State::Off => "Off",
-            State::Error => "Error",
-        };
-        defmt::write!(f, "{}", name)
     }
 }
 struct EventReceivedMessage(GlobEvent);
@@ -189,6 +173,17 @@ impl EventHandler {
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
                 },
                 State::RunningCircling => match event {
+                    GlobEvent::ButtonShortPress => EventResponse::NewState(State::Running3point),
+                    GlobEvent::ButtonDoublePress => EventResponse::Ignore,
+                    GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
+                    GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
+                    GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
+                    GlobEvent::HomingFinished => EventResponse::Unexpected,
+                    GlobEvent::InitFinished => EventResponse::Unexpected,
+                    GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
+                    GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                },
+                State::Running3point => match event{
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCenterHold),
                     GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
