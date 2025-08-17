@@ -9,6 +9,7 @@ const DEG2RAD: f32 = 0.017_453_292;
 pub trait FeedForwardGen {
     fn reset(&mut self, time: Microseconds<u64>);
     fn get_ff(&mut self, time: Microseconds<u64>) -> PlateState;
+    fn finished(&self) -> bool;
 }
 
 pub struct FFGenCH {}
@@ -20,6 +21,10 @@ impl FeedForwardGen for FFGenCH {
             height: Default::default(),
             angle: [KinState::default(); 2],
         }
+    }
+
+    fn finished(&self) -> bool {
+        false
     }
 }
 #[derive(Default)]
@@ -75,6 +80,9 @@ impl FeedForwardGen for FFGenContCircle {
             }],
         }
     }
+    fn finished(&self) -> bool {
+        false
+    }
 }
 #[derive(Default)]
 pub struct FFGenMotionDemo {
@@ -128,5 +136,8 @@ impl FeedForwardGen for FFGenMotionDemo {
             idx = sequence.len() -1;
         }
         *sequence[idx]
+    }
+    fn finished(&self) -> bool {
+        false
     }
 }

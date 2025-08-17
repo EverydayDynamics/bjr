@@ -181,6 +181,7 @@ where
                         command: &self.state_runner_command,
                         telemetry_builder: &mut telemetry_builder,
                         motor_enabler: &mut self.motor_enabler,
+                        last_plate_setpoint: Default::default(),
                     };
                     let state_manager_result = self.state_manager.update(
                         state,

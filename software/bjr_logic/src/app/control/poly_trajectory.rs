@@ -1,6 +1,4 @@
 use crate::app::control_primitives::KinState;
-use embedded_time::duration::Microseconds;
-use crate::utils::usec2sec;
 /// Computes position, velocity, and acceleration using a 5th degree polynomial trajectory
 ///
 /// This function uses a 5th degree polynomial with the following boundary conditions:

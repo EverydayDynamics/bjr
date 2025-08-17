@@ -9,6 +9,7 @@ use crate::app::state_runners::default_state_runner::DefaultStateRunner;
 use crate::app::state_runners::feedforward_state_runner::FeedforwardStateRunner;
 use crate::app::state_runners::homing_state_runner::HomingStateRunner;
 use crate::app::state_runners::initializing_state_runner::InitializingStateRunner;
+use crate::app::state_runners::shutdown_state_runner::ShutdownStateRunner;
 
 pub trait StateRunnerSelector {
     fn get_runner(&mut self, state: State) -> &mut StateRunnerWrapper;
@@ -21,6 +22,7 @@ pub enum StateRunnerWrapper {
     CirclingControl(ControlStateRunner<PIDController, FFGenCH, SetPointGenCircling>),
     Point3Control(ControlStateRunner<PIDController, FFGenCH, SetPointGen3Point>),
     Feedforward(FeedforwardStateRunner),
+    Shutdown(ShutdownStateRunner),
 }
 impl RunnableState for StateRunnerWrapper {
     fn entry<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>) {
@@ -32,6 +34,7 @@ impl RunnableState for StateRunnerWrapper {
             StateRunnerWrapper::Point3Control(runner) => {runner.entry(ctx)}
             StateRunnerWrapper::Feedforward(runner) => {runner.entry(ctx)}
             StateRunnerWrapper::Homing(runner) => {runner.entry(ctx)}
+            StateRunnerWrapper::Shutdown(runner) => {runner.entry(ctx)}
         }
     }
 
@@ -44,6 +47,7 @@ impl RunnableState for StateRunnerWrapper {
             StateRunnerWrapper::Point3Control(runner) => {runner.update(ctx)}
             StateRunnerWrapper::Feedforward(runner) => {runner.update(ctx)}
             StateRunnerWrapper::Homing(runner) => {runner.update(ctx)}
+            StateRunnerWrapper::Shutdown(runner) => {runner.update(ctx)}
         }
     }
 
@@ -56,6 +60,7 @@ impl RunnableState for StateRunnerWrapper {
             StateRunnerWrapper::Point3Control(runner) => {runner.exit(ctx)}
             StateRunnerWrapper::Feedforward(runner) => {runner.exit(ctx)}
             StateRunnerWrapper::Homing(runner) => {runner.exit(ctx)}
+            StateRunnerWrapper::Shutdown(runner) => {runner.exit(ctx)}
         }
     }
 }
@@ -67,6 +72,7 @@ pub struct DefaultStateRunnerSelector {
     point_3_control_runner: StateRunnerWrapper,
     circling_control_runner: StateRunnerWrapper,
     feedforward_state_runner: StateRunnerWrapper,
+    shutdown_state_runner: StateRunnerWrapper,
 }
 impl Default for DefaultStateRunnerSelector {
     fn default() -> Self {
@@ -96,6 +102,7 @@ impl DefaultStateRunnerSelector {
                 SetPointGen3Point::default(),
             )),
             feedforward_state_runner: StateRunnerWrapper::Feedforward(Default::default()),
+            shutdown_state_runner: StateRunnerWrapper::Shutdown(Default::default()),
         }
     }
 }
@@ -109,7 +116,7 @@ impl StateRunnerSelector for DefaultStateRunnerSelector {
             State::Running3point => &mut self.point_3_control_runner,
             State::RunningTriangle => &mut self.center_hold_control_runner,
             State::FeedForward => &mut self.feedforward_state_runner,
-            State::Deinit => &mut self.default_state_runner,
+            State::Deinit => &mut self.shutdown_state_runner,
             State::Off => &mut self.default_state_runner,
             _ => &mut self.default_state_runner,
         }

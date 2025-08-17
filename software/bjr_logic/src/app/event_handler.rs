@@ -149,6 +149,7 @@ impl EventHandler {
                     GlobEvent::EnterFeedforward => EventResponse::Ignore,
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
                     GlobEvent::ButtonDoublePress => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::Homing => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
@@ -160,6 +161,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::Ignore,
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::RunningCenterHold => match event {
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCircling),
@@ -171,6 +173,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::RunningCircling => match event {
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::Running3point),
@@ -182,6 +185,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::Running3point => match event{
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCenterHold),
@@ -193,6 +197,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::RunningTriangle => match event {
                     GlobEvent::ButtonShortPress => {
@@ -206,6 +211,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::Deinit => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
@@ -217,6 +223,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::Ignore,
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::NewState(State::Off),
                 },
                 State::Off => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
@@ -228,6 +235,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::Error => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
@@ -239,6 +247,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Ignore,
                     GlobEvent::EnterFeedforward => EventResponse::Ignore,
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
                 State::FeedForward => match event {
                     GlobEvent::ButtonShortPress => EventResponse::Ignore,
@@ -250,6 +259,7 @@ impl EventHandler {
                     GlobEvent::InitFinished => EventResponse::Unexpected,
                     GlobEvent::EnterFeedforward => EventResponse::NewState(State::FeedForward),
                     GlobEvent::ExitFeedforward => EventResponse::NewState(State::RunningCenterHold),
+                    GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
             };
             match response {

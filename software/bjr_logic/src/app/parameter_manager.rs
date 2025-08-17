@@ -173,10 +173,6 @@ generate_parameter_types!(
     (AtomicF32, f32, SP3Point3Y, -0.02*(-0.5)/*libm::sinf(-PI/6.0)*/),
     (AtomicF32, f32, SP3PointPathDuration, 1.0),
     (AtomicF32, f32, SP3PointDwellTime, 2.0),
-
-
-
-
 );
 // Parameter manager
 

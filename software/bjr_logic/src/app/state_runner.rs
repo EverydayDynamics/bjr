@@ -16,6 +16,7 @@ pub enum StateRunnerError {
     HomingOverrun,
     HomingLimistSWStuckAtSafePos,
     HomingUnexpectedStopGoingToSafePos,
+    ShutdownUnexpectedStopGoingToSafePos,
     HomingInErrorState,
     QueueFull(GlobEvent),
     IOError(IOManagerError),
@@ -53,6 +54,12 @@ impl Display for StateRunnerError {
                 write!(f, "Trimming error: {}", e)
 
             }
+            StateRunnerError::ShutdownUnexpectedStopGoingToSafePos => {
+                write!(
+                    f,
+                    "Movement Unexpectedly stopped while going to safe position in shutdown mode"
+                )
+            }
         }
     }
 }
@@ -69,6 +76,7 @@ impl Severity for StateRunnerError {
             StateRunnerError::QueueFull(_) => ErrorSeverity::Panic,
             StateRunnerError::IOError(_) => ErrorSeverity::ImmediateShutdown,
             StateRunnerError::TrimmingError(_) => ErrorSeverity::Report,
+            StateRunnerError::ShutdownUnexpectedStopGoingToSafePos => ErrorSeverity::ImmediateShutdown,
         }
     }
 }
@@ -134,6 +142,7 @@ pub struct StateRunnerContext<'a, LOG> {
     pub command: &'a StateRunnerCommand,
     pub telemetry_builder: &'a mut TelemetryBuilder,
     pub motor_enabler: &'a mut dyn MotorEnabler,
+    pub last_plate_setpoint: PlateState
 }
 pub trait RunnableState {
     fn entry<LOG: Logger>(

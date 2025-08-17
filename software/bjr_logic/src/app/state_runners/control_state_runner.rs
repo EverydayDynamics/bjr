@@ -106,6 +106,7 @@ where
         };
 
         let final_target = target_plate_state + feed_forward + self.plate_trimmer.get();
+        ctx.last_plate_setpoint = final_target;
         let motor_setpoints = inverse_kinematics(&final_target);
         let mut motor_outputs: [KinState;MOTOR_NUM] = Default::default();
         for mot_idx in 0..MOTOR_NUM {

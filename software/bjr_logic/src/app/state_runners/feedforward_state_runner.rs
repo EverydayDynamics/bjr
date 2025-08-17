@@ -58,7 +58,6 @@ impl RunnableState for FeedforwardStateRunner {
     ) {
         ctx.motor_enabler.set_enable(true);
         self.state = FeedForwardStateRunnerState::NoState;
-        //self.state = FeedForwardStateRunnerState::NoState;
     }
     fn update<LOG: Logger>(
         &mut self,
@@ -111,6 +110,7 @@ impl RunnableState for FeedforwardStateRunner {
             FeedForwardStateRunnerState::MotionDemo => {Some(self.ff_motion_demo.get_ff(ctx.call_time))}
         };
         if let Some(desired_state) = maybe_desired_state {
+                ctx.last_plate_setpoint = desired_state;
                 let motors_state = ctx.iomanager.read_motor_inputs(ctx.telemetry_builder).map_err(StateRunnerError::IOError)?;
                 let motors_setpoint = inverse_kinematics(&desired_state);
                 let mut motor_outputs: [KinState;3] = Default::default();

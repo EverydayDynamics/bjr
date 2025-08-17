@@ -13,6 +13,7 @@ pub enum GlobEvent {
     InitFinished,
     EnterFeedforward,
     ExitFeedforward,
+    DeinitDone,
 }
 impl LoggableMessage for GlobEvent {}
 impl Display for GlobEvent {
@@ -44,6 +45,10 @@ impl Display for GlobEvent {
             }
             GlobEvent::ButtonDoublePress => {
                 write!(f, "GlobEvent Button Double Press")
+            }
+            GlobEvent::DeinitDone => {
+                write!(f, "GlobEvent Deinit finished")
+
             }
         }
     }
