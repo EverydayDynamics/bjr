@@ -7,8 +7,8 @@ use crate::app::parameter_manager::{
     HomingSafePosition,
 };
 use crate::app::state_runner::{RunnableState, StateRunnerContext, StateRunnerError};
-use device_traits::{LoggableMessage, Logger};
 use core::fmt::{Display, Formatter};
+use device_traits::{LoggableMessage, Logger};
 
 #[derive(Copy, Clone)]
 pub enum HomingStateRunnerState {
@@ -22,7 +22,7 @@ pub enum HomingStateRunnerState {
     Done,
     Error,
 }
-#[cfg(not(feature = "defmt"))]
+
 impl Display for HomingStateRunnerState {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -56,58 +56,20 @@ impl Display for HomingStateRunnerState {
         }
     }
 }
-#[cfg(feature = "defmt")]
-impl defmt::Format for  HomingStateRunnerState{
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            HomingStateRunnerState::Default => {
-                defmt::write!(f, "Default")
-            }
-            HomingStateRunnerState::FastApproach => {
-                defmt::write!(f, "FastApproach")
-            }
-            HomingStateRunnerState::StoppingAfterFastApproach => {
-                defmt::write!(f, "StoppingAfterFastApproach")
-            }
-            HomingStateRunnerState::SlowApproach => {
-                defmt::write!(f, "SlowApproach")
-            }
-            HomingStateRunnerState::StoppingAfterSlowApproach => {
-                defmt::write!(f, "StoppingAfterSlowApproach")
-            }
-            HomingStateRunnerState::FirstGoingToSafeSpot => {
-                defmt::write!(f, "FirstGoingToSafeSpot")
-            }
-            HomingStateRunnerState::FinalGoingToSafeSpot => {
-                defmt::write!(f, "FinalGoingToSafeSpot")
-            }
-            HomingStateRunnerState::Done => {
-                defmt::write!(f, "Done")
-            }
-            HomingStateRunnerState::Error => {
-                defmt::write!(f, "Error")
-            }
-        }
-    }
-}
 struct HomingStateChangeMessage(HomingStateRunnerState, HomingStateRunnerState, usize);
 impl LoggableMessage for HomingStateChangeMessage {}
 
-#[cfg(not(feature = "defmt"))]
-impl Display for  HomingStateChangeMessage{
+
+impl Display for HomingStateChangeMessage {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f,"changing homing state from ({}) to ({}) in motor ({})", self.0, self.1, self.2)
-
+        write!(
+            f,
+            "changing homing state from ({}) to ({}) in motor ({})",
+            self.0, self.1, self.2
+        )
     }
 }
 
-
-#[cfg(feature = "defmt")]
-impl defmt::Format for  HomingStateChangeMessage{
-    fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f,"changing homing state from ({}) to ({}) in motor ({})", self.0, self.1, self.2);
-    }
-}
 pub struct HomingStateRunner {
     states: [HomingStateRunnerState; MOTOR_NUM],
 }
@@ -125,17 +87,14 @@ impl HomingStateRunner {
     }
 }
 impl RunnableState for HomingStateRunner {
-    fn entry<LOG: Logger>(
-        &mut self,
-        ctx: &mut StateRunnerContext<LOG>
-    ) {
+    fn entry<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>) {
         ctx.motor_enabler.set_enable(true);
         self.states = [HomingStateRunnerState::Default; MOTOR_NUM];
     }
 
     fn update<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        ctx: &mut StateRunnerContext<LOG>,
     ) -> Result<(), StateRunnerError> {
         let homing_high_velocity = parameter_manager().get::<HomingHighVelocity>();
         let homing_low_velocity = parameter_manager().get::<HomingLowVelocity>();
@@ -144,7 +103,8 @@ impl RunnableState for HomingStateRunner {
         let homing_accel = parameter_manager().get::<HomingAccel>();
 
         let mut retval = Ok(());
-        let inputs = ctx.iomanager
+        let inputs = ctx
+            .iomanager
             .read_motor_inputs(ctx.telemetry_builder)
             .map_err(StateRunnerError::HomingIOError)?;
         let mut outputs: [Option<(KinState, ControlMode)>; 3] = [None; MOTOR_NUM];
@@ -297,7 +257,8 @@ impl RunnableState for HomingStateRunner {
                 }
             }
             if let Some(next_state) = maybe_next_state {
-                ctx.logger.debug(HomingStateChangeMessage(*state, next_state, motor_idx));
+                ctx.logger
+                    .debug(HomingStateChangeMessage(*state, next_state, motor_idx));
                 *state = next_state;
             }
             motor_idx += 1;
@@ -314,8 +275,5 @@ impl RunnableState for HomingStateRunner {
         retval
     }
 
-    fn exit<LOG: Logger>(
-        &mut self,
-        _ctx: &mut StateRunnerContext<LOG>
-    ) {}
+    fn exit<LOG: Logger>(&mut self, _ctx: &mut StateRunnerContext<LOG>) {}
 }

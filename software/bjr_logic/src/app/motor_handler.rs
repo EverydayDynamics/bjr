@@ -2,10 +2,12 @@ use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::KinState;
 use crate::app::limits::{Limit, LimitError, MotorPosLimit, MotorVelLimit};
 use crate::app::parameter_manager::{parameter_manager, MotorM2Ustep};
-use device_traits::{MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController};
+use crate::app::telemetry_handler::TelemetryBuilder;
 use core::fmt::Display;
 use core::fmt::Formatter;
-use crate::app::telemetry_handler::TelemetryBuilder;
+use device_traits::{
+    MotorInput, MotorMode, MotorState, StepperDeviceError, StepperMotorController,
+};
 
 #[derive(PartialEq, Copy, Clone, Default)]
 pub enum ControlMode {
@@ -28,7 +30,7 @@ pub enum MotorHandlerError {
     InputOverflow,
     MotorIdxOutOfRange(usize),
 }
-#[cfg(not(feature = "defmt"))]
+
 impl Display for MotorHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -54,38 +56,6 @@ impl Display for MotorHandlerError {
             }
             MotorHandlerError::MotorIdxOutOfRange(idx) => {
                 write!(f, "MotorHandler Motor index ({}) out of range", idx)
-            }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for MotorHandlerError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            MotorHandlerError::MotorError(e, idx) => {
-                defmt::write!(f, "Motor Handler Motor error: {}, motor idx: {}", e, idx)
-            }
-            MotorHandlerError::MotorPositionLimitError(e, idx) => {
-                defmt::write!(
-                    f,
-                    "MotorHandler Position limit error: {}, motor idx: {}",
-                    e,
-                    idx
-                )
-            }
-            MotorHandlerError::MotorVelocityLimitError(e, idx) => {
-                defmt::write!(
-                    f,
-                    "MotorHandler Velocity limit error: {}, motor idx: {}",
-                    e,
-                    idx
-                )
-            }
-            MotorHandlerError::InputOverflow => {
-                defmt::write!(f, "MotorHandler Input value overflow")
-            }
-            MotorHandlerError::MotorIdxOutOfRange(idx) => {
-                defmt::write!(f, "MotorHandler Motor index ({}) out of range", idx)
             }
         }
     }
@@ -173,7 +143,8 @@ where
         }
     }
     pub fn get_motor_state(
-        &mut self, telemetry_builder: &mut TelemetryBuilder
+        &mut self,
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<[(KinState, MotorStatus); MOTOR_NUM], MotorHandlerError> {
         let mut state: [(KinState, MotorStatus); MOTOR_NUM] = Default::default();
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
@@ -205,7 +176,7 @@ where
     pub fn maybe_set_motor_input(
         &mut self,
         inputs: [Option<(KinState, ControlMode)>; MOTOR_NUM],
-        telemetry_builder: &mut TelemetryBuilder
+        telemetry_builder: &mut TelemetryBuilder,
     ) -> Result<(), MotorHandlerError> {
         let motm2us = parameter_manager().get::<MotorM2Ustep>();
         for motor_idx in 0..MOTOR_NUM {

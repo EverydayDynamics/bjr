@@ -23,7 +23,6 @@ tsc2046 = { path = "../../../TSC2046", optional = true}
 
 log = {version ="0.4", optional = true}
 env_logger = {version = "0.11.5", optional = true}
-defmt = { version = "0.3.8", optional = true }
 strum = { version = "0.26.3", default-features = false, features = ["derive"] }
 strum_macros = "0.26.4"
 ufmt = "0.2.0"
@@ -69,7 +68,6 @@ overflow-checks = false  # <-
 [features]
 default = []
 std = []
-defmt = ["dep:defmt", "device_traits/defmt"]
 embedded = ["dep:cortex-m", "dep:cortex-m-rt", "dep:cortex-m-semihosting", "dep:embedded-hal"]
 mock_board = ["dep:log", "dep:env_logger", "std"]
 main_board = ["embedded","dep:stm32f4xx-hal", "dep:tmc5130", "dep:tsc2046", "dep:rtt-target"]

@@ -1,12 +1,11 @@
 #[cfg(test)]
 pub mod bsp_mocks {
-    use crate::app::telemetry_handler::TelemetryBuilder;
-use crate::app::control_primitives::KinState;
+    use crate::app::control_primitives::KinState;
     use crate::app::io_manager::{IOManager, IOManagerError, Inputs, Outputs};
     use crate::app::motor_handler::{ControlMode, MotorStatus};
+    use crate::app::telemetry_handler::TelemetryBuilder;
     use device_traits::{MotorEnabler, TouchPoint, TouchSensor, TouchSensorError};
     use mockall::mock;
-
 
     mock! {
         pub TouchSensor {}

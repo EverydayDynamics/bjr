@@ -7,9 +7,7 @@ pub struct RttTelemetry {
 }
 impl RttTelemetry {
     pub fn new(up_channel: UpChannel) -> RttTelemetry {
-        RttTelemetry {
-            up_channel,
-        }
+        RttTelemetry { up_channel }
     }
 }
 impl TelemetrySender for RttTelemetry {

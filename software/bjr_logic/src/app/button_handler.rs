@@ -1,18 +1,20 @@
+use crate::app::button_handler::ButtonHandlerError::QueueFull;
 use crate::app::event::GlobEvent;
-use crate::app::parameter_manager::{parameter_manager, DoublePressThresholdMs, LongPressThresholdMs};
+use crate::app::parameter_manager::{
+    parameter_manager, DoublePressThresholdMs, LongPressThresholdMs,
+};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use device_traits::{Button, LoggableMessage};
 use core::fmt::{Display, Formatter};
+use device_traits::{Button, LoggableMessage};
 use embedded_time::duration::*;
 use heapless::mpmc::Q8;
-use crate::app::button_handler::ButtonHandlerError::QueueFull;
 
 #[derive(PartialEq)]
 pub enum ButtonHandlerError {
     QueueFull(GlobEvent),
 }
 impl LoggableMessage for ButtonHandlerError {}
-#[cfg(not(feature = "defmt"))]
+
 impl Display for ButtonHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -23,16 +25,6 @@ impl Display for ButtonHandlerError {
     }
 }
 
-#[cfg(feature = "defmt")]
-impl defmt::Format for ButtonHandlerError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            ButtonHandlerError::QueueFull(ge) => {
-                defmt::write!(f, "ButtonHandlerError Queue Full. Dropped msg: {}", ge)
-            }
-        }
-    }
-}
 impl Severity for ButtonHandlerError {
     fn get_severity(&self) -> ErrorSeverity {
         match self {
@@ -40,7 +32,7 @@ impl Severity for ButtonHandlerError {
         }
     }
 }
-enum ButtonHandlerState{
+enum ButtonHandlerState {
     NoPress,
     FirstDown(Microseconds<u64>),
     FirstUp(Microseconds<u64>),
@@ -63,7 +55,7 @@ impl<BTN: Button> ButtonHandler<BTN> {
 
     pub fn update(&mut self, call_time: Microseconds<u64>) -> Result<(), ButtonHandlerError> {
         let currently_pressed = self.button.is_pressed();
-        let event_to_send:Option<GlobEvent> = match self.state {
+        let event_to_send: Option<GlobEvent> = match self.state {
             ButtonHandlerState::NoPress => {
                 if currently_pressed {
                     self.state = ButtonHandlerState::FirstDown(call_time);
@@ -72,8 +64,9 @@ impl<BTN: Button> ButtonHandler<BTN> {
             }
             ButtonHandlerState::FirstDown(fdt) => {
                 if !currently_pressed {
-                    let longpress_thrs: Microseconds<u64>= Microseconds::new(
-                        (parameter_manager().get::<LongPressThresholdMs>()*1000) as u64);
+                    let longpress_thrs: Microseconds<u64> = Microseconds::new(
+                        (parameter_manager().get::<LongPressThresholdMs>() * 1000) as u64,
+                    );
                     if (call_time - fdt) > longpress_thrs {
                         self.state = ButtonHandlerState::NoPress;
                         Some(GlobEvent::ButtonLongPress)
@@ -81,14 +74,15 @@ impl<BTN: Button> ButtonHandler<BTN> {
                         self.state = ButtonHandlerState::FirstUp(call_time);
                         None
                     }
-                }else {
+                } else {
                     None
                 }
             }
             ButtonHandlerState::FirstUp(fut) => {
-                let doublepress_thrs: Microseconds<u64>= Microseconds::new(
-                    (parameter_manager().get::<DoublePressThresholdMs>()*1000) as u64);
-                if (call_time-fut) > doublepress_thrs {
+                let doublepress_thrs: Microseconds<u64> = Microseconds::new(
+                    (parameter_manager().get::<DoublePressThresholdMs>() * 1000) as u64,
+                );
+                if (call_time - fut) > doublepress_thrs {
                     self.state = ButtonHandlerState::NoPress;
                     Some(GlobEvent::ButtonShortPress)
                 } else {
@@ -100,8 +94,9 @@ impl<BTN: Button> ButtonHandler<BTN> {
             }
             ButtonHandlerState::SecondDown(sdt) => {
                 if !currently_pressed {
-                    let longpress_thrs: Microseconds<u64>= Microseconds::new(
-                        (parameter_manager().get::<LongPressThresholdMs>()*1000) as u64);
+                    let longpress_thrs: Microseconds<u64> = Microseconds::new(
+                        (parameter_manager().get::<LongPressThresholdMs>() * 1000) as u64,
+                    );
                     if (call_time - sdt) > longpress_thrs {
                         self.state = ButtonHandlerState::NoPress;
                         Some(GlobEvent::ButtonLongPress)
@@ -110,12 +105,14 @@ impl<BTN: Button> ButtonHandler<BTN> {
                         Some(GlobEvent::ButtonDoublePress)
                     }
                 } else {
-                   None
+                    None
                 }
             }
         };
         if let Some(event_to_send) = event_to_send {
-            self.event_handler.enqueue(event_to_send).map_err(|_| QueueFull(event_to_send))?;
+            self.event_handler
+                .enqueue(event_to_send)
+                .map_err(|_| QueueFull(event_to_send))?;
         }
         Ok(())
     }
@@ -149,7 +146,7 @@ mod tests {
         let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_1);
         for run_num in 1..(run_count + 1) {
             let call_time = call_rate * run_num;
-            assert!(test_button_handler.update(call_time)==Ok(()));
+            assert!(test_button_handler.update(call_time) == Ok(()));
         }
         assert!(EVENT_QUEUE_1.dequeue() == None);
     }
@@ -165,7 +162,7 @@ mod tests {
         let mut test_button_handler = ButtonHandler::new(mock_button, &EVENT_QUEUE_2);
         for run_num in 1..(run_count + 1) {
             let call_time = call_rate * run_num;
-            assert!(test_button_handler.update(call_time)==Ok(()));
+            assert!(test_button_handler.update(call_time) == Ok(()));
         }
         assert!(EVENT_QUEUE_2.dequeue() == Some(GlobEvent::ButtonShortPress));
         assert!(EVENT_QUEUE_2.dequeue() == None);

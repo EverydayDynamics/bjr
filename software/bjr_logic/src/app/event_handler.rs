@@ -1,35 +1,18 @@
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
-use device_traits::{LoggableMessage, Logger};
-use core::fmt::{Display, Formatter};
-#[cfg(feature = "defmt")]
-use defmt;
 use crate::app::state_runner::StateRunnerCommand;
+use core::fmt::{Display, Formatter};
+use device_traits::{LoggableMessage, Logger};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum EventHandlerError {
     UnexpectedEvent(GlobEvent, State),
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for EventHandlerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             EventHandlerError::UnexpectedEvent(event, state) => {
                 write!(
-                    f,
-                    "EventHandlerError Unexpected event ({}) received at state ({})",
-                    event, state
-                )
-            }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for EventHandlerError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            EventHandlerError::UnexpectedEvent(event, state) => {
-                defmt::write!(
                     f,
                     "EventHandlerError Unexpected event ({}) received at state ({})",
                     event, state
@@ -70,32 +53,24 @@ impl Display for State {
     }
 }
 struct EventReceivedMessage(GlobEvent);
-#[cfg(not(feature = "defmt"))]
-impl Display for  EventReceivedMessage{
+
+impl Display for EventReceivedMessage {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f,"Event received: {}", self.0)
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for  EventReceivedMessage{
-    fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f,"Event received: {}", self.0)
+        write!(f, "Event received: {}", self.0)
     }
 }
 impl LoggableMessage for EventReceivedMessage {}
 
 struct StateChangeMessage(State, State, GlobEvent);
 
-#[cfg(not(feature = "defmt"))]
-impl Display for  StateChangeMessage{
+
+impl Display for StateChangeMessage {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f,"state change occured: ({})->({}) Due to event: {}", self.0, self.1, self.2)
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for  StateChangeMessage{
-    fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f,"state change occured: ({})->({}) Due to event: {}", self.0, self.1, self.2)
+        write!(
+            f,
+            "state change occured: ({})->({}) Due to event: {}",
+            self.0, self.1, self.2
+        )
     }
 }
 impl LoggableMessage for StateChangeMessage {}
@@ -112,16 +87,14 @@ pub struct EventHandler {
 }
 struct IgnoredEventWarning(GlobEvent, State);
 impl LoggableMessage for IgnoredEventWarning {}
-#[cfg(not(feature = "defmt"))]
-impl Display for  IgnoredEventWarning{
+
+impl Display for IgnoredEventWarning {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f,"Incoming Event ({}) ignored! current state: {}", self.0 ,self.1 )
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for IgnoredEventWarning {
-    fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f,"Incoming Event ({}) ignored! current state: {}", self.0 ,self.1 )
+        write!(
+            f,
+            "Incoming Event ({}) ignored! current state: {}",
+            self.0, self.1
+        )
     }
 }
 impl EventHandler {
@@ -165,7 +138,9 @@ impl EventHandler {
                 },
                 State::RunningCenterHold => match event {
                     GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCircling),
-                    GlobEvent::ButtonDoublePress => EventResponse::Command(StateRunnerCommand::TrimPlateAngle),
+                    GlobEvent::ButtonDoublePress => {
+                        EventResponse::Command(StateRunnerCommand::TrimPlateAngle)
+                    }
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithImmediateShutdown => EventResponse::NewState(State::Error),
@@ -187,8 +162,10 @@ impl EventHandler {
                     GlobEvent::ExitFeedforward => EventResponse::Ignore,
                     GlobEvent::DeinitDone => EventResponse::Ignore,
                 },
-                State::Running3point => match event{
-                    GlobEvent::ButtonShortPress => EventResponse::NewState(State::RunningCenterHold),
+                State::Running3point => match event {
+                    GlobEvent::ButtonShortPress => {
+                        EventResponse::NewState(State::RunningCenterHold)
+                    }
                     GlobEvent::ButtonDoublePress => EventResponse::Ignore,
                     GlobEvent::ButtonLongPress => EventResponse::NewState(State::Deinit),
                     GlobEvent::ErrorWithGracefulShutdown => EventResponse::NewState(State::Deinit),
@@ -264,7 +241,7 @@ impl EventHandler {
             };
             match response {
                 EventResponse::Ignore => {
-                    logger_device.warn(IgnoredEventWarning(event ,self.state));
+                    logger_device.warn(IgnoredEventWarning(event, self.state));
                 }
                 EventResponse::Unexpected => {
                     return Err(EventHandlerError::UnexpectedEvent(event, self.state))

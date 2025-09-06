@@ -29,11 +29,11 @@ where
             Err(StepperDeviceError::ShortToGround(StepperMotorPhase::B))
         } else if read_drv_status.ot() {
             Err(StepperDeviceError::OverTemperatureShutdown)
-        }else if read_drv_status.olb() {
+        } else if read_drv_status.olb() {
             Err(StepperDeviceError::OpenLoad(StepperMotorPhase::B))
         } else if read_drv_status.ola() {
             Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
-        }else {
+        } else {
             //Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
             Ok(())
         }
@@ -56,9 +56,9 @@ where
                 Err(StepperDeviceError::OverTemperatureShutdown)
             } else if read_drv_status.ola() {
                 Err(StepperDeviceError::OpenLoad(StepperMotorPhase::A))
-            }else if read_drv_status.olb() {
+            } else if read_drv_status.olb() {
                 Err(StepperDeviceError::OpenLoad(StepperMotorPhase::B))
-            }else {
+            } else {
                 Ok(())
             }
         } else if status.reset_flag() {
@@ -89,7 +89,7 @@ where
         *self.map.ioin_mut() = read_ioin;
         if self.map.ioin().drv_enn_cfg6() {
             Err(StepperDeviceError::EnableError)
-        }else if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
+        } else if self.map.ioin().version() != EXPECTED_IOIN_VERSION {
             Err(StepperDeviceError::SelfTestVersionMismatch)
         } else {
             Ok(())

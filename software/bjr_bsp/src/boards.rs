@@ -1,6 +1,9 @@
-use device_traits::{Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController, TelemetrySender, TelemetrySenderError, TouchSensor, TouchSensorError};
 use core::fmt::{Debug, Display, Formatter};
 use core::result::Result;
+use device_traits::{
+    Button, Logger, MotorEnabler, Reader, StepperDeviceError, StepperMotorController,
+    TelemetrySender, TelemetrySenderError, TouchSensor, TouchSensorError,
+};
 
 pub trait BoardResources {
     // Infallible Resources
@@ -54,12 +57,7 @@ impl Display for BoardCreationError {
                 )
             }
             BoardCreationError::TelemetrySenderInitError(err) => {
-                write!(
-                    f,
-                    "Telemetry sender initialization error: {}",
-                    err
-                )
-
+                write!(f, "Telemetry sender initialization error: {}", err)
             }
         }
     }

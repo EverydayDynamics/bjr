@@ -1,24 +1,24 @@
 #![cfg_attr(not(test), no_std)]
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, VariantNames};
 
 #[derive(Serialize, Deserialize)]
 pub struct TelemetryPacket {
     pub timestamp: u64,
     pub packet_id: u64,
-    pub data: [Option<TelemetryData>; TelemetryData::COUNT]
+    pub data: [Option<TelemetryData>; TelemetryData::COUNT],
 }
-impl TelemetryPacket{
-    pub fn new(timestamp:u64, packet_id:u64) -> TelemetryPacket {
-        TelemetryPacket{
+impl TelemetryPacket {
+    pub fn new(timestamp: u64, packet_id: u64) -> TelemetryPacket {
+        TelemetryPacket {
             timestamp,
             packet_id,
-            data: [None;TelemetryData::COUNT]
+            data: [None; TelemetryData::COUNT],
         }
     }
 }
 #[derive(EnumCount, AsRefStr, Copy, Clone, Serialize, Deserialize, VariantNames)]
-pub enum TelemetryData{
+pub enum TelemetryData {
     BallXPos(f32),
     BallYPos(f32),
     BallXVel(f32),
@@ -51,7 +51,7 @@ pub enum TelemetryData{
     BallYTargetVel(f32),
 }
 impl TelemetryData {
-    pub fn get_idx(&self) -> usize{
+    pub fn get_idx(&self) -> usize {
         match self {
             TelemetryData::BallXPos(_) => 0,
             TelemetryData::BallYPos(_) => 1,
@@ -86,26 +86,26 @@ impl TelemetryData {
         }
     }
     pub fn get_printable_value(&self) -> f64 {
-        let data  = match self {
-            TelemetryData::BallXPos(data) => {data}
-            TelemetryData::BallYPos(data) => {data}
-            TelemetryData::BallXVel(data) => {data}
-            TelemetryData::BallYVel(data) => {data}
-            TelemetryData::MotorTargetAPos(data) => {data}
-            TelemetryData::MotorTargetBPos(data) => {data}
-            TelemetryData::MotorTargetCPos(data) => {data}
-            TelemetryData::MotorTargetAVel(data) => {data}
-            TelemetryData::MotorTargetBVel(data) => {data}
-            TelemetryData::MotorTargetCVel(data) => {data}
-            TelemetryData::MotorTargetAAccel(data) => {data}
-            TelemetryData::MotorTargetBAccel(data) => {data}
-            TelemetryData::MotorTargetCAccel(data) => {data}
-            TelemetryData::MotorStateAPos(data) => {data}
-            TelemetryData::MotorStateBPos(data) => {data}
-            TelemetryData::MotorStateCPos(data) => {data}
-            TelemetryData::MotorStateAVel(data) => {data}
-            TelemetryData::MotorStateBVel(data) => {data}
-            TelemetryData::MotorStateCVel(data) => {data}
+        let data = match self {
+            TelemetryData::BallXPos(data) => data,
+            TelemetryData::BallYPos(data) => data,
+            TelemetryData::BallXVel(data) => data,
+            TelemetryData::BallYVel(data) => data,
+            TelemetryData::MotorTargetAPos(data) => data,
+            TelemetryData::MotorTargetBPos(data) => data,
+            TelemetryData::MotorTargetCPos(data) => data,
+            TelemetryData::MotorTargetAVel(data) => data,
+            TelemetryData::MotorTargetBVel(data) => data,
+            TelemetryData::MotorTargetCVel(data) => data,
+            TelemetryData::MotorTargetAAccel(data) => data,
+            TelemetryData::MotorTargetBAccel(data) => data,
+            TelemetryData::MotorTargetCAccel(data) => data,
+            TelemetryData::MotorStateAPos(data) => data,
+            TelemetryData::MotorStateBPos(data) => data,
+            TelemetryData::MotorStateCPos(data) => data,
+            TelemetryData::MotorStateAVel(data) => data,
+            TelemetryData::MotorStateBVel(data) => data,
+            TelemetryData::MotorStateCVel(data) => data,
             TelemetryData::UnfilteredBallXVel(data) => data,
             TelemetryData::UnfilteredBallYVel(data) => data,
             TelemetryData::CpuUse(data) => data,
@@ -121,8 +121,8 @@ impl TelemetryData {
         *data as f64
     }
 }
-impl TelemetryPacket{
-    pub fn set_field(&mut self, data: TelemetryData){
+impl TelemetryPacket {
+    pub fn set_field(&mut self, data: TelemetryData) {
         let idx = data.get_idx();
         self.data[idx] = Some(data);
     }

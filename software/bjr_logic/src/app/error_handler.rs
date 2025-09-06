@@ -1,27 +1,10 @@
 use crate::app::event::{EventError, GlobEvent};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use device_traits::{LoggableMessage, Logger, MotorEnabler};
-use core::fmt::{Display, Formatter};
 use heapless::mpmc::Q8;
 
 pub struct ErrorHandler {
     event_queue: &'static Q8<GlobEvent>,
-}
-struct ErrorIgnoredMessage<ERR:LoggableMessage>(ERR);
-impl<ERR: LoggableMessage> LoggableMessage for ErrorIgnoredMessage<ERR> {}
-#[cfg(not(feature = "defmt"))]
-impl<ERR: LoggableMessage> Display for ErrorIgnoredMessage<ERR> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f, "Ignored Error: {}", self.0)
-    }
-}
-
-
-#[cfg(feature = "defmt")]
-impl<ERR: LoggableMessage> defmt::Format for  ErrorIgnoredMessage<ERR> {
-    fn format(&self, f: defmt::Formatter) {
-        defmt::write!(f, "Ignored Error: {}", self.0);
-    }
 }
 impl ErrorHandler {
     pub fn new(event_queue: &'static Q8<GlobEvent>) -> Self {
@@ -95,7 +78,7 @@ mod tests {
         Report,
         Ignore,
     }
-    impl LoggableMessage for TestError{}
+    impl LoggableMessage for TestError {}
     impl Display for TestError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             write!(f, "{:?}", self)
@@ -113,20 +96,15 @@ mod tests {
     }
     pub struct TestLogger {}
     impl Logger for TestLogger {
-        fn trace<MSG: LoggableMessage>(&mut self, _message: MSG) {
-        }
+        fn trace<MSG: LoggableMessage>(&mut self, _message: MSG) {}
 
-        fn debug<MSG: LoggableMessage>(&mut self, _message: MSG) {
-        }
+        fn debug<MSG: LoggableMessage>(&mut self, _message: MSG) {}
 
-        fn info<MSG: LoggableMessage>(&mut self, _message: MSG) {
-        }
+        fn info<MSG: LoggableMessage>(&mut self, _message: MSG) {}
 
-        fn warn<MSG: LoggableMessage>(&mut self, _message: MSG) {
-        }
+        fn warn<MSG: LoggableMessage>(&mut self, _message: MSG) {}
 
-        fn error<MSG: LoggableMessage>(&mut self, _message: MSG) {
-        }
+        fn error<MSG: LoggableMessage>(&mut self, _message: MSG) {}
     }
 
     #[test]

@@ -1,15 +1,17 @@
+use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::{KinState, PlateState};
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::get_event_queue;
-use crate::app::parameter_manager::{FFDefaultLinAccel, FFDefaultLinSpeed, parameter_manager, ParameterList};
+use crate::app::parameter_manager::{
+    parameter_manager, FFDefaultLinAccel, FFDefaultLinSpeed, ParameterList,
+};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_runner::{CirclingParams, StateRunnerCommand};
-use device_traits::{LoggableMessage, Reader};
 use core::fmt::{Display, Formatter, Write};
 use core::str::FromStr;
+use device_traits::{LoggableMessage, Reader};
 use menu::{Item, ItemType, Menu, Parameter, Runner};
 use strum::{IntoEnumIterator, VariantNames};
-use crate::app::consts::MOTOR_NUM;
 
 const READ_BUF_LEN: usize = 64;
 #[derive(Clone)]
@@ -26,19 +28,6 @@ impl Display for MenuError {
             }
             MenuError::MenuInterfaceWriteError => {
                 write!(f, "Menu Interface Writing Error")
-            }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for MenuError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            MenuError::EventBufferOverflow => {
-                defmt::write!(f, "Menu Event Buffer Overflow")
-            }
-            MenuError::MenuInterfaceWriteError => {
-                defmt::write!(f, "Menu Interface Writing Error")
             }
         }
     }
@@ -170,30 +159,30 @@ where
                                 },
                             },
                             &Item {
-                            command: "setplate",
-                            help: Some("set the plate state"),
-                            item_type: ItemType::Callback {
-                                function: set_plate_state,
-                                parameters: &[
-                                    Parameter::Mandatory {
-                                        parameter_name: "height",
-                                        help: Some("the height of the plate to be set in mm"),
-                                    },
-                                    Parameter::Mandatory {
-                                        parameter_name: "alpha",
-                                        help: Some(
-                                            "the alpha angle of the plate to be set in degrees",
-                                        ),
-                                    },
-                                    Parameter::Mandatory {
-                                        parameter_name: "beta",
-                                        help: Some(
-                                            "the beta angle of the plate to be set in degrees",
-                                        ),
-                                    },
-                                ],
+                                command: "setplate",
+                                help: Some("set the plate state"),
+                                item_type: ItemType::Callback {
+                                    function: set_plate_state,
+                                    parameters: &[
+                                        Parameter::Mandatory {
+                                            parameter_name: "height",
+                                            help: Some("the height of the plate to be set in mm"),
+                                        },
+                                        Parameter::Mandatory {
+                                            parameter_name: "alpha",
+                                            help: Some(
+                                                "the alpha angle of the plate to be set in degrees",
+                                            ),
+                                        },
+                                        Parameter::Mandatory {
+                                            parameter_name: "beta",
+                                            help: Some(
+                                                "the beta angle of the plate to be set in degrees",
+                                            ),
+                                        },
+                                    ],
+                                },
                             },
-                        },
                             &Item {
                                 command: "setmot",
                                 help: Some("set the motor state"),
@@ -202,14 +191,15 @@ where
                                     parameters: &[
                                         Parameter::Mandatory {
                                             parameter_name: "motor0",
-                                            help: None},
+                                            help: None,
+                                        },
                                         Parameter::Mandatory {
                                             parameter_name: "motor1",
-                                            help: None
+                                            help: None,
                                         },
                                         Parameter::Mandatory {
                                             parameter_name: "motor2",
-                                            help: None
+                                            help: None,
                                         },
                                     ],
                                 },
@@ -222,16 +212,25 @@ where
                                     parameters: &[
                                         Parameter::Mandatory {
                                             parameter_name: "angle",
-                                            help: None},
+                                            help: None,
+                                        },
                                         Parameter::Mandatory {
                                             parameter_name: "time",
-                                            help: None
+                                            help: None,
                                         },
                                         Parameter::Mandatory {
                                             parameter_name: "height",
-                                            help: None
+                                            help: None,
                                         },
                                     ],
+                                },
+                            },
+                            &Item {
+                                command: "motion_demo",
+                                help: Some("create a motion demo"),
+                                item_type: ItemType::Callback {
+                                    function: set_mot_demo,
+                                    parameters: &[],
                                 },
                             },
                         ],
@@ -308,7 +307,6 @@ fn fallible_test_motion<MIO: Reader + Write>(
     interface: &mut MIO,
     context: &mut Context,
 ) -> Result<(), MenuError> {
-
     if let Ok(motor_id) = usize::from_str(args[0]) {
         if motor_id > MOTOR_NUM {
             write!(interface, "Motor ID can't be larger than {}", MOTOR_NUM)
@@ -479,9 +477,9 @@ fn fallible_set_plate_state<MIO: Reader + Write>(
     if let Ok(height) = f32::from_str(args[0]) {
         if let Ok(alpha) = f32::from_str(args[1]) {
             if let Ok(beta) = f32::from_str(args[2]) {
-                //context.state_runner_command = StateRunnerCommand::FeedForwardPlateCommand(
-                //    PlateState::new_with_default_sa(height * 1e-3, alpha * DEG2RAD, beta * DEG2RAD),
-                //);
+                context.state_runner_command = StateRunnerCommand::FeedForwardPlateCommand(
+                    PlateState::new_with_default_sa(height * 1e-3, alpha * DEG2RAD, beta * DEG2RAD),
+                );
                 context.state_runner_command = StateRunnerCommand::MotionDemo;
             } else {
                 interface
@@ -522,26 +520,23 @@ fn fallible_set_motor_state<MIO: Reader + Write>(
             if let Ok(motor3) = f32::from_str(args[2]) {
                 let ff_default_lin_speed = parameter_manager().get::<FFDefaultLinSpeed>();
                 let ff_default_lin_accel = parameter_manager().get::<FFDefaultLinAccel>();
-                context.state_runner_command = StateRunnerCommand::FeedForwardMotorCommand(
-                    [
-                        KinState{
+                context.state_runner_command = StateRunnerCommand::FeedForwardMotorCommand([
+                    KinState {
                         pos: motor1,
                         speed: ff_default_lin_speed,
                         accel: ff_default_lin_accel,
-                        },
-                        KinState{
-                            pos: motor2,
-                            speed: ff_default_lin_speed,
-                            accel: ff_default_lin_accel,
-                        },
-                        KinState{
-                            pos: motor3,
-                            speed: ff_default_lin_speed,
-                            accel: ff_default_lin_accel,
-                        },
-
-                    ]
-                );
+                    },
+                    KinState {
+                        pos: motor2,
+                        speed: ff_default_lin_speed,
+                        accel: ff_default_lin_accel,
+                    },
+                    KinState {
+                        pos: motor3,
+                        speed: ff_default_lin_speed,
+                        accel: ff_default_lin_accel,
+                    },
+                ]);
             } else {
                 interface
                     .write_str("Couldn't parse motor 0. Please enter a number.")
@@ -580,13 +575,12 @@ fn fallible_set_angulate<MIO: Reader + Write>(
     if let Ok(angle) = f32::from_str(args[0]) {
         if let Ok(time) = f32::from_str(args[1]) {
             if let Ok(height) = f32::from_str(args[2]) {
-                context.state_runner_command = StateRunnerCommand::FeedForwardCircling(
-                    CirclingParams{
-                        height: height* 1e-3,
+                context.state_runner_command =
+                    StateRunnerCommand::FeedForwardCircling(CirclingParams {
+                        height: height * 1e-3,
                         angulation_angle: angle * DEG2RAD,
                         angulation_time: time,
-                    }
-                );
+                    });
             } else {
                 interface
                     .write_str("Couldn't parse angle parameter. Please enter a number.")
@@ -603,4 +597,13 @@ fn fallible_set_angulate<MIO: Reader + Write>(
             .map_err(|_| MenuError::MenuInterfaceWriteError)?;
     }
     Ok(())
+}
+fn set_mot_demo<MIO: Reader + Write>(
+    _menu: &Menu<MIO, Context>,
+    _item: &Item<MIO, Context>,
+    _args: &[&str],
+    _interface: &mut MIO,
+    context: &mut Context,
+) {
+    context.state_runner_command = StateRunnerCommand::MotionDemo;
 }

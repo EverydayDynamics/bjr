@@ -42,7 +42,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
     let pistion_body_len = parameter_manager().get::<PistonBodyLen>();
     [
         aligned_state(
-            (plate.angle[0] * SQ3 - (plate.angle[1]*(-1.0))) / 2.0,
+            (plate.angle[0] * SQ3 - (plate.angle[1] * (-1.0))) / 2.0,
             plate.height,
             base_circle_radius,
             hinge_offset,
@@ -51,7 +51,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
             pistion_body_len,
         ),
         aligned_state(
-            plate.angle[1]*(-1.0),
+            plate.angle[1] * (-1.0),
             plate.height,
             base_circle_radius,
             hinge_offset,
@@ -60,7 +60,7 @@ pub fn inverse_kinematics(plate: &PlateState) -> [KinState; 3] {
             pistion_body_len,
         ),
         aligned_state(
-            (-plate.angle[0] * SQ3 - (plate.angle[1]*(-1.0))) / 2.0,
+            (-plate.angle[0] * SQ3 - (plate.angle[1] * (-1.0))) / 2.0,
             plate.height,
             base_circle_radius,
             hinge_offset,
@@ -93,17 +93,31 @@ mod tests {
     #[test]
     fn test_actual_values() {
         let test_level_plate = PlateState {
-            height: KinState { pos: 0.012, speed: 0.01, accel: 0.02},
-            angle: [KinState { pos: 0.0, speed: core::f32::consts::FRAC_PI_2, accel: core::f32::consts::PI},
-                    KinState { pos: 0.0, speed: core::f32::consts::FRAC_PI_2, accel: core::f32::consts::PI}],
+            height: KinState {
+                pos: 0.012,
+                speed: 0.01,
+                accel: 0.02,
+            },
+            angle: [
+                KinState {
+                    pos: 0.0,
+                    speed: core::f32::consts::FRAC_PI_2,
+                    accel: core::f32::consts::PI,
+                },
+                KinState {
+                    pos: 0.0,
+                    speed: core::f32::consts::FRAC_PI_2,
+                    accel: core::f32::consts::PI,
+                },
+            ],
         };
         let result = inverse_kinematics(&test_level_plate);
         println!("{:#?}", result);
-        assert!((result[0].pos - result[1].pos).abs()<EPSILON);
-        assert!((result[0].pos - result[2].pos).abs()<EPSILON);
-        assert!((result[0].speed - result[1].speed).abs()<EPSILON);
-        assert!((result[0].speed - result[2].speed).abs()<EPSILON);
-        assert!((result[0].accel - result[1].accel).abs()<EPSILON);
-        assert!((result[0].accel - result[2].accel).abs()<EPSILON);
+        assert!((result[0].pos - result[1].pos).abs() < EPSILON);
+        assert!((result[0].pos - result[2].pos).abs() < EPSILON);
+        assert!((result[0].speed - result[1].speed).abs() < EPSILON);
+        assert!((result[0].speed - result[2].speed).abs() < EPSILON);
+        assert!((result[0].accel - result[1].accel).abs() < EPSILON);
+        assert!((result[0].accel - result[2].accel).abs() < EPSILON);
     }
 }

@@ -12,10 +12,13 @@ use bjr_logic::app::motor_handler::MotorHandler;
 use bjr_logic::app::severity_trait::{ErrorSeverity, Severity};
 use bjr_logic::app::state_manager::StateManager;
 use bjr_logic::app::state_runner_selector::DefaultStateRunnerSelector;
-use bjr_logic::app::touch_handler::{SGDifferentiator, TouchHandler};
-use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
-use core::fmt::{Display, Formatter, Write};
 use bjr_logic::app::telemetry_handler::TelemetryHandler;
+use bjr_logic::app::touch_handler::{SGDifferentiator, TouchHandler};
+use core::fmt::{Display, Formatter, Write};
+use device_traits::{
+    Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender,
+    TouchSensor,
+};
 use os_traits::TimeControl;
 
 pub enum AppError {
@@ -63,10 +66,10 @@ pub fn build_application<
         TelemetrySender = TEL,
     >,
     menu_context: &'a mut MenuContext,
-    time_control: TIM
-) -> LogicRunner<'a, BTN, LOG, ME, STPA, STPB, STPC, TS, MIO, TEL, SGDifferentiator<5,3>, TIM> {
+    time_control: TIM,
+) -> LogicRunner<'a, BTN, LOG, ME, STPA, STPB, STPC, TS, MIO, TEL, SGDifferentiator<5, 3>, TIM> {
     let event_queue = get_event_queue();
-    let (mut motor_enabler, mut log_device,menu_io) = board.get_infallible_resources();
+    let (mut motor_enabler, mut log_device, menu_io) = board.get_infallible_resources();
     let mut error_handler = ErrorHandler::new(event_queue);
     match board.get_fallible_resources() {
         Ok((button, stp_a, stp_b, stp_c, touch_sensor, telemetry)) => {
@@ -79,7 +82,10 @@ pub fn build_application<
                 MotorPosLimit::new(LimitLevel::Error),
                 MotorVelLimit::new(LimitLevel::Error),
             );
-            let touch_handler = TouchHandler::new(touch_sensor, [SGDifferentiator::new(), SGDifferentiator::new()]);
+            let touch_handler = TouchHandler::new(
+                touch_sensor,
+                [SGDifferentiator::new(), SGDifferentiator::new()],
+            );
             let io_manager = DefaultIOManager::new(motor_handler, touch_handler);
             let state_manager = StateManager::new(DefaultStateRunnerSelector::new());
             let event_handler = EventHandler::new(event_queue);

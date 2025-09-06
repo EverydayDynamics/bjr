@@ -23,18 +23,12 @@ where
         ctx: &mut StateRunnerContext<LOG>,
     ) -> Result<(), StateRunnerError> {
         if self.current_state != state {
-            self.runners
-                .get_runner(self.current_state)
-                .exit(ctx);
-            self.runners
-                .get_runner(state)
-                .entry(ctx);
+            self.runners.get_runner(self.current_state).exit(ctx);
+            self.runners.get_runner(state).entry(ctx);
             self.current_state = state;
         }
         let runner = self.runners.get_runner(self.current_state);
-        runner.update(
-            ctx
-        )?;
+        runner.update(ctx)?;
         Ok(())
     }
 }

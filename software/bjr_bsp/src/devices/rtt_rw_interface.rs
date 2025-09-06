@@ -1,5 +1,5 @@
-use device_traits::Reader;
 use core::fmt::Write;
+use device_traits::Reader;
 use rtt_target;
 use rtt_target::{DownChannel, UpChannel};
 

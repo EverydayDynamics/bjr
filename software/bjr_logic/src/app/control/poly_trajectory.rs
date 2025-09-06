@@ -25,7 +25,6 @@ pub fn trajectory_5th_degree(
     duration_s: f32,
     elapsed_s: f32,
 ) -> KinState {
-
     // Normalize time to [0, 1]
     let t = elapsed_s / duration_s;
     // Polynomial coefficients for f(t) = at⁵ + bt⁴ + ct³ + dt² + et + f
@@ -38,18 +37,21 @@ pub fn trajectory_5th_degree(
 
     // Calculate position: f(t) = at⁵ + bt⁴ + ct³ + dt² + et + f
     //let position = 0.0;
-    let position = a * (t*t*t*t*t) + b * (t*t*t*t) + c * (t*t*t) + d * (t*t) + e * t + f;
+    let position =
+        a * (t * t * t * t * t) + b * (t * t * t * t) + c * (t * t * t) + d * (t * t) + e * t + f;
     // Calculate velocity: f'(t) = 5at⁴ + 4bt³ + 3ct² + 2dt + e
     // Note: we need to scale by 1/duration to get velocity in original time units
 
     //let velocity_normalized = 0.0;
-    let velocity_normalized = 5.0 * a * (t*t*t*t) + 4.0 * b * (t*t*t) + 3.0 * c * (t*t) + 2.0 * d * t + e;
+    let velocity_normalized =
+        5.0 * a * (t * t * t * t) + 4.0 * b * (t * t * t) + 3.0 * c * (t * t) + 2.0 * d * t + e;
     let velocity = velocity_normalized / duration_s;
 
     // Calculate acceleration: f''(t) = 20at³ + 12bt² + 6ct + 2d
     // Note: we need to scale by 1/duration² to get acceleration in original time units
     //let acceleration_normalized = 0.0;
-    let acceleration_normalized = 20.0 * a * (t*t*t) + 12.0 * b * (t*t) + 6.0 * c * t + 2.0 * d;
+    let acceleration_normalized =
+        20.0 * a * (t * t * t) + 12.0 * b * (t * t) + 6.0 * c * t + 2.0 * d;
     let acceleration = acceleration_normalized / (duration_s * duration_s);
 
     KinState {

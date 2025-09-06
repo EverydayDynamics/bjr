@@ -1,7 +1,7 @@
-use core::fmt::{Display, Formatter};
 use crate::app::parameter_manager::{
     parameter_manager, FFDefaultAngAccel, FFDefaultAngSpeed, FFDefaultLinAccel, FFDefaultLinSpeed,
 };
+use core::fmt::{Display, Formatter};
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use embedded_time::duration::Microseconds;
 

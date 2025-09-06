@@ -1,6 +1,5 @@
 #![no_std]
 use core::fmt::{Display, Formatter};
-
 pub trait TemperatureSensor {
     fn read_temperature(&self) -> Result<f32, DeviceError>;
 }
@@ -32,14 +31,11 @@ pub trait StepperMotorController {
     fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError>;
     fn test_motion(&mut self) -> Result<(), StepperDeviceError>;
 }
-
 pub struct TouchPoint {
     pub x: i32,
     pub y: i32,
     pub pressure: f32,
 }
-
-
 pub trait TouchSensor {
     fn get_touch(&mut self) -> Result<Option<TouchPoint>, TouchSensorError>;
 }
@@ -47,8 +43,7 @@ pub trait TouchSensor {
 pub enum TouchSensorError {
     CommunicationError(CommsError),
 }
-
-impl core::fmt::Display for TouchSensorError {
+impl Display for TouchSensorError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             TouchSensorError::CommunicationError(e) => write!(f, "Communication error: {}", e),
@@ -58,7 +53,6 @@ impl core::fmt::Display for TouchSensorError {
 pub trait Button {
     fn is_pressed(&mut self) -> bool;
 }
-
 pub trait Monotonic {
     fn current_time(&mut self) -> u64;
 }
@@ -83,7 +77,6 @@ pub enum StepperMotorPhase {
     A,
     B,
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for StepperMotorPhase {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -92,19 +85,6 @@ impl Display for StepperMotorPhase {
             }
             StepperMotorPhase::B => {
                 write!(f, "B")
-            }
-        }
-    }
-}
-#[cfg(feature = "defmt")]
-impl defmt::Format for StepperMotorPhase {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            StepperMotorPhase::A => {
-                defmt::write!(f, "A")
-            }
-            StepperMotorPhase::B => {
-                defmt::write!(f, "B")
             }
         }
     }
@@ -122,7 +102,6 @@ pub enum StepperDeviceError {
     EnableError,
     HardwareFailure,
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for StepperDeviceError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -159,40 +138,6 @@ impl Display for StepperDeviceError {
         }
     }
 }
-#[cfg(feature = "defmt")]
-impl defmt::Format for StepperDeviceError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            StepperDeviceError::CommunicationError(e) => {
-                defmt::write!(f, "Communication error: {}", e)
-            }
-            StepperDeviceError::SelfTestVersionMismatch => {
-                defmt::write!(f, "Self Test version mismatch")
-            }
-            StepperDeviceError::DriverError => {
-                defmt::write!(f, "driver error")
-            }
-            StepperDeviceError::UnexpectedReset => {
-                defmt::write!(f, "Unexpected Reset")
-            }
-            StepperDeviceError::InvalidParameter => {
-                defmt::write!(f, "Invalid Parameter")
-            }
-            StepperDeviceError::HardwareFailure => {
-                defmt::write!(f, "Hardware Failure")
-            }
-            StepperDeviceError::ShortToGround(ph) => {
-                defmt::write!(f, "Phase {} shorted to ground", ph)
-            }
-            StepperDeviceError::OverTemperatureShutdown => {
-                defmt::write!(f, "Over temperature shutdown")
-            }
-            StepperDeviceError::OpenLoad(ph) => {
-                defmt::write!(f, "Phase {} open load", ph)
-            }
-        }
-    }
-}
 #[derive(PartialEq, Copy, Clone)]
 pub enum CommsError {
     SPIMutex,
@@ -204,7 +149,6 @@ pub enum CommsError {
     NotImplemented,
     Unknown,
 }
-#[cfg(not(feature = "defmt"))]
 impl Display for CommsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -235,37 +179,6 @@ impl Display for CommsError {
         }
     }
 }
-#[cfg(feature = "defmt")]
-impl defmt::Format for CommsError {
-    fn format(&self, f: defmt::Formatter) {
-        match self {
-            CommsError::SPIMutex => {
-                defmt::write!(f, "CommsError SPIMutex")
-            }
-            CommsError::SPICSPIn => {
-                defmt::write!(f, "CommsError SPICSPIn")
-            }
-            CommsError::SPIOverrun => {
-                defmt::write!(f, "CommsError SPIOverrun")
-            }
-            CommsError::SPICRIC => {
-                defmt::write!(f, "CommsError SPICRIC")
-            }
-            CommsError::SPIModeFault => {
-                defmt::write!(f, "CommsError SPIModeFault")
-            }
-            CommsError::SPIFrameFormat => {
-                defmt::write!(f, "CommsError SPIFrameFormat")
-            }
-            CommsError::NotImplemented => {
-                defmt::write!(f, "CommsError NotImplemented")
-            }
-            CommsError::Unknown => {
-                defmt::write!(f, "CommsError Unknown")
-            }
-        }
-    }
-}
 #[derive(Clone, Copy)]
 pub enum TelemetrySenderError {
     ConnectionError,
@@ -274,11 +187,15 @@ pub enum TelemetrySenderError {
 impl Display for TelemetrySenderError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            TelemetrySenderError::ConnectionError => {write!(f, "Connection Error")}
-            TelemetrySenderError::SendError => {write!(f, "Sending Error")}
+            TelemetrySenderError::ConnectionError => {
+                write!(f, "Connection Error")
+            }
+            TelemetrySenderError::SendError => {
+                write!(f, "Sending Error")
+            }
         }
     }
 }
 pub trait TelemetrySender {
-    fn send(&mut self, data:&[u8])-> Result<(),TelemetrySenderError>;
+    fn send(&mut self, data: &[u8]) -> Result<(), TelemetrySenderError>;
 }

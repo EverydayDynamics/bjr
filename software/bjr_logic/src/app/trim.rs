@@ -1,9 +1,10 @@
-
 pub mod trimming {
+    use crate::app::control_primitives::PlateState;
+    use crate::app::parameter_manager::{
+        parameter_manager, ParameterType, TrimPlateAngleA, TrimPlateAngleB,
+    };
     use core::fmt::{Display, Formatter};
-    use crate::app::parameter_manager::{parameter_manager, ParameterType, TrimPlateAngleA, TrimPlateAngleB};
     use heapless::Deque;
-    use crate::app::control_primitives::{PlateState};
 
     #[derive(PartialEq, Copy, Clone)]
     pub enum TrimmerError {
@@ -12,21 +13,24 @@ pub mod trimming {
     impl Display for TrimmerError {
         fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
             match self {
-                TrimmerError::BufferLowError => {write!(f, "TrimmerBuffer not full")}
+                TrimmerError::BufferLowError => {
+                    write!(f, "TrimmerBuffer not full")
+                }
             }
         }
     }
     pub struct Trimmer<T: ParameterType, const N: usize>
-    where T::ReturnType: Into<f32> + From<f32>
+    where
+        T::ReturnType: Into<f32> + From<f32>,
     {
         buffer: Deque<f32, N>,
         _marker: core::marker::PhantomData<T>,
     }
 
     impl<T: ParameterType, const N: usize> Trimmer<T, N>
-    where T::ReturnType: Into<f32> + From<f32>
+    where
+        T::ReturnType: Into<f32> + From<f32>,
     {
-
         /// Creates a new `Trimmer` with an empty buffer and default trimming value.
         pub const fn new() -> Self {
             Self {
@@ -49,8 +53,8 @@ pub mod trimming {
         }
         pub fn save_trimming(&mut self) -> Result<(), TrimmerError> {
             if self.buffer.is_full() {
-                let sum:f32 = self.buffer.iter().sum();
-                let trim:f32 =  sum/ (N as f32);
+                let sum: f32 = self.buffer.iter().sum();
+                let trim: f32 = sum / (N as f32);
                 parameter_manager().set::<T>(trim.into());
                 Ok(())
             } else {
@@ -65,11 +69,9 @@ pub mod trimming {
     }
     pub struct PlateTrimmer<const N: usize> {
         plate_a_trim: Trimmer<TrimPlateAngleA, N>,
-        plate_b_trim: Trimmer<TrimPlateAngleB, N>
+        plate_b_trim: Trimmer<TrimPlateAngleB, N>,
     }
-    impl<const N: usize> PlateTrimmer<N>
-    {
-
+    impl<const N: usize> PlateTrimmer<N> {
         /// Creates a new `Trimmer` with an empty buffer and default trimming value.
         pub const fn new() -> Self {
             Self {
@@ -79,7 +81,7 @@ pub mod trimming {
         }
 
         /// Returns the current trimming value.
-        pub fn get(&self) ->PlateState  {
+        pub fn get(&self) -> PlateState {
             let mut plate_trim = PlateState::default();
             plate_trim.angle[0].pos = self.plate_a_trim.get_trimming();
             plate_trim.angle[1].pos = self.plate_b_trim.get_trimming();
@@ -91,9 +93,8 @@ pub mod trimming {
             self.plate_b_trim.load_value(value.angle[1].pos);
         }
         pub fn save(&mut self) -> Result<(), TrimmerError> {
-           self.plate_a_trim.save_trimming()?;
-           self.plate_b_trim.save_trimming()
-
+            self.plate_a_trim.save_trimming()?;
+            self.plate_b_trim.save_trimming()
         }
 
         /// Clears the buffer.
@@ -105,9 +106,9 @@ pub mod trimming {
     // ---- TESTS ----
     #[cfg(test)]
     mod tests {
-        use libm::fabsf;
         use crate::app::parameter_manager::{parameter_manager, TrimPlateAngleA};
         use crate::app::trim::trimming::{Trimmer, TrimmerError};
+        use libm::fabsf;
 
         #[test]
         fn test_load_and_flush() {
@@ -123,8 +124,7 @@ pub mod trimming {
             test_trimmer.load_value(10.0);
             test_trimmer.load_value(20.0);
             assert!(test_trimmer.save_trimming() == Ok(()));
-            assert!(fabsf(test_trimmer.get_trimming()-15.0) < 1e-5f32);
-
+            assert!(fabsf(test_trimmer.get_trimming() - 15.0) < 1e-5f32);
         }
     }
 }

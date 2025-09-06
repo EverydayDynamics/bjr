@@ -1,14 +1,14 @@
+use crate::app::consts::MOTOR_NUM;
 use crate::app::control_primitives::{KinState, PlateState};
 use crate::app::event::GlobEvent;
 use crate::app::event_queue::EventQueue;
 use crate::app::io_manager::{IOManager, IOManagerError};
 use crate::app::severity_trait::{ErrorSeverity, Severity};
-use device_traits::{LoggableMessage, Logger, MotorEnabler};
-use core::fmt::{Display, Formatter};
-use embedded_time::duration::Microseconds;
-use crate::app::consts::MOTOR_NUM;
 use crate::app::telemetry_handler::TelemetryBuilder;
 use crate::app::trim::trimming::TrimmerError;
+use core::fmt::{Display, Formatter};
+use device_traits::{LoggableMessage, Logger, MotorEnabler};
+use embedded_time::duration::Microseconds;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum StateRunnerError {
@@ -22,7 +22,7 @@ pub enum StateRunnerError {
     IOError(IOManagerError),
     TrimmingError(TrimmerError),
 }
-impl LoggableMessage for StateRunnerError{}
+impl LoggableMessage for StateRunnerError {}
 impl Display for StateRunnerError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
@@ -52,7 +52,6 @@ impl Display for StateRunnerError {
             }
             StateRunnerError::TrimmingError(e) => {
                 write!(f, "Trimming error: {}", e)
-
             }
             StateRunnerError::ShutdownUnexpectedStopGoingToSafePos => {
                 write!(
@@ -76,7 +75,9 @@ impl Severity for StateRunnerError {
             StateRunnerError::QueueFull(_) => ErrorSeverity::Panic,
             StateRunnerError::IOError(_) => ErrorSeverity::ImmediateShutdown,
             StateRunnerError::TrimmingError(_) => ErrorSeverity::Report,
-            StateRunnerError::ShutdownUnexpectedStopGoingToSafePos => ErrorSeverity::ImmediateShutdown,
+            StateRunnerError::ShutdownUnexpectedStopGoingToSafePos => {
+                ErrorSeverity::ImmediateShutdown
+            }
         }
     }
 }
@@ -89,7 +90,7 @@ pub struct CirclingParams {
 #[derive(Copy, Clone)]
 pub enum StateRunnerCommand {
     FeedForwardPlateCommand(PlateState),
-    FeedForwardMotorCommand([KinState;MOTOR_NUM]),
+    FeedForwardMotorCommand([KinState; MOTOR_NUM]),
     FeedForwardCircling(CirclingParams),
     DebugMotorTest(usize),
     TrimPlateAngle,
@@ -107,29 +108,26 @@ impl StateRunnerCommand {
 impl Display for StateRunnerCommand {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            StateRunnerCommand::TrimPlateAngle =>{
-                writeln!(f,"Trim the plate angle")
+            StateRunnerCommand::TrimPlateAngle => {
+                writeln!(f, "Trim the plate angle")
             }
             StateRunnerCommand::FeedForwardPlateCommand(_) => {
-                writeln!(f,"Plate command")
-
+                writeln!(f, "Plate command")
             }
             StateRunnerCommand::FeedForwardMotorCommand(_) => {
-                writeln!(f,"Plate command")
+                writeln!(f, "Plate command")
             }
             StateRunnerCommand::FeedForwardCircling(_) => {
-                writeln!(f,"Circling")
-
+                writeln!(f, "Circling")
             }
             StateRunnerCommand::DebugMotorTest(_) => {
-                writeln!(f,"Debug Motor")
+                writeln!(f, "Debug Motor")
             }
             StateRunnerCommand::NoCommand => {
-                writeln!(f,"No Command")
+                writeln!(f, "No Command")
             }
             StateRunnerCommand::MotionDemo => {
-                writeln!(f,"Motion Demo")
-
+                writeln!(f, "Motion Demo")
             }
         }
     }
@@ -142,17 +140,13 @@ pub struct StateRunnerContext<'a, LOG> {
     pub command: &'a StateRunnerCommand,
     pub telemetry_builder: &'a mut TelemetryBuilder,
     pub motor_enabler: &'a mut dyn MotorEnabler,
-    pub last_plate_setpoint: PlateState
+    pub last_plate_setpoint: PlateState,
 }
 pub trait RunnableState {
-    fn entry<LOG: Logger>(
-        &mut self,
-        ctx: &mut StateRunnerContext<LOG>
-    );
+    fn entry<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>);
     fn update<LOG: Logger>(
         &mut self,
-        ctx: &mut StateRunnerContext<LOG>
+        ctx: &mut StateRunnerContext<LOG>,
     ) -> Result<(), StateRunnerError>;
-    fn exit<LOG: Logger>(&mut self,
-                         ctx: &mut StateRunnerContext<LOG>);
+    fn exit<LOG: Logger>(&mut self, ctx: &mut StateRunnerContext<LOG>);
 }

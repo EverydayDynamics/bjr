@@ -9,12 +9,15 @@ use crate::app::severity_trait::{ErrorSeverity, Severity};
 use crate::app::state_manager::StateManager;
 use crate::app::state_runner::{StateRunnerCommand, StateRunnerContext};
 use crate::app::state_runner_selector::DefaultStateRunnerSelector;
-use device_traits::{Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender, TouchSensor};
-use core::fmt::{Display, Formatter, Write};
-use embedded_time::duration::*;
-use heapless::mpmc::Q8;
 use crate::app::telemetry_handler::{TelemetryBuilder, TelemetryHandler, TelemetryHandlerError};
 use crate::app::touch_handler::Differentiator;
+use core::fmt::{Display, Formatter, Write};
+use device_traits::{
+    Button, LoggableMessage, Logger, MotorEnabler, Reader, StepperMotorController, TelemetrySender,
+    TouchSensor,
+};
+use embedded_time::duration::*;
+use heapless::mpmc::Q8;
 use os_traits::TimeControl;
 
 enum LogicRunnerError {
@@ -38,7 +41,6 @@ impl Display for LogicRunnerError {
             }
             LogicRunnerError::CommandDropped(dropped_cmd) => {
                 write!(f, "Command Dropped: {}", dropped_cmd)
-
             }
         }
     }
@@ -77,10 +79,11 @@ where
     menu_handler: MenuHandler<'a, MIO>,
     state_runner_command: StateRunnerCommand,
     telemetry_handler: TelemetryHandler<TEL>,
-    time_control: TIM
+    time_control: TIM,
 }
 
-impl<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO, TEL, DIFF, TIM> LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO, TEL, DIFF, TIM>
+impl<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO, TEL, DIFF, TIM>
+    LogicRunner<'a, BTN, LOG, ME, MA, MB, MC, TS, MIO, TEL, DIFF, TIM>
 where
     BTN: Button,
     LOG: Logger,
@@ -125,25 +128,22 @@ where
             time_control,
         }
     }
-    fn handle_error<E>(&mut self, result: Result<(),E>)
-    where E: Severity+LoggableMessage
+    fn handle_error<E>(&mut self, result: Result<(), E>)
+    where
+        E: Severity + LoggableMessage,
     {
         if let Err(error) = result {
-            self.error_handler.handle_error(
-                &mut self.motor_enabler,
-                &mut self.log_device,
-                error,
-            );
+            self.error_handler
+                .handle_error(&mut self.motor_enabler, &mut self.log_device, error);
         }
     }
-    fn send_cpu_use_telem(&mut self, period:u64, telem_builder:&mut TelemetryBuilder) {
+    fn send_cpu_use_telem(&mut self, period: u64, telem_builder: &mut TelemetryBuilder) {
         if let Some(last_end_time) = self.last_end_time {
             if let Some(last_call_time) = self.last_call_time {
                 let call_duration = last_end_time - last_call_time;
-                let cpu_use = call_duration.integer() as f32 /period as f32*100.0;
+                let cpu_use = call_duration.integer() as f32 / period as f32 * 100.0;
                 telem_builder.add_cpu_use(cpu_use);
             }
-
         }
     }
     pub fn update(&mut self) -> Microseconds<u64> {
@@ -160,7 +160,10 @@ where
         } else {
             let button_handler_result = self.button_handler.update(call_time);
             self.handle_error(button_handler_result);
-            match self.event_handler.handle_events(&mut self.log_device).map_err(LogicRunnerError::EventHandlerError)
+            match self
+                .event_handler
+                .handle_events(&mut self.log_device)
+                .map_err(LogicRunnerError::EventHandlerError)
             {
                 Err(error) => {
                     self.handle_error(Err(error));
@@ -169,11 +172,11 @@ where
                     if command.has_command() {
                         if self.state_runner_command.has_command() {
                             self.handle_error(Err(LogicRunnerError::CommandDropped(command)));
-                        }else {
+                        } else {
                             self.state_runner_command = command;
                         }
                     }
-                    let mut state_ctx = StateRunnerContext{
+                    let mut state_ctx = StateRunnerContext {
                         iomanager: &mut self.io_manager,
                         call_time,
                         event_queue: self.event_queue,
@@ -183,10 +186,7 @@ where
                         motor_enabler: &mut self.motor_enabler,
                         last_plate_setpoint: Default::default(),
                     };
-                    let state_manager_result = self.state_manager.update(
-                        state,
-                        &mut state_ctx
-                    );
+                    let state_manager_result = self.state_manager.update(state, &mut state_ctx);
                     self.handle_error(state_manager_result);
                 }
             }
@@ -194,9 +194,10 @@ where
             self.handle_error(menu_result);
         }
         self.send_cpu_use_telem(period, &mut telemetry_builder);
-            let telem_result = self.telemetry_handler.send_packet(telemetry_builder
-                    .get_packet())
-                .map_err(LogicRunnerError::TelementryError);
+        let telem_result = self
+            .telemetry_handler
+            .send_packet(telemetry_builder.get_packet())
+            .map_err(LogicRunnerError::TelementryError);
         self.handle_error(telem_result);
         self.next_call_time = Some(next_call_time);
         let end_time = self.time_control.get_tick();

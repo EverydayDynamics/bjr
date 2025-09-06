@@ -1,5 +1,5 @@
-use device_traits::{LoggableMessage, Logger};
 use core::fmt::Write;
+use device_traits::{LoggableMessage, Logger};
 use rtt_target;
 use rtt_target::UpChannel;
 

@@ -9,9 +9,5 @@ os_traits = {path = "../os_traits"}
 bjr_logic = { path = "../bjr_logic", version = "0.1.0" }
 bjr_bsp = { path = "../bjr_bsp", version = "0.1.0" }
 embedded-time = "0.12.1"
-defmt = { version = "0.3.8", optional = true }
 strum = { version = "0.26.3", default-features = false, features = ["derive"] }
 strum_macros = "0.26.4"
-
-[features]
-defmt = ["dep:defmt", "device_traits/defmt", "bjr_logic/defmt", "bjr_bsp/defmt"]

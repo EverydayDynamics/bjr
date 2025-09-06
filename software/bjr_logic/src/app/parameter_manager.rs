@@ -1,5 +1,4 @@
 use atomic_float::AtomicF32;
-use core::f32::consts::{FRAC_PI_2, PI};
 use core::fmt::Write;
 use core::str::FromStr;
 use core::sync::atomic::{AtomicI32, AtomicU32};
@@ -120,7 +119,6 @@ generate_parameter_types!(
     (AtomicF32, f32, TouchScaleXY, -2.62963158e-05),
     (AtomicF32, f32, TouchScaleYX, -2.62963158e-05),
     (AtomicF32, f32, TouchScaleYY, 1.51821850e-05),
-
     //(AtomicI32, i32, TouchCenterOffsetX, 0),
     //(AtomicI32, i32, TouchCenterOffsetY, 0),
     //(AtomicF32, f32, TouchScaleXX, 1.0),
@@ -167,10 +165,30 @@ generate_parameter_types!(
     //3Point setpoint generator
     (AtomicF32, f32, SP3Point1X, 0.00),
     (AtomicF32, f32, SP3Point1Y, -0.02),
-    (AtomicF32, f32, SP3Point2X, 0.02*(0.86602540378)/*libm::cosf(-PI/6.0)*/),
-    (AtomicF32, f32, SP3Point2Y, -0.02*(-0.5)/*libm::sinf(-PI/6.0)*/),
-    (AtomicF32, f32, SP3Point3X, -0.02*(0.86602540378)/*libm::cosf(-PI/6.0)*/),
-    (AtomicF32, f32, SP3Point3Y, -0.02*(-0.5)/*libm::sinf(-PI/6.0)*/),
+    (
+        AtomicF32,
+        f32,
+        SP3Point2X,
+        0.02 * (0.86602540378) /*libm::cosf(-PI/6.0)*/
+    ),
+    (
+        AtomicF32,
+        f32,
+        SP3Point2Y,
+        -0.02 * (-0.5) /*libm::sinf(-PI/6.0)*/
+    ),
+    (
+        AtomicF32,
+        f32,
+        SP3Point3X,
+        -0.02 * (0.86602540378) /*libm::cosf(-PI/6.0)*/
+    ),
+    (
+        AtomicF32,
+        f32,
+        SP3Point3Y,
+        -0.02 * (-0.5) /*libm::sinf(-PI/6.0)*/
+    ),
     (AtomicF32, f32, SP3PointPathDuration, 1.0),
     (AtomicF32, f32, SP3PointDwellTime, 2.0),
 );

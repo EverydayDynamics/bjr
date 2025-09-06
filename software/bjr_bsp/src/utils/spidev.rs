@@ -3,7 +3,7 @@ use core::fmt::{Debug, Formatter};
 use cortex_m::interrupt;
 use cortex_m::interrupt::Mutex;
 use embedded_hal::digital::OutputPin;
-use embedded_hal::spi::{ErrorKind,Operation, SpiBus, SpiDevice};
+use embedded_hal::spi::{ErrorKind, Operation, SpiBus, SpiDevice};
 
 pub struct Spidev<'a, SPI, CSPIN> {
     guarded_spi: &'a Mutex<RefCell<Option<SPI>>>,

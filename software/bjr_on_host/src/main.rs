@@ -1,16 +1,18 @@
-use bjr_builder::build_application;
 use bjr_bsp::Board;
-use embedded_time::duration::*;
-use std::time::{Duration, Instant};
-use std::thread;
+use bjr_builder::build_application;
 use bjr_logic::app::menu_handler::MenuContext;
+use embedded_time::duration::*;
 use os_traits::TimeControl;
+use std::thread;
+use std::time::{Duration, Instant};
 struct StdTimeControl {
-    pub start_time: Instant
+    pub start_time: Instant,
 }
 impl StdTimeControl {
     pub fn new() -> StdTimeControl {
-        StdTimeControl{ start_time: Instant::now() }
+        StdTimeControl {
+            start_time: Instant::now(),
+        }
     }
 }
 impl TimeControl for StdTimeControl {
@@ -31,7 +33,8 @@ fn main() {
         let time = (Instant::now() - start_time).as_micros() as u64;
         let next_run = logic_runner.update();
         let time = (Instant::now() - start_time).as_micros() as u64;
-        thread::sleep(Duration::from_micros(next_run.integer().saturating_sub(time)));
+        thread::sleep(Duration::from_micros(
+            next_run.integer().saturating_sub(time),
+        ));
     }
-
 }

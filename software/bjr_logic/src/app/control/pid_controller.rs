@@ -1,16 +1,16 @@
 use crate::app::control_primitives::{ControlInputs, Controller, KinState, PlateState};
-use embedded_time::duration::Microseconds;
 use crate::app::parameter_manager::{parameter_manager, PlatePDCtrlKd, PlatePDCtrlKp};
+use embedded_time::duration::Microseconds;
 use libm::asinf;
 
 #[derive(Default)]
 pub struct PIDController {
     last_call_time: Microseconds<u64>,
-    last_error: [f32;2],
+    last_error: [f32; 2],
 }
 impl Controller for PIDController {
     fn reset(&mut self, call_time: Microseconds<u64>) {
-        self.last_error = [0.0,0.0];
+        self.last_error = [0.0, 0.0];
         self.last_call_time = call_time;
     }
 
@@ -23,14 +23,18 @@ impl Controller for PIDController {
             let error = inputs.ball_setpoint[axis].pos - inputs.measured_ball_state[axis].pos;
             let error_d = inputs.ball_setpoint[axis].speed - inputs.measured_ball_state[axis].speed;
             self.last_error[axis] = error;
-            let target_ball_accel = error* k_p + error_d * k_d + inputs.ball_setpoint[axis].accel;
-            let target_angle = asinf((target_ball_accel/g)*(7.0/5.0));
+            let target_ball_accel = error * k_p + error_d * k_d + inputs.ball_setpoint[axis].accel;
+            let target_angle = asinf((target_ball_accel / g) * (7.0 / 5.0));
             output_angles[axis].pos = target_angle;
         }
         self.last_call_time = call_time;
 
         PlateState {
-            height: KinState{pos: 10e-3, speed: 0.0, accel:0.0},
+            height: KinState {
+                pos: 10e-3,
+                speed: 0.0,
+                accel: 0.0,
+            },
             angle: output_angles,
         }
     }

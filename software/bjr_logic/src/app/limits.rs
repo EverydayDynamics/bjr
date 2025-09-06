@@ -1,4 +1,7 @@
-use crate::app::parameter_manager::{parameter_manager, MotorLowerPosLimit, MotorLowerVelLimit, MotorUpperPosLimit, MotorUpperVelLimit, ParameterType, MCVelMax, MCVelMin};
+use crate::app::parameter_manager::{
+    parameter_manager, MCVelMax, MCVelMin, MotorLowerPosLimit, MotorLowerVelLimit,
+    MotorUpperPosLimit, MotorUpperVelLimit, ParameterType,
+};
 use core::fmt::{Display, Formatter};
 
 #[derive(PartialEq, Copy, Clone)]
@@ -56,25 +59,30 @@ where
     fn check(&self, value: &mut T) -> Result<Option<LimitWarning<T>>, LimitError<T>> {
         let upper_limit = parameter_manager().get::<Self::UpperParam>();
         let lower_limit = parameter_manager().get::<Self::LowerParam>();
-        let report :Option<LimitReport<T>> =
-        if *value > upper_limit {
+        let report: Option<LimitReport<T>> = if *value > upper_limit {
             if self.get_level() == LimitLevel::Clamp {
                 *value = upper_limit;
             }
-            Some(LimitReport{ limit: upper_limit, value: *value })
+            Some(LimitReport {
+                limit: upper_limit,
+                value: *value,
+            })
         } else if *value < lower_limit {
             if self.get_level() == LimitLevel::Clamp {
                 *value = lower_limit;
             }
-            Some(LimitReport{ limit: upper_limit, value: *value })
+            Some(LimitReport {
+                limit: upper_limit,
+                value: *value,
+            })
         } else {
             None
         };
         match self.get_level() {
-            LimitLevel::Ignore => {Ok(None)}
-            LimitLevel::Warn => {Ok(report.map(|res|LimitWarning(res)))}
-            LimitLevel::Clamp => {Ok(None)}
-            LimitLevel::Error => { report.map_or(Ok(None), |res|Err(LimitError(res)))}
+            LimitLevel::Ignore => Ok(None),
+            LimitLevel::Warn => Ok(report.map(|res| LimitWarning(res))),
+            LimitLevel::Clamp => Ok(None),
+            LimitLevel::Error => report.map_or(Ok(None), |res| Err(LimitError(res))),
         }
     }
 }
@@ -91,9 +99,13 @@ impl Limit<f32> for MotorPosLimit {
     type UpperParam = MotorUpperPosLimit;
     type LowerParam = MotorLowerPosLimit;
 
-    fn get_level(&self) -> LimitLevel {self.level}
+    fn get_level(&self) -> LimitLevel {
+        self.level
+    }
 
-    fn set_level(&mut self, level: LimitLevel) {self.level = level;}
+    fn set_level(&mut self, level: LimitLevel) {
+        self.level = level;
+    }
 }
 pub struct MotorVelLimit {
     level: LimitLevel,
@@ -107,11 +119,15 @@ impl Limit<f32> for MotorVelLimit {
     type UpperParam = MotorUpperVelLimit;
     type LowerParam = MotorLowerVelLimit;
 
-    fn get_level(&self) -> LimitLevel { self.level}
+    fn get_level(&self) -> LimitLevel {
+        self.level
+    }
 
-    fn set_level(&mut self, level: LimitLevel) {self.level = level;}
+    fn set_level(&mut self, level: LimitLevel) {
+        self.level = level;
+    }
 }
-pub struct MotorControlVelLimit{
+pub struct MotorControlVelLimit {
     level: LimitLevel,
 }
 impl MotorControlVelLimit {
@@ -123,7 +139,11 @@ impl Limit<f32> for MotorControlVelLimit {
     type UpperParam = MCVelMax;
     type LowerParam = MCVelMin;
 
-    fn get_level(&self) -> LimitLevel { self.level}
+    fn get_level(&self) -> LimitLevel {
+        self.level
+    }
 
-    fn set_level(&mut self, level: LimitLevel) {self.level = level;}
+    fn set_level(&mut self, level: LimitLevel) {
+        self.level = level;
+    }
 }

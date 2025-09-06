@@ -1,11 +1,11 @@
 use crate::boards::{BoardCreationError, BoardResources};
+use core::cell::RefCell;
+use cortex_m::interrupt;
+use cortex_m::interrupt::Mutex;
 use device_traits::StepperMotorController;
 use device_traits::{
     Button, CommsError, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError,
 };
-use core::cell::RefCell;
-use cortex_m::interrupt;
-use cortex_m::interrupt::Mutex;
 use stm32f4xx_hal as hal;
 use stm32f4xx_hal::gpio::{Output, Pin, PinState};
 use stm32f4xx_hal::prelude::*;
@@ -14,14 +14,14 @@ use stm32f4xx_hal::spi::{Phase, Polarity, Spi};
 use crate::devices::gpio_motor_enabler::GPIOMotorEnabler;
 use crate::devices::rtt_logger::RttLogger;
 use crate::devices::rtt_rw_interface::RttRWInterface;
+use crate::devices::rtt_telemetry::RttTelemetry;
 use crate::devices::tsc2046_touchscreen_dev::Tsc2046TouchDev;
 use crate::devices::{gpio_button::GpioButton, tmc5130_stepper_dev::TMC5130StepperDev};
 use crate::utils::error_wrapper::ErrorWrapper;
 use crate::utils::spidev::{SpiDevError, Spidev};
 use embedded_hal::spi::{Error, ErrorKind};
-use rtt_target::{rtt_init, ChannelMode, UpChannel, DownChannel};
+use rtt_target::{rtt_init, ChannelMode, DownChannel, UpChannel};
 use stm32f4xx_hal::pac::SPI1;
-use crate::devices::rtt_telemetry::RttTelemetry;
 
 // global logger
 pub struct MyBoard {
@@ -35,8 +35,8 @@ pub struct MyBoard {
     cs_touch_sense_pin: Option<Pin<'A', 8, Output>>,
     motor_enabler_pin: Option<Pin<'B', 7, Output>>,
     spi1: Option<Spi<stm32f4xx_hal::pac::SPI1>>,
-    rtt_up_channels: [Option<UpChannel>;3],
-    rtt_down_channels: [Option<DownChannel>;1],
+    rtt_up_channels: [Option<UpChannel>; 3],
+    rtt_down_channels: [Option<DownChannel>; 1],
 }
 pub struct InfallibleResources {
     pub motor_enabler: GPIOMotorEnabler<Pin<'B', 7, Output>>,
@@ -112,7 +112,11 @@ impl MyBoard {
             mot_c_lim_pin,
             motor_enabler_pin: Some(motor_enabler_pin),
             spi1: Some(spi),
-            rtt_up_channels: [Some(channels.up.0), Some(channels.up.1), Some(channels.up.2)],
+            rtt_up_channels: [
+                Some(channels.up.0),
+                Some(channels.up.1),
+                Some(channels.up.2),
+            ],
             cs_mot_a_pin: Some(cs_mot_a_pin),
             cs_mot_b_pin: Some(cs_mot_b_pin),
             cs_mot_c_pin: Some(cs_mot_c_pin),
@@ -139,7 +143,10 @@ impl BoardResources for MyBoard {
         (
             GPIOMotorEnabler::new(self.motor_enabler_pin.take().unwrap()),
             RttLogger::new(self.rtt_up_channels[1].take().unwrap()),
-            RttRWInterface::new(self.rtt_up_channels[0].take().unwrap(), self.rtt_down_channels[0].take().unwrap()),
+            RttRWInterface::new(
+                self.rtt_up_channels[0].take().unwrap(),
+                self.rtt_down_channels[0].take().unwrap(),
+            ),
         )
     }
     fn get_fallible_resources(
