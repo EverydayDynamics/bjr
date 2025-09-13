@@ -1,0 +1,13 @@
+[package]
+name = "application_builder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+device_traits = { path = "../device_traits", version = "0.1.0" }
+os_traits = {path = "../os_traits"}
+application_logic = { path = "../application_logic", version = "0.1.0" }
+board_support_package = { path = "../board_support_package", version = "0.1.0" }
+embedded-time = "0.12.1"
+strum = { version = "0.26.3", default-features = false, features = ["derive"] }
+strum_macros = "0.26.4"

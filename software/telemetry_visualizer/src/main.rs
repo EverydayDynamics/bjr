@@ -5,17 +5,15 @@ use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::error::Error;
 use std::io::Read;
-use std::net::{TcpListener, TcpStream};
+use std::net::TcpListener;
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use eframe::egui::{Vec2b, ViewportBuilder};
-use bjr_telemetry::{TelemetryData, TelemetryPacket};
+use telemetry_interface::{TelemetryData, TelemetryPacket};
 use strum::{EnumCount, VariantNames};
 use rfd::FileDialog;
 use csv::Writer;
 use std::fs::File;
-use std::io;
 
 const MAX_POINTS: usize = 1000;
 
@@ -47,16 +45,13 @@ struct TelemetryApp {
     reset_ball_view: bool,
 }
 fn get_ball_position_and_velocity(telemetry_data: &TelemetryHolder) -> Option<(PlotPoint, PlotPoint)> {
-    // Get the latest packet
     let latest_packet = telemetry_data.data.back()?;
 
-    // Find indices for BallXPos, BallYPos, BallXVel, BallYVel
     let ball_x_pos_idx = TelemetryData::VARIANTS.iter().position(|&name| name == "BallXPos")?;
     let ball_y_pos_idx = TelemetryData::VARIANTS.iter().position(|&name| name == "BallYPos")?;
     let ball_x_vel_idx = TelemetryData::VARIANTS.iter().position(|&name| name == "BallXVel")?;
     let ball_y_vel_idx = TelemetryData::VARIANTS.iter().position(|&name| name == "BallYVel")?;
 
-    // Extract values
     let ball_x_pos = latest_packet.data[ball_x_pos_idx]?.get_printable_value();
     let ball_y_pos = latest_packet.data[ball_y_pos_idx]?.get_printable_value();
     let ball_x_vel = latest_packet.data[ball_x_vel_idx]?.get_printable_value();
@@ -137,7 +132,6 @@ impl TelemetryApp {
                 }
                 wtr.write_record(&record).unwrap();
             }
-            // Flush writer
             wtr.flush().unwrap();
         }
     }
@@ -177,10 +171,8 @@ impl eframe::App for TelemetryApp {
 
             let telemetry_data = self.telemetry_data.lock().unwrap();
 
-            // Create a vertical layout for the two plots
             egui::CentralPanel::default().show(ctx, |ui| {
                 ui.vertical(|ui| {
-                    // First plot - Time series data
                     let max_time_plot_height = 400.0;
                     let time_plot_height = (ui.available_height() * 0.5).min(max_time_plot_height);
                     ui.allocate_ui_with_layout(

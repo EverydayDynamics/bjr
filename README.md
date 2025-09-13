@@ -3,7 +3,7 @@ A Ball Juggling Robot's repository
 
 ## Getting started
 
-### Software build
+### firmware build and flashing
 
 install rust on you computer
 ```
@@ -22,12 +22,22 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/probe-rs/probe-rs/relea
 Download and install jlink tools from here
 https://www.segger.com/downloads/jlink/
 Restart your shell
-go change directory to the main software
+Change directory to the main software
 ```
-cd software/bjr_central_control_rust
+cd software/central_control_firmware
 ```
 
 Build the firmware with:
 ```
-cargo embed --bin bjr_app --release 
+cargo embed --bin main_app --release 
+```
+### telemetry visualizer build
+Change directory to the visualizer
+```
+cd software/telemetry_visualizer
+```
+
+Build the visualizer with:
+```
+cargo embed --bin main_app --release 
 ```
