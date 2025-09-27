@@ -1,7 +1,7 @@
 use crate::boards::{BoardCreationError, BoardResources};
 use core::fmt::Display;
 use device_traits::{
-    Button, CommsError, Logger, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError,
+    Button, Logger, MotorEnabler, MotorInput, MotorState, Reader, StepperDeviceError,
     TouchSensor, TouchSensorError,
 };
 use device_traits::{StepperMotorController, TelemetrySender, TelemetrySenderError, TouchPoint};
@@ -70,7 +70,7 @@ impl MotorEnabler for Dummy {
     fn set_enable(&mut self, _enable: bool) {}
 }
 impl StepperMotorController for Dummy {
-    fn set_inputs(&mut self, inputs: MotorInput) -> Result<(), StepperDeviceError> {
+    fn set_inputs(&mut self, _inputs: MotorInput) -> Result<(), StepperDeviceError> {
         Ok(())
     }
 
@@ -84,7 +84,7 @@ impl StepperMotorController for Dummy {
             standstill: false,
         })
     }
-    fn set_position(&mut self, new_position: i32) -> Result<(), StepperDeviceError> {
+    fn set_position(&mut self, _new_position: i32) -> Result<(), StepperDeviceError> {
         todo!()
     }
 
